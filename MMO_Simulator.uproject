@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{A46EA47A-4770-AF7C-AD59-F2A166D52949}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "MMO_Simulator",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
