@@ -5,7 +5,6 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "Characters/MMOBaseHero.h"
 #include "Engine/World.h"
 
 AMMOPlayerController::AMMOPlayerController()
@@ -14,9 +13,39 @@ AMMOPlayerController::AMMOPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
+bool AMMOPlayerController::DeprojectMouseToTerrain(FVector& OutLocation, FVector& OutTerrainNormal) const
+{
+	FVector MouseLocation, Direction;
+	if (DeprojectMousePositionToWorld(MouseLocation, Direction))
+	{
+		FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllStaticObjects);
+
+		FHitResult HitResult;
+		if (GetWorld()->LineTraceSingleByObjectType(HitResult, MouseLocation, MouseLocation + Direction * 3000.f, Params))
+		{
+			OutLocation = HitResult.ImpactPoint;
+			OutTerrainNormal = HitResult.ImpactNormal;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void AMMOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+
+	if (AMMODummyPawn* DummyPawn =  GetDummyPawn())
+	{
+		MoveCamera(DeltaTime);
+
+		FVector WorldLocation, TerrainNormal;
+		if(DeprojectMouseToTerrain(WorldLocation, TerrainNormal))
+		{
+			DummyPawn->SetCursorLocationAndRotation(WorldLocation, TerrainNormal.Rotation());
+		}
+	}
 
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
@@ -33,27 +62,19 @@ void AMMOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMMOPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AMMOPlayerController::OnSetDestinationReleased);
 
-	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AMMOPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AMMOPlayerController::MoveToTouchLocation);
-
-	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AMMOPlayerController::OnResetVR);
-}
-
-void AMMOPlayerController::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+	InputComponent->BindAction("Select", IE_Pressed, this, &AMMOPlayerController::OnSelectPressed);
+	InputComponent->BindAction("Select", IE_Released, this, &AMMOPlayerController::OnSelectReleased);
 }
 
 void AMMOPlayerController::MoveToMouseCursor()
 {
 	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
 	{
-		if (AMMOBaseHero* Hero = Cast<AMMOBaseHero>(GetPawn()))
+		if (AMMODummyPawn* DummyPawn = Cast<AMMODummyPawn>(GetPawn()))
 		{
-			if (Hero->GetCursorToWorldDecal())
+			if (DummyPawn->GetCursorToWorldDecal())
 			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hero->GetCursorToWorldDecal()->GetComponentLocation());
+				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DummyPawn->GetCursorToWorldDecal()->GetComponentLocation());
 			}
 		}
 	}
@@ -71,20 +92,6 @@ void AMMOPlayerController::MoveToMouseCursor()
 	}
 }
 
-void AMMOPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	FVector2D ScreenSpaceLocation(Location);
-
-	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
-	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
-	}
-}
-
 void AMMOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	APawn* const MyPawn = GetPawn();
@@ -93,9 +100,51 @@ void AMMOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
+		if ((Distance > 50.0f))
 		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation); 
+		}
+	}
+}
+
+void AMMOPlayerController::ToggleCameraLock()
+{
+	bCameraLocked = !bCameraLocked;
+}
+
+void AMMOPlayerController::MoveCamera(float DeltaSeconds)
+{
+	APawn* const MyPawn = GetPawn();
+
+	if(!MyPawn)
+	{ 
+		return;
+	}
+
+	if (bCameraLocked)
+	{
+		// #MMO_TODO
+	}
+	else
+	{
+		constexpr int32 BorderSize = 50;
+
+		int32 SizeX, SizeY;
+		GetViewportSize(SizeX, SizeY);
+
+		float LocationX, LocationY;
+		if (GetMousePosition(LocationX, LocationY))
+		{
+			const bool MoveUp = LocationY < BorderSize;
+			const bool MoveDown = LocationY > (SizeY - BorderSize);
+			const bool MoveLeft = LocationX < BorderSize;
+			const bool MoveRight = LocationX > (SizeX - BorderSize);
+
+			const float SpeedY = MoveUp ? CameraSpeed : MoveDown ? -CameraSpeed : 0.f;
+			const float SpeedX = MoveRight ? CameraSpeed : MoveLeft ? -CameraSpeed : 0.f;
+
+			const FVector Delta = FVector::ForwardVector * SpeedY + FVector::RightVector * SpeedX;
+			MyPawn->AddActorWorldOffset(Delta * DeltaSeconds);
 		}
 	}
 }
@@ -110,5 +159,16 @@ void AMMOPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void AMMOPlayerController::OnSelectPressed()
+{
+	// #MMO_TODO: box selection
+}
+
+void AMMOPlayerController::OnSelectReleased()
+{
+	// #MMO_TODO: box selection
+
 }
 
