@@ -1,19 +1,20 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MMO_SimulatorPlayerController.h"
+
+#include "Core/MMOPlayerController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "MMO_SimulatorCharacter.h"
+#include "Characters/MMOBaseHero.h"
 #include "Engine/World.h"
 
-AMMO_SimulatorPlayerController::AMMO_SimulatorPlayerController()
+AMMOPlayerController::AMMOPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
-void AMMO_SimulatorPlayerController::PlayerTick(float DeltaTime)
+void AMMOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
@@ -24,35 +25,35 @@ void AMMO_SimulatorPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
-void AMMO_SimulatorPlayerController::SetupInputComponent()
+void AMMOPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMMO_SimulatorPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AMMO_SimulatorPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMMOPlayerController::OnSetDestinationPressed);
+	InputComponent->BindAction("SetDestination", IE_Released, this, &AMMOPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AMMO_SimulatorPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AMMO_SimulatorPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AMMOPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AMMOPlayerController::MoveToTouchLocation);
 
-	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AMMO_SimulatorPlayerController::OnResetVR);
+	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AMMOPlayerController::OnResetVR);
 }
 
-void AMMO_SimulatorPlayerController::OnResetVR()
+void AMMOPlayerController::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-void AMMO_SimulatorPlayerController::MoveToMouseCursor()
+void AMMOPlayerController::MoveToMouseCursor()
 {
 	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
 	{
-		if (AMMO_SimulatorCharacter* MyPawn = Cast<AMMO_SimulatorCharacter>(GetPawn()))
+		if (AMMOBaseHero* Hero = Cast<AMMOBaseHero>(GetPawn()))
 		{
-			if (MyPawn->GetCursorToWorld())
+			if (Hero->GetCursorToWorldDecal())
 			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
+				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Hero->GetCursorToWorldDecal()->GetComponentLocation());
 			}
 		}
 	}
@@ -70,7 +71,7 @@ void AMMO_SimulatorPlayerController::MoveToMouseCursor()
 	}
 }
 
-void AMMO_SimulatorPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
+void AMMOPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	FVector2D ScreenSpaceLocation(Location);
 
@@ -84,7 +85,7 @@ void AMMO_SimulatorPlayerController::MoveToTouchLocation(const ETouchIndex::Type
 	}
 }
 
-void AMMO_SimulatorPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void AMMOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -99,14 +100,15 @@ void AMMO_SimulatorPlayerController::SetNewMoveDestination(const FVector DestLoc
 	}
 }
 
-void AMMO_SimulatorPlayerController::OnSetDestinationPressed()
+void AMMOPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
 	bMoveToMouseCursor = true;
 }
 
-void AMMO_SimulatorPlayerController::OnSetDestinationReleased()
+void AMMOPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
+

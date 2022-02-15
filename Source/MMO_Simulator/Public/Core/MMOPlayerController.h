@@ -1,18 +1,17 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "MMO_SimulatorPlayerController.generated.h"
+#include "MMOPlayerController.generated.h"
 
 UCLASS()
-class AMMO_SimulatorPlayerController : public APlayerController
+class MMO_SIMULATOR_API AMMOPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
 public:
-	AMMO_SimulatorPlayerController();
+	AMMOPlayerController();
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
@@ -31,7 +30,7 @@ protected:
 
 	/** Navigate player to the current touch location. */
 	void MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location);
-	
+
 	/** Navigate player to the given world location. */
 	void SetNewMoveDestination(const FVector DestLocation);
 
@@ -39,5 +38,3 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 };
-
-

@@ -1,18 +1,18 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "MMO_SimulatorCharacter.generated.h"
+#include "Characters/MMOBaseCharacter.h"
+#include "MMOBaseHero.generated.h"
 
-UCLASS(Blueprintable)
-class AMMO_SimulatorCharacter : public ACharacter
+UCLASS()
+class MMO_SIMULATOR_API AMMOBaseHero : public AMMOBaseCharacter
 {
 	GENERATED_BODY()
-
 public:
-	AMMO_SimulatorCharacter();
+	
+	AMMOBaseHero();
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -22,7 +22,7 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns CursorToWorld subobject **/
-	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+	FORCEINLINE class UDecalComponent* GetCursorToWorldDecal() { return CursorToWorldDecal; }
 
 private:
 	/** Top down camera */
@@ -35,6 +35,5 @@ private:
 
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UDecalComponent* CursorToWorld;
+	class UDecalComponent* CursorToWorldDecal;
 };
-
