@@ -25,14 +25,40 @@ void AMMOBaseHUD::DrawHUD()
 	{
 		const FVector2D& Start = PC->GetMouseClickLocation();
 		const FVector2D& End = PC->GetCurrentMousePosition();
-
+		
 		FLinearColor Color(1.f, 1.f, 1.f, TextureAlpha);
 		DrawTexture(SelectionTexture, End.X, End.Y, Start.X - End.X, Start.Y - End.Y, 0.f, 0.f, 0.f, 0.f, Color);
 
 		TArray<AMMOBaseHero*> SelectedHeroes;
+		GetActorsInSelectionRectangle<AMMOBaseHero>(Start, End, SelectedHeroes, false);
 
-		GetActorsInSelectionRectangle<AMMOBaseHero>(Start, End, SelectedHeroes);
+		if ((End - Start).Size() <= 5.f && SelectedHeroes.Num() > 0)
+		{
+			// we only want to select the nearest Hero
+			FVector WorldLocation, Direction;
+			if (PC->HasValidMousePositions())
+			{
+				const FVector MousePosition(PC->GetCurrentMousePosition(), 0.f);
+				AMMOBaseHero* SelectedHero = SelectedHeroes[0];
+				float MinDistance = (MousePosition - Project(SelectedHero->GetActorLocation(), true)).Size2D();
 
-		PC->SetSelectedHeroes(SelectedHeroes);
+				// find nearest
+				for (int32 i = 1; i < SelectedHeroes.Num(); i++)
+				{
+					const float Dist = (MousePosition - Project(SelectedHeroes[i]->GetActorLocation(), true)).Size2D();
+					if (Dist < MinDistance)
+					{
+						SelectedHero = SelectedHeroes[i];
+						MinDistance = Dist;
+					}
+				}
+
+				PC->SetSelectedHeroes({ SelectedHero });
+			}
+		}
+		else
+		{
+			PC->SetSelectedHeroes(SelectedHeroes);
+		}
 	}
 }
