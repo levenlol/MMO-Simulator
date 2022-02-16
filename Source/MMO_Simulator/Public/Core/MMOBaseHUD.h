@@ -19,7 +19,6 @@ public:
 
 	virtual void DrawHUD() override;
 
-
 	UPROPERTY(EditDefaultsOnly, Category = Selection)
 	UTexture* SelectionTexture = nullptr;
 

@@ -41,16 +41,9 @@ public:
 	FORCEINLINE TArray<AMMOBaseHero*> GetSelectedHeroes() const { return SelectedHeroes; }
 
 protected:
-	// Camera Movement Speed when isn't locked.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
-	float CameraSpeed = 1000.f;
-
 	// Current selected heroes.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TArray<AMMOBaseHero*> SelectedHeroes;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	bool bCameraLocked = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	bool bSelecting = false;
@@ -79,12 +72,6 @@ private:
 
 	/** Navigate player to the given world location. */
 	void SetNewMoveDestination(const FVector DestLocation);
-
-	/** Toggle camera lock: switch between free camera movement and lock into target. */
-	void ToggleCameraLock();
-
-	/** Handle camera movements */
-	void MoveCamera(float DeltaSeconds);
 
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();

@@ -36,6 +36,13 @@ public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 private:
+	// Camera Movement Speed when isn't locked.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float CameraSpeed = 1000.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	bool bCameraLocked = false;
+
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* TopDownCameraComponent;
@@ -43,4 +50,13 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
+
+	/** Handle camera movements */
+	void MoveCameraMouse(float DeltaSeconds);
+	void MoveCameraUp(float AxisValue);
+	void MoveCameraRight(float AxisValue);
+
+
+	/** Toggle camera lock: switch between free camera movement and lock into target. */
+	void ToggleCameraLock();
 };

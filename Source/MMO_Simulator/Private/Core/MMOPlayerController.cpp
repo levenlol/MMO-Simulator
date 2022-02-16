@@ -67,18 +67,7 @@ void AMMOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if (AMMODummyPawn* DummyPawn =  GetDummyPawn())
-	{
-		MoveCamera(DeltaTime);
-
-		bHasValidMousePosition = GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y);
-
-		FVector WorldLocation, TerrainNormal;
-		if(DeprojectMouseToTerrain(WorldLocation, TerrainNormal))
-		{
-			//DummyPawn->SetCursorLocationAndRotation(WorldLocation, TerrainNormal.Rotation());
-		}
-	}
+	bHasValidMousePosition = GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y);
 
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
@@ -122,48 +111,6 @@ void AMMOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 		if ((Distance > 50.0f))
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
-		}
-	}
-}
-
-void AMMOPlayerController::ToggleCameraLock()
-{
-	bCameraLocked = !bCameraLocked;
-}
-
-void AMMOPlayerController::MoveCamera(float DeltaSeconds)
-{
-	APawn* const MyPawn = GetPawn();
-
-	if(!MyPawn)
-	{ 
-		return;
-	}
-
-	if (bCameraLocked)
-	{
-		// #MMO_TODO
-	}
-	else
-	{
-		constexpr int32 BorderSize = 50;
-
-		int32 SizeX, SizeY;
-		GetViewportSize(SizeX, SizeY);
-
-		float LocationX, LocationY;
-		if (GetMousePosition(LocationX, LocationY))
-		{
-			const bool MoveUp = LocationY < BorderSize;
-			const bool MoveDown = LocationY > (SizeY - BorderSize);
-			const bool MoveLeft = LocationX < BorderSize;
-			const bool MoveRight = LocationX > (SizeX - BorderSize);
-
-			const float SpeedY = MoveUp ? CameraSpeed : MoveDown ? -CameraSpeed : 0.f;
-			const float SpeedX = MoveRight ? CameraSpeed : MoveLeft ? -CameraSpeed : 0.f;
-
-			const FVector Delta = FVector::ForwardVector * SpeedY + FVector::RightVector * SpeedX;
-			MyPawn->AddActorWorldOffset(Delta * DeltaSeconds);
 		}
 	}
 }
