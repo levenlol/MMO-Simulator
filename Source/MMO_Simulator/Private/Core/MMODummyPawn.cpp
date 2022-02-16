@@ -21,7 +21,7 @@ AMMODummyPawn::AMMODummyPawn()
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 1200.f;
 	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
-	CameraBoom->bDoCollisionTest = true;
+	CameraBoom->bDoCollisionTest = false;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));

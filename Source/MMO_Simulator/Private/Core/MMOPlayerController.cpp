@@ -114,15 +114,14 @@ void AMMOPlayerController::MoveToMouseCursor()
 
 void AMMOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
-	APawn* const MyPawn = GetPawn();
-	if (MyPawn)
+	for (AMMOBaseHero* CurrentHero : SelectedHeroes)
 	{
-		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
+		float const Distance = FVector::Dist(DestLocation, CurrentHero->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > 50.0f))
 		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation); 
+			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
 		}
 	}
 }
