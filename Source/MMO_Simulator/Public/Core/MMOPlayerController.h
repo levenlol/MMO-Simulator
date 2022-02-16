@@ -17,6 +17,29 @@ class MMO_SIMULATOR_API AMMOPlayerController : public APlayerController
 public:
 	AMMOPlayerController();
 
+	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintPure, Category = Default)
+	FORCEINLINE AMMODummyPawn* GetDummyPawn() const { return Cast<AMMODummyPawn>(GetPawn()); }
+
+	UFUNCTION(BlueprintPure, Category = Selection)
+	FORCEINLINE bool IsSelecting() const { return bSelecting; }
+
+	UFUNCTION(BlueprintPure, Category = Selection)
+	const FVector2D& GetCurrentMousePosition() const { return CurrentMouseLocation; }
+
+	UFUNCTION(BlueprintPure, Category = Selection)
+	const FVector2D& GetMouseClickLocation() const { return MousePressedLocation; }
+
+	UFUNCTION(BlueprintPure, Category = Selection)
+	bool HasValidMousePositions() const { return bHasValidMousePosition;  }
+
+	UFUNCTION(BlueprintCallable, Category = Selection)
+	void SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHeroes);
+
+	UFUNCTION(BlueprintPure, Category = Selection)
+	FORCEINLINE TArray<AMMOBaseHero*> GetSelectedHeroes() const { return SelectedHeroes; }
+
 protected:
 	// Camera Movement Speed when isn't locked.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
@@ -26,7 +49,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TArray<AMMOBaseHero*> SelectedHeroes;
 
-	FORCEINLINE AMMODummyPawn* GetDummyPawn() const { return Cast<AMMODummyPawn>(GetPawn()); }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	bool bCameraLocked = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	bool bSelecting = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	FVector2D MousePressedLocation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	FVector2D CurrentMouseLocation;
 
 	// Deproject mouse to terrain
 	bool DeprojectMouseToTerrain(FVector& OutLocation, FVector& OutTerrainNormal) const;
@@ -34,7 +67,7 @@ protected:
 private:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
-	bool bCameraLocked = false;
+	uint32 bHasValidMousePosition : 1;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;

@@ -8,7 +8,6 @@
 
 class UCameraComponent;
 class USpringArmComponent;
-class UDecalComponent;
 class UInputComponent;
 
 UCLASS()
@@ -31,14 +30,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	void SetCursorLocationAndRotation(const FVector& WorldLocation, const FRotator& WorldRotator);
-
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns CursorToWorld subobject **/
-	FORCEINLINE UDecalComponent* GetCursorToWorldDecal() { return CursorToWorldDecal; }
 
 private:
 	/** Top down camera */
@@ -48,9 +43,4 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
-
-	/** A decal that projects to the cursor location. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UDecalComponent* CursorToWorldDecal;
-
 };

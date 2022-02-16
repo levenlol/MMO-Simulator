@@ -6,6 +6,9 @@
 #include "Characters/MMOBaseCharacter.h"
 #include "MMOBaseHero.generated.h"
 
+class UDecalComponent;
+
+
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseHero : public AMMOBaseCharacter
 {
@@ -14,4 +17,18 @@ public:
 	
 	AMMOBaseHero();
 
+
+	UFUNCTION(BlueprintNativeEvent, Category = Selection)
+	void OnSelected();
+
+	UFUNCTION(BlueprintNativeEvent, Category = Selection)
+	void OnDeselected();
+
+	UFUNCTION(BlueprintPure, Category = Decal)
+	FORCEINLINE UDecalComponent* GetDecalComponent() const { return SelectionDecal; }
+
+private:
+	/** A decal to follow  */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UDecalComponent* SelectionDecal;
 };

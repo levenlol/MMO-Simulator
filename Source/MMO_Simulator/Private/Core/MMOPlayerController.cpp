@@ -6,11 +6,42 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Engine/World.h"
+#include "Characters/MMOBaseHero.h"
+#include "Core/MMOBaseHUD.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+}
+
+void AMMOPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Lock mouse to viewport
+	FInputModeGameAndUI InputMode;
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	InputMode.SetHideCursorDuringCapture(false);
+
+	SetInputMode(InputMode);
+}
+
+void AMMOPlayerController::SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHeroes)
+{
+	// Deselect
+	for (AMMOBaseHero* CurrentHero : SelectedHeroes)
+	{
+		CurrentHero->OnDeselected();
+	}
+
+	SelectedHeroes = InHeroes;
+
+	// Select
+	for (AMMOBaseHero* CurrentHero : SelectedHeroes)
+	{
+		CurrentHero->OnSelected();
+	}
 }
 
 bool AMMOPlayerController::DeprojectMouseToTerrain(FVector& OutLocation, FVector& OutTerrainNormal) const
@@ -40,10 +71,12 @@ void AMMOPlayerController::PlayerTick(float DeltaTime)
 	{
 		MoveCamera(DeltaTime);
 
+		bHasValidMousePosition = GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y);
+
 		FVector WorldLocation, TerrainNormal;
 		if(DeprojectMouseToTerrain(WorldLocation, TerrainNormal))
 		{
-			DummyPawn->SetCursorLocationAndRotation(WorldLocation, TerrainNormal.Rotation());
+			//DummyPawn->SetCursorLocationAndRotation(WorldLocation, TerrainNormal.Rotation());
 		}
 	}
 
@@ -68,27 +101,14 @@ void AMMOPlayerController::SetupInputComponent()
 
 void AMMOPlayerController::MoveToMouseCursor()
 {
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-	{
-		if (AMMODummyPawn* DummyPawn = Cast<AMMODummyPawn>(GetPawn()))
-		{
-			if (DummyPawn->GetCursorToWorldDecal())
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DummyPawn->GetCursorToWorldDecal()->GetComponentLocation());
-			}
-		}
-	}
-	else
-	{
-		// Trace to see what is under the mouse cursor
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	// Trace to see what is under the mouse cursor
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-		if (Hit.bBlockingHit)
-		{
-			// We hit something, move there
-			SetNewMoveDestination(Hit.ImpactPoint);
-		}
+	if (Hit.bBlockingHit)
+	{
+		// We hit something, move there
+		SetNewMoveDestination(Hit.ImpactPoint);
 	}
 }
 
@@ -163,12 +183,17 @@ void AMMOPlayerController::OnSetDestinationReleased()
 
 void AMMOPlayerController::OnSelectPressed()
 {
-	// #MMO_TODO: box selection
+	if (GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y))
+	{
+		bSelecting = true;
+		MousePressedLocation = CurrentMouseLocation;
+	}
 }
 
 void AMMOPlayerController::OnSelectReleased()
 {
-	// #MMO_TODO: box selection
+	if (!bSelecting)
+		return;
 
+	bSelecting = false;
 }
-
