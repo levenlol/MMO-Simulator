@@ -4,7 +4,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
-#include "GameFramework/PlayerController.h"
+#include "Core/MMOPlayerController.h"
+#include "Characters/MMOBaseHero.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
 
@@ -62,7 +63,7 @@ void AMMODummyPawn::ToggleCameraLock()
 
 void AMMODummyPawn::MoveCameraMouse(float DeltaSeconds)
 {
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	AMMOPlayerController* PlayerController = Cast<AMMOPlayerController>(GetController());
 
 	if (!PlayerController)
 	{
@@ -71,7 +72,31 @@ void AMMODummyPawn::MoveCameraMouse(float DeltaSeconds)
 
 	if (bCameraLocked)
 	{
-		// #MMO_TODO
+		if (!PlayerController->IsSelecting())
+		{
+			const TArray<AMMOBaseHero*>& Heroes = PlayerController->GetSelectedHeroes();
+			if (Heroes.Num() > 0)
+			{
+				float X = 0.f;
+				float Y = 0.f;
+				float Z = 0.f;
+
+				// fly average
+				for (int32 i = 0; i < Heroes.Num(); i++)
+				{
+					const FVector& Location = Heroes[i]->GetActorLocation();
+					const float n = (i + 1.f);
+					const float a = 1 / n;
+					const float b = 1 - a;
+
+					X = a * Location.X + b * X;
+					Y = a * Location.Y + b * Y;
+					Z = a * Location.Z + b * Z;
+				}
+
+				SetActorLocation(FVector(X, Y, Z));
+			}
+		}
 	}
 	else
 	{

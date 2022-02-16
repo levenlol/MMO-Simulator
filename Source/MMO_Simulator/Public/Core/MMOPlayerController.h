@@ -37,8 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Selection)
 	void SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHeroes);
 
-	UFUNCTION(BlueprintPure, Category = Selection)
-	FORCEINLINE TArray<AMMOBaseHero*> GetSelectedHeroes() const { return SelectedHeroes; }
+	FORCEINLINE const TArray<AMMOBaseHero*>& GetSelectedHeroes() const { return SelectedHeroes; }
+
 
 protected:
 	// Current selected heroes.
