@@ -21,7 +21,7 @@ AMMODummyPawn::AMMODummyPawn()
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
+	CameraBoom->SetUsingAbsoluteRotation(false); 
 	CameraBoom->TargetArmLength = 1200.f;
 	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false;
@@ -51,11 +51,16 @@ void AMMODummyPawn::Tick(float DeltaSeconds)
 
 	HandleCameraZoom(DeltaSeconds);
 	MoveCameraMouse(DeltaSeconds);
+	HandleRotateCamera(DeltaSeconds);
 
 #if WITH_EDITORONLY_DATA
 	if (bDebug)
 	{
 		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, FString("Current: ") + FString::SanitizeFloat(CameraBoom->TargetArmLength) + FString(" - Target: ") + FString::SanitizeFloat(TargetZoom) + FString(" - Delta: ") + FString::SanitizeFloat(TargetZoom - CameraBoom->TargetArmLength));
+		
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 200.f, FColor::Red, false, -1.f, 0, 10.f);
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorRightVector() * 200.f, FColor::Green, false, -1.f, 0, 10.f);
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorUpVector() * 200.f, FColor::Blue, false, -1.f, 0, 10.f);
 	}
 #endif
 }
@@ -65,6 +70,8 @@ void AMMODummyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction(FName("ToggleCamera"), EInputEvent::IE_Pressed, this, &AMMODummyPawn::ToggleCameraLock);
+	PlayerInputComponent->BindAction(FName("RotateCamera"), EInputEvent::IE_Pressed, this, &AMMODummyPawn::CameraRotate_Pressed);
+	PlayerInputComponent->BindAction(FName("RotateCamera"), EInputEvent::IE_Released, this, &AMMODummyPawn::CameraRotate_Released);
 
 	PlayerInputComponent->BindAxis(FName("CameraUp"), this, &AMMODummyPawn::MoveCameraUp);
 	PlayerInputComponent->BindAxis(FName("CameraRight"), this, &AMMODummyPawn::MoveCameraRight);
@@ -135,11 +142,24 @@ void AMMODummyPawn::HandleCameraZoom(float DeltaSeconds)
 		else
 		{
 			// smooth interpolation
-			constexpr float InterpSpeed = 3.f;
-			const float NewArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetZoom, DeltaSeconds, InterpSpeed);
+			const float NewArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetZoom, DeltaSeconds, 3.f);
 			CameraBoom->TargetArmLength = NewArmLength;
 		}
 	}
+}
+
+void AMMODummyPawn::CameraRotate_Pressed()
+{
+	AMMOPlayerController* PlayerController = Cast<AMMOPlayerController>(GetController());
+	if (PlayerController && PlayerController->GetMousePosition(LastMousePosition.X, LastMousePosition.Y))
+	{
+		bRotatingCamera = true;
+	}
+}
+
+void AMMODummyPawn::CameraRotate_Released()
+{
+	bRotatingCamera = false;
 }
 
 void AMMODummyPawn::MoveCameraMouse(float DeltaSeconds)
@@ -171,10 +191,6 @@ void AMMODummyPawn::MoveCameraUp(float AxisValue)
 	{
 		const FVector Delta = GetActorForwardVector() * CameraSpeed * AxisValue;
 		AddActorWorldOffset(Delta * GetWorld()->DeltaTimeSeconds);
-
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 200.f, FColor::Red, false, -1.f, 0, 10.f);
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorRightVector() * 200.f, FColor::Green, false, -1.f, 0, 10.f);
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorUpVector() * 200.f, FColor::Blue, false, -1.f, 0, 10.f);
 	}
 }
 
@@ -184,8 +200,21 @@ void AMMODummyPawn::MoveCameraRight(float AxisValue)
 	{
 		const FVector Delta = GetActorRightVector() * CameraSpeed * AxisValue;
 		AddActorWorldOffset(Delta * GetWorld()->DeltaTimeSeconds);
+	}
+}
 
+void AMMODummyPawn::HandleRotateCamera(float DeltaSeconds)
+{
+	AMMOPlayerController* PlayerController = Cast<AMMOPlayerController>(GetController());
 
+	if (!bRotatingCamera || !PlayerController)
+		return;
+
+	const float PrevMouseX = LastMousePosition.X;
+	if (PlayerController->GetMousePosition(LastMousePosition.X, LastMousePosition.Y))
+	{
+		const float Delta = (LastMousePosition.X - PrevMouseX) * DeltaSeconds * CameraRotationSpeed;
+		AddActorWorldRotation(FRotator(0.f, Delta, 0.f));
 	}
 }
 

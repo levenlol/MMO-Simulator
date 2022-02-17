@@ -48,6 +48,9 @@ private:
 	float CameraSpeed = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float CameraRotationSpeed = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	FVector2D CameraZoomRange = FVector2D(800.f, 2000.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -56,8 +59,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	bool bCameraLocked = false;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	bool bRotatingCamera = false;
+
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	float TargetZoom;
+	
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	FVector2D LastMousePosition;
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -72,6 +81,8 @@ private:
 	void MoveCameraUp(float AxisValue);
 	void MoveCameraRight(float AxisValue);
 
+	void HandleRotateCamera(float DeltaSeconds);
+
 	void CameraZoom(float AxisValue);
 
 	/** Toggle camera lock: switch between free camera movement and lock into target. */
@@ -81,4 +92,7 @@ private:
 	void HandleFreeCamera(AMMOPlayerController* PlayerController, float DeltaSeconds);
 
 	void HandleCameraZoom(float DeltaSeconds);
+
+	void CameraRotate_Pressed();
+	void CameraRotate_Released();
 };
