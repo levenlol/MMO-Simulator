@@ -9,6 +9,7 @@
 #include "MMOPlayerController.generated.h"
 
 class AMMOBaseHero;
+class UMMOFormationManager;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOPlayerController : public APlayerController
@@ -19,11 +20,17 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UMMOFormationManager* FormationManager;
+
 	UFUNCTION(BlueprintPure, Category = Default)
 	FORCEINLINE AMMODummyPawn* GetDummyPawn() const { return Cast<AMMODummyPawn>(GetPawn()); }
 
 	UFUNCTION(BlueprintPure, Category = Selection)
 	FORCEINLINE bool IsSelecting() const { return bSelecting; }
+
+	UFUNCTION(BlueprintPure, Category = Selection)
+	FORCEINLINE bool IsMovingUnits() const { return bMovingUnits; }
 
 	UFUNCTION(BlueprintPure, Category = Selection)
 	const FVector2D& GetCurrentMousePosition() const { return CurrentMouseLocation; }
@@ -49,29 +56,30 @@ protected:
 	bool bSelecting = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	bool bMovingUnits = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	FVector2D MousePressedLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	FVector2D CurrentMouseLocation;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	FVector MousePressedTerrainLocation;
+
 	// Deproject mouse to terrain
 	bool DeprojectMouseToTerrain(FVector& OutLocation, FVector& OutTerrainNormal) const;
 
 private:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
-	uint32 bHasValidMousePosition : 1;
+	bool bHasValidMousePosition = false;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	/** Navigate player to the current mouse cursor location. */
-	void MoveToMouseCursor();
-
 	/** Navigate player to the given world location. */
-	void SetNewMoveDestination(const FVector DestLocation);
+	void SetNewMoveDestination();
 
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();

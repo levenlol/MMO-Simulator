@@ -8,11 +8,14 @@
 #include "Engine/World.h"
 #include "Characters/MMOBaseHero.h"
 #include "Core/MMOBaseHUD.h"
+#include "AI/MMOFormationManager.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+
+	FormationManager = CreateDefaultSubobject<UMMOFormationManager>(TEXT("FormationManager"));
 }
 
 void AMMOPlayerController::BeginPlay()
@@ -84,10 +87,14 @@ void AMMOPlayerController::PlayerTick(float DeltaTime)
 
 	bHasValidMousePosition = GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y);
 
-	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
+	if (IsMovingUnits())
 	{
-		MoveToMouseCursor();
+		FVector Location, ImpactNormal;
+		if (DeprojectMouseToTerrain(Location, ImpactNormal))
+		{
+			const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
+
+		}
 	}
 }
 
@@ -103,48 +110,58 @@ void AMMOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Select", IE_Released, this, &AMMOPlayerController::OnSelectReleased);
 }
 
-void AMMOPlayerController::MoveToMouseCursor()
+void AMMOPlayerController::SetNewMoveDestination()
 {
-	// Trace to see what is under the mouse cursor
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	if (SelectedHeroes.Num() <= 0)
+		return;
 
-	if (Hit.bBlockingHit)
+	FVector Location, ImpactNormal;
+	if (DeprojectMouseToTerrain(Location, ImpactNormal))
 	{
-		// We hit something, move there
-		SetNewMoveDestination(Hit.ImpactPoint);
-	}
-}
+		const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
 
-void AMMOPlayerController::SetNewMoveDestination(const FVector DestLocation)
-{
-	for (AMMOBaseHero* CurrentHero : SelectedHeroes)
-	{
-		float const Distance = FVector::Dist(DestLocation, CurrentHero->GetActorLocation());
-
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 50.0f))
+		for (int32 i = 0; i < SelectedHeroes.Num(); i++)
 		{
+			AMMOBaseHero* CurrentHero = SelectedHeroes[i];
+			const FVector& DestLocation = Points[i];
+
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
+
+			//float const Distance = FVector::Dist(DestLocation, CurrentHero->GetActorLocation());
+			//
+			//// We need to issue move command only if far enough in order for walk animation to play correctly
+			//if ((Distance > 50.0f))
+			//{
+			//	UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
+			//}
 		}
 	}
 }
 
 void AMMOPlayerController::OnSetDestinationPressed()
 {
-	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
+	if (!IsSelecting() && SelectedHeroes.Num() > 0 && GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y))
+	{
+		bMovingUnits = true;
+		MousePressedLocation = CurrentMouseLocation;
+
+		FVector Unusued;
+		DeprojectMouseToTerrain(MousePressedTerrainLocation, Unusued);
+	}
 }
 
 void AMMOPlayerController::OnSetDestinationReleased()
 {
-	// clear flag to indicate we should stop updating the destination
-	bMoveToMouseCursor = false;
+	if (!bMovingUnits)
+		return;
+
+	SetNewMoveDestination();
+	bMovingUnits = false;
 }
 
 void AMMOPlayerController::OnSelectPressed()
 {
-	if (GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y))
+	if (!IsMovingUnits() && GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y))
 	{
 		bSelecting = true;
 		MousePressedLocation = CurrentMouseLocation;
