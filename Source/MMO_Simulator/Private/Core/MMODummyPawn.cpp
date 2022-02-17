@@ -16,6 +16,8 @@ AMMODummyPawn::AMMODummyPawn()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -67,7 +69,6 @@ void AMMODummyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis(FName("CameraUp"), this, &AMMODummyPawn::MoveCameraUp);
 	PlayerInputComponent->BindAxis(FName("CameraRight"), this, &AMMODummyPawn::MoveCameraRight);
 	PlayerInputComponent->BindAxis(FName("CameraZoom"), this, &AMMODummyPawn::CameraZoom);
-
 }
 
 void AMMODummyPawn::ToggleCameraLock()
@@ -168,8 +169,12 @@ void AMMODummyPawn::MoveCameraUp(float AxisValue)
 {
 	if (!bCameraLocked)
 	{
-		const FVector Delta = FVector::ForwardVector * CameraSpeed * AxisValue;
+		const FVector Delta = GetActorForwardVector() * CameraSpeed * AxisValue;
 		AddActorWorldOffset(Delta * GetWorld()->DeltaTimeSeconds);
+
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 200.f, FColor::Red, false, -1.f, 0, 10.f);
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorRightVector() * 200.f, FColor::Green, false, -1.f, 0, 10.f);
+		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorUpVector() * 200.f, FColor::Blue, false, -1.f, 0, 10.f);
 	}
 }
 
@@ -177,8 +182,10 @@ void AMMODummyPawn::MoveCameraRight(float AxisValue)
 {
 	if (!bCameraLocked)
 	{
-		const FVector Delta = FVector::RightVector * CameraSpeed * AxisValue;
+		const FVector Delta = GetActorRightVector() * CameraSpeed * AxisValue;
 		AddActorWorldOffset(Delta * GetWorld()->DeltaTimeSeconds);
+
+
 	}
 }
 
