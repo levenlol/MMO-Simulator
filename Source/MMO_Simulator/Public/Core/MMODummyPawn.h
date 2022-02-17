@@ -9,6 +9,8 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UInputComponent;
+class AMMOBaseHero;
+class AMMOPlayerController;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMODummyPawn : public APawn
@@ -40,8 +42,17 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float CameraSpeed = 1000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	FVector2D CameraZoomRange = FVector2D(800.f, 2000.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float CameraZoomSpeed = 200.f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	bool bCameraLocked = false;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	float TargetZoom;
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -56,7 +67,13 @@ private:
 	void MoveCameraUp(float AxisValue);
 	void MoveCameraRight(float AxisValue);
 
+	void CameraZoom(float AxisValue);
 
 	/** Toggle camera lock: switch between free camera movement and lock into target. */
 	void ToggleCameraLock();
+
+	void HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes);
+	void HandleFreeCamera(AMMOPlayerController* PlayerController, float DeltaSeconds);
+
+	void HandleCameraZoom(float DeltaSeconds);
 };
