@@ -50,8 +50,12 @@ void AMMODummyPawn::Tick(float DeltaSeconds)
 	HandleCameraZoom(DeltaSeconds);
 	MoveCameraMouse(DeltaSeconds);
 
-	GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue,
-		FString("Current: ") + FString::SanitizeFloat(CameraBoom->TargetArmLength) + FString(" - Target: ") + FString::SanitizeFloat(TargetZoom) + FString(" - Delta: ") + FString::SanitizeFloat(TargetZoom - CameraBoom->TargetArmLength));
+#if WITH_EDITORONLY_DATA
+	if (bDebug)
+	{
+		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, FString("Current: ") + FString::SanitizeFloat(CameraBoom->TargetArmLength) + FString(" - Target: ") + FString::SanitizeFloat(TargetZoom) + FString(" - Delta: ") + FString::SanitizeFloat(TargetZoom - CameraBoom->TargetArmLength));
+	}
+#endif
 }
 
 void AMMODummyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

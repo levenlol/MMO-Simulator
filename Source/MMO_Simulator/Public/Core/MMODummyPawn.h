@@ -38,6 +38,11 @@ public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 private:
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Category = Debug, meta = (AllowPrivateAccess = "true"))
+	bool bDebug = false;
+#endif
+
 	// Camera Movement Speed when isn't locked.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float CameraSpeed = 1000.f;
