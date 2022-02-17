@@ -29,18 +29,33 @@ void AMMOPlayerController::BeginPlay()
 
 void AMMOPlayerController::SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHeroes)
 {
-	// Deselect
-	for (AMMOBaseHero* CurrentHero : SelectedHeroes)
+	if (IsInputKeyDown(EKeys::LeftControl))
 	{
-		CurrentHero->OnDeselected();
+		// Add to selection
+		for (AMMOBaseHero* CurrentHero : InHeroes)
+		{
+			if (!SelectedHeroes.Contains(CurrentHero))
+			{
+				SelectedHeroes.Add(CurrentHero);
+				CurrentHero->OnSelected();
+			}
+		}
 	}
-
-	SelectedHeroes = InHeroes;
-
-	// Select
-	for (AMMOBaseHero* CurrentHero : SelectedHeroes)
+	else
 	{
-		CurrentHero->OnSelected();
+		// Deselect
+		for (AMMOBaseHero* CurrentHero : SelectedHeroes)
+		{
+			CurrentHero->OnDeselected();
+		}
+
+		SelectedHeroes = InHeroes;
+
+		// Select
+		for (AMMOBaseHero* CurrentHero : SelectedHeroes)
+		{
+			CurrentHero->OnSelected();
+		}
 	}
 }
 
