@@ -22,9 +22,29 @@ public:
 
 	// return an array of points, each for every actors passed as input
 	UFUNCTION(BlueprintCallable, Category = Formation)
-	TArray<FVector> ComputeFormation(const TArray<AMMOBaseHero*>& InHeroes, const FVector& AnchorPoint, const FVector& LastPoint);
+	TArray<FVector> ComputeFormation(const TArray<AMMOBaseHero*>& InHeroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+
+	UFUNCTION(BlueprintCallable, Category = UI)
+	void ShowPreview(const TArray<FVector>& Points);
+
+	void ShowPreview(const FVector& Point);
+
+	UFUNCTION(BlueprintCallable, Category = UI)
+	void HideAllPreviews();
 
 protected:
+	// Formation Preview Actor class.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	TSubclassOf<AActor> UIFormationPreviewClass;
+
+	// FX preview for current formation
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
+	TArray<AActor*> UIFormationPreviews;
+
+	// Number of pre-spawned actors.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
+	int32 InitialPreviewsCacheSize = 25;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "1", UIMin = "1"))
 	int32 MaxHeroesPerRow = 5;
 
@@ -36,5 +56,9 @@ protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
-		
+
+private:
+	int32 CurrentPreviewIndex = -1;
+
+	void AddPrecachePreviewActors(const int32 PreviewNumbersToAdd);
 };

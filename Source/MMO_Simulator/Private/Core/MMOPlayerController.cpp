@@ -86,14 +86,16 @@ void AMMOPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	bHasValidMousePosition = GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y);
+	FormationManager->HideAllPreviews();
 
+	// show previews
 	if (IsMovingUnits())
 	{
 		FVector Location, ImpactNormal;
 		if (DeprojectMouseToTerrain(Location, ImpactNormal))
 		{
 			const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
-
+			FormationManager->ShowPreview(Points);
 		}
 	}
 }
@@ -126,14 +128,6 @@ void AMMOPlayerController::SetNewMoveDestination()
 			const FVector& DestLocation = Points[i];
 
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
-
-			//float const Distance = FVector::Dist(DestLocation, CurrentHero->GetActorLocation());
-			//
-			//// We need to issue move command only if far enough in order for walk animation to play correctly
-			//if ((Distance > 50.0f))
-			//{
-			//	UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
-			//}
 		}
 	}
 }

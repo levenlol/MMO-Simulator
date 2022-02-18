@@ -17,6 +17,66 @@ void UMMOFormationManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AddPrecachePreviewActors(InitialPreviewsCacheSize);
+}
+
+void UMMOFormationManager::AddPrecachePreviewActors(const int32 PreviewNumbersToAdd)
+{
+	if (!UIFormationPreviewClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Dont have a valid UIFormationPreviewClass. Please set it."));
+		return;
+	}
+
+	static const FActorSpawnParameters SpawnParams = [Owner = GetOwner()]
+	{
+		FActorSpawnParameters _SpawnParams;
+		_SpawnParams.Owner = Owner;
+		_SpawnParams.bNoFail = true;
+		_SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		return _SpawnParams;
+	}();
+
+	for (int32 i = 0; i < PreviewNumbersToAdd; i++)
+	{
+		AActor* NewActor = GetWorld()->SpawnActor<AActor>(UIFormationPreviewClass, SpawnParams);
+		NewActor->SetActorEnableCollision(false);
+		NewActor->SetActorHiddenInGame(true);
+
+		UIFormationPreviews.Add(NewActor);
+	}
+
+	ensure(UIFormationPreviews.Num() < 60);
+}
+
+void UMMOFormationManager::ShowPreview(const TArray<FVector>& Points)
+{
+	for (const FVector& Point : Points)
+	{
+		ShowPreview(Point);
+	}
+}
+
+void UMMOFormationManager::ShowPreview(const FVector& Point)
+{
+	if (++CurrentPreviewIndex >= UIFormationPreviews.Num())
+	{
+		AddPrecachePreviewActors(1);
+	}
+
+	UIFormationPreviews[CurrentPreviewIndex]->SetActorHiddenInGame(false);
+	UIFormationPreviews[CurrentPreviewIndex]->SetActorLocation(Point);
+}
+
+void UMMOFormationManager::HideAllPreviews()
+{
+	for (int32 i = 0; i <= CurrentPreviewIndex; i++)
+	{
+		UIFormationPreviews[i]->SetActorHiddenInGame(true);
+	}
+
+	CurrentPreviewIndex = -1;
 }
 
 
@@ -26,7 +86,7 @@ void UMMOFormationManager::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& InHeroes, const FVector& AnchorPoint, const FVector& LastPoint)
+TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& InHeroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview /* = true */)
 {
 	const int32 HeroesNum = InHeroes.Num();
 
@@ -52,7 +112,10 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero
 		const FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) + (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
 		Points.Add(Point);
 
-		DrawDebugSphere(GetWorld(), Point, 32.f, 8, FColor::Blue, false, -1.f, 0, 5.f);
+		if (bShowPreview)
+		{
+			ShowPreview(Point);
+		}
 	}
 	
 	return Points;
