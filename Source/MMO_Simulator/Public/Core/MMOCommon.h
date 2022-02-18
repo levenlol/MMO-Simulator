@@ -21,15 +21,12 @@ enum class ECharacterClass : uint8
 };
 
 USTRUCT(BlueprintType)
-struct MMO_SIMULATOR_API FCharacterStats
+struct MMO_SIMULATOR_API FCharacterAttributes
 {
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	ECharacterClass CharacterClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Level;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Strength;
@@ -49,3 +46,36 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Greediness;
 };
+
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FCharacterStats
+{
+	GENERATED_BODY()
+public:
+	// Max Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 MaxHealth;
+	
+	//Current Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Health;
+
+	// Max resources
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 MaxResources;
+
+	// Mana, rage, energy...
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Resources;
+
+	// Health per seconds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 HPS;
+
+	// Resources per seconds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 RPS;
+
+	void Recuperate(int32 ElapsedSeconds);
+};
+

@@ -20,6 +20,9 @@ public:
 	FName Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FCharacterStats Stats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
