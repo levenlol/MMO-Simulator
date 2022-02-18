@@ -53,16 +53,16 @@ struct MMO_SIMULATOR_API FCharacterStats
 	GENERATED_BODY()
 public:
 	// Max Health
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "1"))
+	int32 MaxHealth = 1;
 	
 	//Current Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Health;
 
 	// Max resources
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 MaxResources;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "1"))
+	int32 MaxResources = 1;
 
 	// Mana, rage, energy...
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)

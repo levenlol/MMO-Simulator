@@ -28,6 +28,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;
 
+	UFUNCTION(BlueprintPure, Category = Stats)
+	FORCEINLINE float GetHealthPercent() const { return static_cast<float>(Stats.Health) / static_cast<float>(Stats.MaxHealth); }
+
+	UFUNCTION(BlueprintPure, Category = Stats)
+	FORCEINLINE float GetResourcePercent() const { return static_cast<float>(Stats.Resources) / static_cast<float>(Stats.MaxResources); }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
