@@ -57,6 +57,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Greediness;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Gold;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
