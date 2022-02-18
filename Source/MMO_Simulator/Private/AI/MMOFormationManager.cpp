@@ -28,15 +28,10 @@ void UMMOFormationManager::AddPrecachePreviewActors(const int32 PreviewNumbersTo
 		return;
 	}
 
-	static const FActorSpawnParameters SpawnParams = [Owner = GetOwner()]
-	{
-		FActorSpawnParameters _SpawnParams;
-		_SpawnParams.Owner = Owner;
-		_SpawnParams.bNoFail = true;
-		_SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		return _SpawnParams;
-	}();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = GetOwner();
+	SpawnParams.bNoFail = true;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	for (int32 i = 0; i < PreviewNumbersToAdd; i++)
 	{

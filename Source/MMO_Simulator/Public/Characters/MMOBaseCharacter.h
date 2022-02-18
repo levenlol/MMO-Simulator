@@ -4,22 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Core/MMOCommon.h"
 #include "MMOBaseCharacter.generated.h"
-
-UENUM(BlueprintType)
-enum class ECharacterClass : uint8
-{
-	Warrior,
-	Paladin,
-	Berserker,
-	DeathKnight,
-	Shaman,
-	Monk,
-	Priest,
-	Druid,
-	Mage,
-	Warlock
-};
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseCharacter : public ACharacter
@@ -34,28 +20,7 @@ public:
 	FName Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	ECharacterClass CharacterClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Level;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Strength;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Health;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Intellect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Dexterity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Happiness;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Greediness;
+	FCharacterStats Stats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;

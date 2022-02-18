@@ -38,7 +38,7 @@ protected:
 	TSubclassOf<AActor> UIFormationPreviewClass;
 
 	// FX preview for current formation
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = UI)
 	TArray<AActor*> UIFormationPreviews;
 
 	// Number of pre-spawned actors.
