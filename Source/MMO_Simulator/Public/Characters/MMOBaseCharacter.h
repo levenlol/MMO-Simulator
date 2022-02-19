@@ -23,10 +23,13 @@ public:
 	int32 Level;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	FCharacterAttributes Attributes;
+	FMMOCharacterAttributes Attributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	FCharacterStats Stats;
+	FMMOCharacterStats Stats;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistances)
+		FMMOResistances Resistances;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;
@@ -36,6 +39,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Stats)
 	FORCEINLINE float GetResourcePercent() const { return static_cast<float>(Stats.Resources) / static_cast<float>(Stats.MaxResources); }
+
+	UFUNCTION(BlueprintNativeEvent, Category = Damage)
+	void DamageTake(FMMODamage InDamage);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

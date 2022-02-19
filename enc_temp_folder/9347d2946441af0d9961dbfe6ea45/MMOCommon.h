@@ -68,7 +68,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "1"))
 	int32 MaxHealth = 100;
 	
-	// Current Health
+	//Current Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Health = 70;
 
@@ -100,34 +100,28 @@ struct MMO_SIMULATOR_API FMMOResistances
 {
 	GENERATED_BODY()
 public:
-	// Physical Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 Armor;
 
-	// Fire Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 FireResistance;
 
-	// Ice Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 IceResistance;
 
-	// Shadow Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 ShadowResistance;
 
-	// Holy Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 HolyResistance;
 
-	// Nature Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 NatureResistance;
 
-	// Arcane Resistance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistance)
 	int32 ArcaneResistance;
 };
+
 
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMODamage

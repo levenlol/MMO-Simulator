@@ -31,6 +31,11 @@ void AMMOBaseCharacter::OnRecuperate()
 	Stats.Recuperate(Stats.RecuperateEverySeconds);
 }
 
+void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
+{
+
+}
+
 // Called every frame
 void AMMOBaseCharacter::Tick(float DeltaTime)
 {
