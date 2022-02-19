@@ -37,24 +37,31 @@ struct MMO_SIMULATOR_API FMMOCharacterAttributes
 {
 	GENERATED_BODY()
 public:
+	// Class of the character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	EMMOCharacterClass CharacterClass;
 
+	// Strength: affects physical damage, block.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Strength;
 
+	// Increase the Maximus Health of the character.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	int32 Health;
+	int32 Constitution;
 
+	// Affects magical damage and resource regen
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Intellect;
 
+	// Affects dodge and crit chance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Dexterity;
 
+	// How happy is the character.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Happiness;
-
+	 
+	// How greedy is the character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Greediness;
 };
