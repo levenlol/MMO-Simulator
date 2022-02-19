@@ -10,6 +10,7 @@
 
 class AMMOBaseHero;
 class UMMOFormationManager;
+class AMMOBaseEnemy;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOPlayerController : public APlayerController
@@ -22,6 +23,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UMMOFormationManager* FormationManager;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TEnumAsByte<ECollisionChannel> EnemyCollionChannel;
 
 	UFUNCTION(BlueprintPure, Category = Default)
 	FORCEINLINE AMMODummyPawn* GetDummyPawn() const { return Cast<AMMODummyPawn>(GetPawn()); }
@@ -82,10 +86,11 @@ private:
 	void SetNewMoveDestination();
 
 	/** Input handlers for SetDestination action. */
-	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
+	void MoveOrAttackPressed();
+	void MoveOrAttackReleased();
 
 	/** Input handlers for Select action. */
 	void OnSelectPressed();
 	void OnSelectReleased();
+	AMMOBaseEnemy* GetEnemyUnderMouse() const;
 };

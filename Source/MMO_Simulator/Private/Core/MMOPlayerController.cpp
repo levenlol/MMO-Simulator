@@ -9,6 +9,7 @@
 #include "Characters/MMOBaseHero.h"
 #include "Core/MMOBaseHUD.h"
 #include "AI/MMOFormationManager.h"
+#include "Characters/MMOBaseEnemy.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
@@ -16,6 +17,7 @@ AMMOPlayerController::AMMOPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 	FormationManager = CreateDefaultSubobject<UMMOFormationManager>(TEXT("FormationManager"));
+	EnemyCollionChannel = ECollisionChannel::ECC_GameTraceChannel1; // Enemy Channel.
 }
 
 void AMMOPlayerController::BeginPlay()
@@ -70,7 +72,7 @@ bool AMMOPlayerController::DeprojectMouseToTerrain(FVector& OutLocation, FVector
 		FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllStaticObjects);
 
 		FHitResult HitResult;
-		if (GetWorld()->LineTraceSingleByObjectType(HitResult, MouseLocation, MouseLocation + Direction * 3000.f, Params))
+		if (GetWorld()->LineTraceSingleByObjectType(HitResult, MouseLocation, MouseLocation + Direction * 3500.f, Params))
 		{
 			OutLocation = HitResult.ImpactPoint;
 			OutTerrainNormal = HitResult.ImpactNormal;
@@ -105,8 +107,8 @@ void AMMOPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AMMOPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AMMOPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("MoveOrAttack", IE_Pressed, this, &AMMOPlayerController::MoveOrAttackPressed);
+	InputComponent->BindAction("MoveOrAttack", IE_Released, this, &AMMOPlayerController::MoveOrAttackReleased);
 
 	InputComponent->BindAction("Select", IE_Pressed, this, &AMMOPlayerController::OnSelectPressed);
 	InputComponent->BindAction("Select", IE_Released, this, &AMMOPlayerController::OnSelectReleased);
@@ -132,19 +134,29 @@ void AMMOPlayerController::SetNewMoveDestination()
 	}
 }
 
-void AMMOPlayerController::OnSetDestinationPressed()
+void AMMOPlayerController::MoveOrAttackPressed()
 {
 	if (!IsSelecting() && SelectedHeroes.Num() > 0 && GetMousePosition(CurrentMouseLocation.X, CurrentMouseLocation.Y))
 	{
-		bMovingUnits = true;
-		MousePressedLocation = CurrentMouseLocation;
+		if (AMMOBaseEnemy* Enemy = GetEnemyUnderMouse())
+		{
+			for (AMMOBaseHero* Hero : SelectedHeroes)
+			{
+				UAIBlueprintHelperLibrary::SimpleMoveToActor(Hero->GetController(), Enemy);
+			}
+		}
+		else
+		{
+			bMovingUnits = true;
+			MousePressedLocation = CurrentMouseLocation;
 
-		FVector Unusued;
-		DeprojectMouseToTerrain(MousePressedTerrainLocation, Unusued);
+			FVector Unusued;
+			DeprojectMouseToTerrain(MousePressedTerrainLocation, Unusued);
+		}
 	}
 }
 
-void AMMOPlayerController::OnSetDestinationReleased()
+void AMMOPlayerController::MoveOrAttackReleased()
 {
 	if (!bMovingUnits)
 		return;
@@ -168,4 +180,24 @@ void AMMOPlayerController::OnSelectReleased()
 		return;
 
 	bSelecting = false;
+}
+
+AMMOBaseEnemy* AMMOPlayerController::GetEnemyUnderMouse() const
+{
+	FVector MouseLocation, Direction;
+	if (DeprojectMousePositionToWorld(MouseLocation, Direction))
+	{
+		const FVector& StartLocation = MouseLocation;
+		const FVector EndLocation = MouseLocation + Direction * 3500.f;
+
+		FCollisionQueryParams Params;
+		
+		FHitResult Hit;
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, EnemyCollionChannel))
+		{
+			return Cast<AMMOBaseEnemy>(Hit.GetActor());
+		}
+	}
+
+	return nullptr;
 }
