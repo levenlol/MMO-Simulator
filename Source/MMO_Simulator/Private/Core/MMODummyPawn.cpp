@@ -76,6 +76,7 @@ void AMMODummyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis(FName("CameraUp"), this, &AMMODummyPawn::MoveCameraUp);
 	PlayerInputComponent->BindAxis(FName("CameraRight"), this, &AMMODummyPawn::MoveCameraRight);
 	PlayerInputComponent->BindAxis(FName("CameraZoom"), this, &AMMODummyPawn::CameraZoom);
+	PlayerInputComponent->BindAxis(FName("RotateCameraAxis"), this, &AMMODummyPawn::CameraRotate_Axis);
 }
 
 void AMMODummyPawn::ToggleCameraLock()
@@ -126,7 +127,7 @@ void AMMODummyPawn::HandleFreeCamera(AMMOPlayerController* PlayerController, flo
 		const float SpeedY = MoveUp ? CameraSpeed : MoveDown ? -CameraSpeed : 0.f;
 		const float SpeedX = MoveRight ? CameraSpeed : MoveLeft ? -CameraSpeed : 0.f;
 
-		const FVector Delta = FVector::ForwardVector * SpeedY + FVector::RightVector * SpeedX;
+		const FVector Delta = GetActorForwardVector() * SpeedY + GetActorRightVector() * SpeedX;
 		AddActorWorldOffset(Delta * DeltaSeconds);
 	}
 }
@@ -160,6 +161,16 @@ void AMMODummyPawn::CameraRotate_Pressed()
 void AMMODummyPawn::CameraRotate_Released()
 {
 	bRotatingCamera = false;
+}
+
+void AMMODummyPawn::CameraRotate_Axis(float AxisValue)
+{
+	RotateCameraYaw(AxisValue * CameraSpeed * GetWorld()->GetDeltaSeconds());
+}
+
+void AMMODummyPawn::RotateCameraYaw(float Delta)
+{
+	AddActorWorldRotation(FRotator(0.f, Delta, 0.f));
 }
 
 void AMMODummyPawn::MoveCameraMouse(float DeltaSeconds)
@@ -214,7 +225,7 @@ void AMMODummyPawn::HandleRotateCamera(float DeltaSeconds)
 	if (PlayerController->GetMousePosition(LastMousePosition.X, LastMousePosition.Y))
 	{
 		const float Delta = (LastMousePosition.X - PrevMouseX) * DeltaSeconds * CameraRotationSpeed;
-		AddActorWorldRotation(FRotator(0.f, Delta, 0.f));
+		RotateCameraYaw(Delta);
 	}
 }
 

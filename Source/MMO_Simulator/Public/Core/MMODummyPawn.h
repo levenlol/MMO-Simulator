@@ -95,4 +95,7 @@ private:
 
 	void CameraRotate_Pressed();
 	void CameraRotate_Released();
+	void CameraRotate_Axis(float AxisValue);
+
+	void RotateCameraYaw(float Delta);
 };
