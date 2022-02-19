@@ -15,12 +15,24 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 void AMMOBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(Stats.RecuperateEverySeconds), true, -1.f);
+}
+
+void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(RecuperateTimerHandle);
+}
+
+void AMMOBaseCharacter::OnRecuperate()
+{
+	Stats.Recuperate(Stats.RecuperateEverySeconds);
 }
 
 // Called every frame
 void AMMOBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }

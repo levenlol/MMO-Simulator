@@ -25,25 +25,25 @@ struct MMO_SIMULATOR_API FCharacterAttributes
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	ECharacterClass CharacterClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Strength;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Health;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Intellect;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Dexterity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Happiness;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Greediness;
 };
 
@@ -75,6 +75,10 @@ public:
 	// Resources per seconds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 RPS;
+
+	// Recuperate Health and Resource every X seconds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0"))
+	int32 RecuperateEverySeconds = 1;
 
 	void Recuperate(int32 ElapsedSeconds);
 };

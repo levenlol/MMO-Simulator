@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Level;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	FCharacterAttributes Attributes;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FCharacterStats Stats;
 
@@ -34,12 +37,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = Stats)
 	FORCEINLINE float GetResourcePercent() const { return static_cast<float>(Stats.Resources) / static_cast<float>(Stats.MaxResources); }
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+private:
+	FTimerHandle RecuperateTimerHandle;
+
+	void OnRecuperate();
 };
