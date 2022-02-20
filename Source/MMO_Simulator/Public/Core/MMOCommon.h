@@ -32,6 +32,45 @@ enum class EMMODamageType : uint8
 	Arcane
 };
 
+UENUM(BlueprintType)
+enum class EMMOWeaponType : uint8
+{
+	Sword1h,
+	Sword2h,
+	Axe1h,
+	Axe2h,
+	Mace1h,
+	Mace2h,
+	Staff,
+	Spear,
+	Bow,
+	Dagger,
+	Rifle,
+	Shield
+};
+
+UENUM(BlueprintType)
+enum class EMMOArmorType : uint8
+{
+	Head,
+	Shoulder,
+	Chest,
+	Legs,
+	Feet,
+	Trinket
+};
+
+UENUM(BlueprintType)
+enum class EMMORarityType : uint8
+{
+	Trash,
+	Common,
+	Uncommon,
+	Rare,
+	Epic,
+	Legendary
+};
+
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOCharacterAttributes
 {
@@ -157,4 +196,48 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
 	bool bCrit = false;
+};
+
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOItemStats
+{
+	GENERATED_BODY()
+public:
+	FMMOItemStats() = default;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FMMOCharacterAttributes Attributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	EMMORarityType Rarity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Durability = 100;
+};
+
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOWeaponStats : public FMMOItemStats
+{
+	GENERATED_BODY()
+public:
+	FMMOWeaponStats() = default;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	EMMODamageType DamageType = EMMODamageType::Physical;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FIntPoint DamageRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0.5"))
+	float AttackSpeed = 2.f;
+};
+
+/** Static class with useful utility functions that can be called from both Blueprint and C++ */
+UCLASS()
+class MMO_SIMULATOR_API UMMOGameplayUtils : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+public:
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	static bool Is2HWeapon(EMMOWeaponType WeaponType);
 };

@@ -7,6 +7,8 @@
 #include "Core/MMOCommon.h"
 #include "MMOBaseCharacter.generated.h"
 
+class AMMOBaseWeapon;
+
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseCharacter : public ACharacter
 {
@@ -29,7 +31,7 @@ public:
 	FMMOCharacterStats Stats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistances)
-		FMMOResistances Resistances;
+	FMMOResistances Resistances;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;
@@ -40,8 +42,20 @@ public:
 	UFUNCTION(BlueprintPure, Category = Stats)
 	FORCEINLINE float GetResourcePercent() const { return static_cast<float>(Stats.Resources) / static_cast<float>(Stats.MaxResources); }
 
+	UFUNCTION(BlueprintPure, Category = Stats)
+	FORCEINLINE AMMOBaseWeapon* GetMainHandWeapon() const { return MainHandWeapon; }
+
+	UFUNCTION(BlueprintPure, Category = Stats)
+	FORCEINLINE AMMOBaseWeapon* GetOffHandWeapon() const { return OffHandWeapon; }
+
+	UFUNCTION(BlueprintPure, Category = Stats)
+	bool CanCharacterAttack() const;
+
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
 	void DamageTake(FMMODamage InDamage);
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	bool TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,4 +70,10 @@ private:
 	FTimerHandle RecuperateTimerHandle;
 
 	void OnRecuperate();
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	AMMOBaseWeapon* MainHandWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	AMMOBaseWeapon* OffHandWeapon;
 };
