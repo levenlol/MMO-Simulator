@@ -2,14 +2,13 @@
 
 
 #include "Core/MMOPlayerController.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "Runtime/Engine/Classes/Components/DecalComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Engine/World.h"
 #include "Characters/MMOBaseHero.h"
 #include "Core/MMOBaseHUD.h"
 #include "AI/MMOFormationManager.h"
 #include "Characters/MMOBaseEnemy.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
@@ -129,7 +128,8 @@ void AMMOPlayerController::SetNewMoveDestination()
 			AMMOBaseHero* CurrentHero = SelectedHeroes[i];
 			const FVector& DestLocation = Points[i];
 
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentHero->GetController(), DestLocation);
+			MoveHeroTo(CurrentHero->GetController(), DestLocation);
+			
 		}
 	}
 }
@@ -142,7 +142,7 @@ void AMMOPlayerController::MoveOrAttackPressed()
 		{
 			for (AMMOBaseHero* Hero : SelectedHeroes)
 			{
-				UAIBlueprintHelperLibrary::SimpleMoveToActor(Hero->GetController(), Enemy);
+				MoveHeroTo(Hero->GetController(), Enemy);
 			}
 		}
 		else
@@ -200,4 +200,26 @@ AMMOBaseEnemy* AMMOPlayerController::GetEnemyUnderMouse() const
 	}
 
 	return nullptr;
+}
+
+void AMMOPlayerController::MoveHeroTo(AController* InController, AActor* Target)
+{
+	if (AAIController* AIController = Cast<AAIController>(InController))
+	{
+		if (UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent())
+		{
+			BlackBoard->SetValueAsObject(FName("TargetActor"), Target);
+		}
+	}
+}
+
+void AMMOPlayerController::MoveHeroTo(AController* InController, const FVector& Location)
+{
+	if (AAIController* AIController = Cast<AAIController>(InController))
+	{
+		if (UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent())
+		{
+			BlackBoard->SetValueAsVector(FName("TargetLocation"), Location);
+		}
+	}
 }

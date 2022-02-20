@@ -93,4 +93,7 @@ private:
 	void OnSelectPressed();
 	void OnSelectReleased();
 	AMMOBaseEnemy* GetEnemyUnderMouse() const;
+
+	void MoveHeroTo(AController* InController, AActor* Target);
+	void MoveHeroTo(AController* InController, const FVector& Location);
 };
