@@ -22,7 +22,7 @@ AMMODummyPawn::AMMODummyPawn()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(false); 
-	CameraBoom->TargetArmLength = 1200.f;
+	CameraBoom->TargetArmLength = 1700.f;
 	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false;
 
