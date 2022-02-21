@@ -99,12 +99,12 @@ bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass
 	if (bMainHand || bIs2H)
 	{
 		MainHandWeapon = Weapon;
-		Weapon->AttachToComponent(GetMesh(), AttachRules, FName("hand_r"));
+		Weapon->AttachToComponent(GetMesh(), AttachRules, MainHandSocket);
 	}
 	else
 	{
 		OffHandWeapon = Weapon;
-		Weapon->AttachToComponent(GetMesh(), AttachRules, FName("hand_l"));
+		Weapon->AttachToComponent(GetMesh(), AttachRules, OffHandSocket);
 	}
 
 	LastAttackTime = GetWorld()->GetTimeSeconds();

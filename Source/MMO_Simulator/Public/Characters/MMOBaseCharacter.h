@@ -25,8 +25,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FName Name;
 
+	// Class of the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	EMMOCharacterClass CharacterClass;
+
+	// How happy is the character.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	int32 Happiness;
+
+	// How greedy is the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	int32 Greediness;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	FName MainHandSocket = ("hand_r");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	FName OffHandSocket = ("hand_l");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	FMMOCharacterAttributes Attributes;
