@@ -1,0 +1,94 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "AI/MMOBTTask_AutoAttack.h"
+#include "AIController.h"
+#include "Characters/MMOBaseCharacter.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Core/MMOCommon.h"
+#include "Weapons/MMOBaseWeapon.h"
+
+UMMOBTTask_AutoAttack::UMMOBTTask_AutoAttack()
+	: Super()
+{
+	bNotifyTick = true;
+}
+
+EBTNodeResult::Type UMMOBTTask_AutoAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	FMMOBTTask_AutoAttackData* MyMemory = CastInstanceNodeMemory<FMMOBTTask_AutoAttackData>(NodeMemory);
+
+	AAIController* AIOwner = OwnerComp.GetAIOwner();
+	AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(AIOwner->GetPawn());
+	UBlackboardComponent* BlackBoard = AIOwner->GetBlackboardComponent();
+
+	if (!Character || !BlackBoard)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to ExecuteTask: UMMOBTTask_AutoAttack"));
+		return EBTNodeResult::Failed;
+	}
+
+	AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(BlackBoard->GetValueAsObject(FName("TargetActor")));
+
+	if (Character->CanAttackTarget(Target))
+	{
+		MyMemory->AttackSpeed = Character->GetMainHandWeapon()->Stats.AttackSpeed;
+		MyMemory->DamageDelayTime = MyMemory->AttackSpeed * DamageAtAnimPercentage;
+		MyMemory->TargetWeak = Target;
+		MyMemory->bDealtDamage = false;
+
+		return EBTNodeResult::InProgress;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("Unable to ExecuteTask: UMMOBTTask_AutoAttack"));
+	return EBTNodeResult::Failed;
+}
+
+void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	FMMOBTTask_AutoAttackData* MyMemory = CastInstanceNodeMemory<FMMOBTTask_AutoAttackData>(NodeMemory);
+
+	MyMemory->AttackSpeed -= DeltaSeconds;
+	MyMemory->DamageDelayTime -= DeltaSeconds;
+
+	if (!MyMemory->bDealtDamage && MyMemory->DamageDelayTime <= 0.0f)
+	{
+		// continue execution from this node
+		AAIController* AIOwner = OwnerComp.GetAIOwner();
+		AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(AIOwner->GetPawn());
+		AMMOBaseCharacter* Target = MyMemory->TargetWeak.Get();
+
+
+		if (!Character || !Target)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Unable to Complete Task: UMMOBTTask_AutoAttack"));
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		}
+
+		MyMemory->bDealtDamage = true;
+		const bool bAttackPerformed = Character->TryAttack(Target);
+		check(bAttackPerformed);
+	}
+
+	if (MyMemory->DamageDelayTime <= 0.f)
+	{
+		// animation finished
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
+}
+
+void UMMOBTTask_AutoAttack::DescribeRuntimeValues(const UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTDescriptionVerbosity::Type Verbosity, TArray<FString>& Values) const
+{
+	Super::DescribeRuntimeValues(OwnerComp, NodeMemory, Verbosity, Values);
+
+	FMMOBTTask_AutoAttackData* MyMemory = CastInstanceNodeMemory<FMMOBTTask_AutoAttackData>(NodeMemory);
+	if (MyMemory->DamageDelayTime)
+	{
+		Values.Add(FString::Printf(TEXT("remaining: %ss"), *FString::SanitizeFloat(MyMemory->DamageDelayTime)));
+	}
+}
+
+uint16 UMMOBTTask_AutoAttack::GetInstanceMemorySize() const
+{
+	return sizeof(FMMOBTTask_AutoAttackData);
+}

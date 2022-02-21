@@ -27,6 +27,21 @@ void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(RecuperateTimerHandle);
 }
 
+FMMODamage AMMOBaseCharacter::ComputeAutoAttackDamage() const
+{
+	FMMODamage Damage;
+
+	if (MainHandWeapon)
+	{
+		const FMMOWeaponStats& WeaponStats = MainHandWeapon->Stats;
+		Damage.Damage = FMath::RandRange(WeaponStats.Damage.X, WeaponStats.Damage.Y);
+		Damage.bCrit = WeaponStats.CritChance >= FMath::RandRange(0.f, 1.f);
+		Damage.DamageType = EMMODamageType::Physical;
+	}
+
+	return Damage;
+}
+
 void AMMOBaseCharacter::OnRecuperate()
 {
 	Stats.Recuperate(Stats.RecuperateEverySeconds);
@@ -34,13 +49,15 @@ void AMMOBaseCharacter::OnRecuperate()
 
 void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
 {
-
+	Stats.Health = FMath::Clamp(Stats.Health - InDamage.Damage, 0, Stats.MaxHealth);
+	
+	// TODO add event
 }
 
 bool AMMOBaseCharacter::CanCharacterAttack() const
 {
-	// TODO
-	return false;
+	const float CurrentTime = GetWorld()->GetTimeSeconds();
+	return MainHandWeapon && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
 }
 
 bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand)
@@ -91,7 +108,26 @@ bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass
 		Weapon->AttachToComponent(GetMesh(), AttachRules, FName("hand_l"));
 	}
 
+	LastAttackTime = GetWorld()->GetTimeSeconds();
+
 	return true;
+}
+
+bool AMMOBaseCharacter::TryAttack(AMMOBaseCharacter* Target)
+{
+	if (!CanAttackTarget(Target) || !MainHandWeapon)
+	{
+		return false;
+	}
+
+	FMMODamage Damage = ComputeAutoAttackDamage();
+	Target->DamageTake(MoveTemp(Damage));
+	return true;
+}
+
+bool AMMOBaseCharacter::CanAttackTarget(AMMOBaseCharacter* Target) const
+{
+	return Target && CanCharacterAttack() && (GetActorLocation() - Target->GetActorLocation()).SizeSquared() <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
 }
 
 // Called every frame

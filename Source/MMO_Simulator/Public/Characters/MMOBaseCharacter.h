@@ -57,6 +57,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand);
 
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	bool TryAttack(AMMOBaseCharacter* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -65,6 +72,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	FMMODamage ComputeAutoAttackDamage() const;
 
 private:
 	FTimerHandle RecuperateTimerHandle;
@@ -76,4 +85,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AMMOBaseWeapon* OffHandWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	float LastAttackTime = 0.f;
 };

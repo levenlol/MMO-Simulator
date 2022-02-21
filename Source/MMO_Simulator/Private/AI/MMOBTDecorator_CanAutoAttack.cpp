@@ -5,13 +5,16 @@
 #include "Characters/MMOBaseCharacter.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 bool UMMOBTDecorator_CanAutoAttack::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (Character)
+	const UBlackboardComponent* BlackBoard = OwnerComp.GetBlackboardComponent();
+	if (Character && BlackBoard)
 	{
-		return Character->CanCharacterAttack();
+		AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(BlackBoard->GetValueAsObject(FName("TargetActor")));
+		return Target && Character->CanAttackTarget(Target);
 	}
 
 	return false;

@@ -209,6 +209,7 @@ void AMMOPlayerController::MoveHeroTo(AController* InController, AActor* Target)
 		if (UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent())
 		{
 			BlackBoard->SetValueAsObject(FName("TargetActor"), Target);
+			BlackBoard->ClearValue(FName("TargetLocation"));
 		}
 	}
 }
@@ -220,6 +221,7 @@ void AMMOPlayerController::MoveHeroTo(AController* InController, const FVector& 
 		if (UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent())
 		{
 			BlackBoard->SetValueAsVector(FName("TargetLocation"), Location);
+			BlackBoard->ClearValue(FName("TargetActor"));
 		}
 	}
 }

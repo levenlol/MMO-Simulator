@@ -226,10 +226,16 @@ public:
 	EMMODamageType DamageType = EMMODamageType::Physical;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	FIntPoint DamageRange;
+	FIntPoint Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float WeaponRange = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0.5"))
 	float AttackSpeed = 2.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0.5"))
+	float CritChance = 0.f;
 };
 
 /** Static class with useful utility functions that can be called from both Blueprint and C++ */
