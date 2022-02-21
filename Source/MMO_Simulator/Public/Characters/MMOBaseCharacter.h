@@ -9,6 +9,10 @@
 
 class AMMOBaseWeapon;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOStartAttack, AMMOBaseCharacter*, Sender);
+
+
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseCharacter : public ACharacter
 {
@@ -63,9 +67,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
 
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	// Events
+	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOOnDamageTaken OnDamageTaken;
+
+	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOStartAttack OnStartAttack;
 
 protected:
 	// Called when the game starts or when spawned

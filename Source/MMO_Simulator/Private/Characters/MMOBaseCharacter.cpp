@@ -50,8 +50,7 @@ void AMMOBaseCharacter::OnRecuperate()
 void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
 {
 	Stats.Health = FMath::Clamp(Stats.Health - InDamage.Damage, 0, Stats.MaxHealth);
-	
-	// TODO add event
+	OnDamageTaken.Broadcast(this, InDamage);
 }
 
 bool AMMOBaseCharacter::CanCharacterAttack() const
@@ -120,8 +119,12 @@ bool AMMOBaseCharacter::TryAttack(AMMOBaseCharacter* Target)
 		return false;
 	}
 
+	// TODO this is wrong, should be start attack.
+
 	FMMODamage Damage = ComputeAutoAttackDamage();
 	Target->DamageTake(MoveTemp(Damage));
+
+	OnStartAttack.Broadcast(this);
 	return true;
 }
 
