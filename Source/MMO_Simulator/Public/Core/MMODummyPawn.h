@@ -24,6 +24,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	/** Toggle camera lock: switch between free camera movement and lock into target. */
+	UFUNCTION(BlueprintCallable, Category = Camera)
+	void ToggleCameraLock();
 
 public:	
 	// Called every frame
@@ -85,10 +89,6 @@ private:
 	void HandleRotateCamera(float DeltaSeconds);
 
 	void CameraZoom(float AxisValue);
-
-	/** Toggle camera lock: switch between free camera movement and lock into target. */
-	UFUNCTION(BlueprintCallable, Category = Camera)
-	void ToggleCameraLock();
 
 	void HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes);
 	void HandleFreeCamera(AMMOPlayerController* PlayerController, float DeltaSeconds);
