@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Core/MMOCommon.h"
+#include "GameplayTagContainer.h"
 #include "MMOBaseCharacter.generated.h"
 
 class AMMOBaseWeapon;
@@ -71,6 +72,12 @@ public:
 	FORCEINLINE AMMOBaseWeapon* GetOffHandWeapon() const { return OffHandWeapon; }
 
 	UFUNCTION(BlueprintPure, Category = Stats)
+	bool IsAttacking() const;
+
+	UFUNCTION(BlueprintPure, Category = Stats)
+	bool IsStunned() const;
+
+	UFUNCTION(BlueprintPure, Category = Stats)
 	bool CanCharacterAttack() const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
@@ -80,7 +87,7 @@ public:
 	bool TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand);
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool TryAttack(AMMOBaseCharacter* Target);
+	bool StartAttack(AMMOBaseCharacter* Target);
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
@@ -95,11 +102,23 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOStartAttack OnStartAttack;
 
+	UPROPERTY(VisibleAnywhere, Category = Status)
+	FGameplayTagContainer StatusTags;
+
+	UPROPERTY(EditAnywhere, Category = Status)
+	FGameplayTag AttackTag;
+
+	UPROPERTY(EditAnywhere, Category = Status)
+	FGameplayTag StunnedTag;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	bool TryAttack(AMMOBaseCharacter* Target);
+	void StopAttack();
 
 	FMMODamage ComputeAutoAttackDamage() const;
 

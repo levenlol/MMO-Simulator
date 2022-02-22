@@ -66,7 +66,7 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		}
 
 		MyMemory->bDealtDamage = true;
-		const bool bAttackPerformed = Character->TryAttack(Target);
+		const bool bAttackPerformed = Character->StartAttack(Target);
 		check(bAttackPerformed);
 	}
 

@@ -3,6 +3,8 @@
 
 #include "Characters/MMOBaseCharacter.h"
 #include "Weapons/MMOBaseWeapon.h"
+#include "GameplayTagsManager.h"
+#include "TimerManager.h"
 
 // Sets default values
 AMMOBaseCharacter::AMMOBaseCharacter()
@@ -10,6 +12,8 @@ AMMOBaseCharacter::AMMOBaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AttackTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Status.Action.Attack"));
+	StunnedTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Status.Malus.Stunned"));
 }
 
 // Called when the game starts or when spawned
@@ -53,10 +57,22 @@ void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
 	OnDamageTaken.Broadcast(this, InDamage);
 }
 
+bool AMMOBaseCharacter::IsAttacking() const
+{
+	return StatusTags.HasTag(AttackTag);
+}
+
+bool AMMOBaseCharacter::IsStunned() const
+{
+	return StatusTags.HasTag(StunnedTag);
+}
+
 bool AMMOBaseCharacter::CanCharacterAttack() const
 {
 	const float CurrentTime = GetWorld()->GetTimeSeconds();
-	return MainHandWeapon && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
+
+	const bool bIsStunned = IsStunned();
+	return MainHandWeapon && !bIsStunned && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
 }
 
 bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand)
@@ -116,6 +132,7 @@ bool AMMOBaseCharacter::TryAttack(AMMOBaseCharacter* Target)
 {
 	if (!CanAttackTarget(Target) || !MainHandWeapon)
 	{
+		StopAttack();
 		return false;
 	}
 
@@ -125,6 +142,51 @@ bool AMMOBaseCharacter::TryAttack(AMMOBaseCharacter* Target)
 	Target->DamageTake(MoveTemp(Damage));
 
 	OnStartAttack.Broadcast(this);
+	return true;
+}
+
+void AMMOBaseCharacter::StopAttack()
+{
+	if (!IsAttacking())
+	{
+		return;
+	}
+
+	StatusTags.RemoveTag(AttackTag);
+}
+
+bool AMMOBaseCharacter::StartAttack(AMMOBaseCharacter* Target)
+{
+	if (!CanAttackTarget(Target) || !MainHandWeapon)
+	{
+		return false;
+	}
+
+	StatusTags.AddTag(AttackTag);
+
+	// Damage Delegate
+	FTimerHandle UnusuedHandle;
+	FTimerDelegate AttackDelegate;
+
+	TWeakObjectPtr<AMMOBaseCharacter> TargetWeak = Target;
+	TWeakObjectPtr<AMMOBaseCharacter> ThisWeak = this;
+
+	AttackDelegate.BindLambda([ThisWeak, TargetWeak] ()
+	{
+		if (!ThisWeak.IsValid())
+		{
+			return;
+		}
+
+		ThisWeak->TryAttack(TargetWeak.Get());
+	});
+
+	// Stop autoattack delegate
+	FTimerHandle UnusuedHandle2;
+
+	GetWorldTimerManager().SetTimer(UnusuedHandle, AttackDelegate, MainHandWeapon->Stats.AttackSpeed * 0.5f, false, MainHandWeapon->Stats.AttackSpeed * 0.5f);
+	GetWorldTimerManager().SetTimer(UnusuedHandle2, this, &AMMOBaseCharacter::StopAttack, MainHandWeapon->Stats.AttackSpeed, false, MainHandWeapon->Stats.AttackSpeed);
+
 	return true;
 }
 
