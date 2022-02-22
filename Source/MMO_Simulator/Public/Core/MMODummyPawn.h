@@ -87,6 +87,7 @@ private:
 	void CameraZoom(float AxisValue);
 
 	/** Toggle camera lock: switch between free camera movement and lock into target. */
+	UFUNCTION(BlueprintCallable, Category = Camera)
 	void ToggleCameraLock();
 
 	void HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes);
