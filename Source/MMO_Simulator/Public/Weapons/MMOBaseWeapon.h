@@ -7,7 +7,6 @@
 #include "Core/MMOCommon.h"
 #include "MMOBaseWeapon.generated.h"
 
-class UAnimSequenceBase;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseWeapon : public AActor
@@ -32,9 +31,6 @@ public:
 	// 0 - 100
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0", ClampMax = "100"))
 	int32 CritChance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-	UAnimSequenceBase* WeaponAnimation;
 
 protected:
 	// Called when the game starts or when spawned
