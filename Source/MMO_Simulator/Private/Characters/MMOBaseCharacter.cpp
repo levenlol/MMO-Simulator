@@ -31,7 +31,7 @@ void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(RecuperateTimerHandle);
 }
 
-FMMODamage AMMOBaseCharacter::ComputeAutoAttackDamage() const
+FMMODamage AMMOBaseCharacter::ComputeAutoAttackDamage()
 {
 	FMMODamage Damage;
 
@@ -41,6 +41,7 @@ FMMODamage AMMOBaseCharacter::ComputeAutoAttackDamage() const
 		Damage.Damage = FMath::RandRange(WeaponStats.Damage.X, WeaponStats.Damage.Y);
 		Damage.bCrit = WeaponStats.CritChance >= FMath::RandRange(0.f, 1.f);
 		Damage.DamageType = EMMODamageType::Physical;
+		Damage.DamageDealer = this;
 	}
 
 	return Damage;

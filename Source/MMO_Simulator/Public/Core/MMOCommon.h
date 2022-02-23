@@ -6,6 +6,7 @@
 #include "MMOCommon.generated.h"
 
 class UAnimSequenceBase;
+class AMMOBaseCharacter;
 
 UENUM(BlueprintType)
 enum class EMMOCharacterClass : uint8
@@ -173,10 +174,11 @@ struct MMO_SIMULATOR_API FMMODamage
 public:
 	FMMODamage() = default;
 
-	FMMODamage(int32 InDamage, EMMODamageType InDamageType, bool bInCrit)
+	FMMODamage(int32 InDamage, EMMODamageType InDamageType, bool bInCrit, AMMOBaseCharacter* InDamageDealer)
 		: Damage(InDamage)
 		, DamageType(InDamageType)
 		, bCrit(bInCrit) 
+		, DamageDealer(InDamageDealer)
 	{}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
@@ -187,6 +189,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
 	bool bCrit = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	AMMOBaseCharacter* DamageDealer;
 };
 
 USTRUCT(BlueprintType)

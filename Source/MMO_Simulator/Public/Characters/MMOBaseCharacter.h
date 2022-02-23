@@ -124,7 +124,7 @@ protected:
 	bool TryAttack(AMMOBaseCharacter* Target);
 	void StopAttack();
 
-	FMMODamage ComputeAutoAttackDamage() const;
+	FMMODamage ComputeAutoAttackDamage();
 
 private:
 	FTimerHandle RecuperateTimerHandle;
