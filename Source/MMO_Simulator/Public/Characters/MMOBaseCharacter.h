@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Core/MMOCommon.h"
 #include "GameplayTagContainer.h"
+#include "Containers/Map.h"
 #include "MMOBaseCharacter.generated.h"
 
 class AMMOBaseWeapon;
@@ -79,6 +80,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Stats)
 	bool CanCharacterAttack() const;
+
+	UFUNCTION(BlueprintPure, Category = Stats)
+	FMMOWeaponTypeCouple GetCurrentEquippedWeaponsType() const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
 	void DamageTake(FMMODamage InDamage);

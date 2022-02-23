@@ -75,6 +75,23 @@ bool AMMOBaseCharacter::CanCharacterAttack() const
 	return MainHandWeapon && !bIsStunned && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
 }
 
+FMMOWeaponTypeCouple AMMOBaseCharacter::GetCurrentEquippedWeaponsType() const
+{
+	FMMOWeaponTypeCouple CurrentEquippedWeapons(EMMOWeaponType::Unarmed, EMMOWeaponType::Unarmed);
+
+	if (MainHandWeapon)
+	{
+		CurrentEquippedWeapons.MainWeaponType = MainHandWeapon->WeaponType;
+	}
+
+	if (OffHandWeapon)
+	{
+		CurrentEquippedWeapons.OffWeaponType = OffHandWeapon->WeaponType;
+	}
+
+	return CurrentEquippedWeapons;
+}
+
 bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand)
 {
 	if (!InWeaponClass)

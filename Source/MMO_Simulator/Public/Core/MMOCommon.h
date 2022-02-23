@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "MMOCommon.generated.h"
 
+class UAnimSequenceBase;
+
 UENUM(BlueprintType)
 enum class EMMOCharacterClass : uint8
 {
@@ -46,7 +48,8 @@ enum class EMMOWeaponType : uint8
 	Bow,
 	Dagger,
 	Rifle,
-	Shield
+	Shield,
+	Unarmed
 };
 
 UENUM(BlueprintType)
@@ -226,6 +229,41 @@ public:
 	float CritChance = 0.f;
 };
 
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOWeaponTypeCouple
+{
+	GENERATED_BODY()
+public:
+	FMMOWeaponTypeCouple() {}
+	FMMOWeaponTypeCouple(const FMMOWeaponTypeCouple& Other)
+		: FMMOWeaponTypeCouple(Other.MainWeaponType, Other.OffWeaponType)
+	{}
+
+	FMMOWeaponTypeCouple(const EMMOWeaponType& InMainHandWeaponType, const EMMOWeaponType& InOffHandWeaponType)
+	{
+		MainWeaponType = InMainHandWeaponType;
+		OffWeaponType = InOffHandWeaponType;
+	}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Animation)
+	EMMOWeaponType MainWeaponType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Animation)
+	EMMOWeaponType OffWeaponType;
+
+	bool operator==(const FMMOWeaponTypeCouple& Other) const
+	{
+		return MainWeaponType == Other.MainWeaponType && OffWeaponType == Other.OffWeaponType;
+	}
+};
+
+// Type hash for struct.
+FORCEINLINE uint32 GetTypeHash(const FMMOWeaponTypeCouple& Thing)
+{
+	uint32 Hash = FCrc::MemCrc32(&Thing, sizeof(FMMOWeaponTypeCouple));
+	return Hash;
+}
+
 /** Static class with useful utility functions that can be called from both Blueprint and C++ */
 UCLASS()
 class MMO_SIMULATOR_API UMMOGameplayUtils : public UBlueprintFunctionLibrary
@@ -234,4 +272,10 @@ class MMO_SIMULATOR_API UMMOGameplayUtils : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	static bool Is2HWeapon(EMMOWeaponType WeaponType);
+
+	UFUNCTION(BlueprintPure, Category = Animation, meta = (BlueprintThreadSafe))
+	static UAnimSequenceBase* GetAnimSequence(const FMMOWeaponTypeCouple& WeaponCouple);
+
+	UFUNCTION(BlueprintPure, Category = Animation, meta = (BlueprintThreadSafe))
+	static float PlayRateToFitAnimation(const UAnimSequenceBase* Anim, float TargetSeconds);
 };

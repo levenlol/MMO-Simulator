@@ -2,6 +2,7 @@
 
 
 #include "Core/MMOCommon.h"
+#include "Data/MMODataFinder.h"
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
 {
@@ -26,4 +27,21 @@ bool UMMOGameplayUtils::Is2HWeapon(EMMOWeaponType WeaponType)
 	}
 
 	return false;
+}
+
+UAnimSequenceBase* UMMOGameplayUtils::GetAnimSequence(const FMMOWeaponTypeCouple& WeaponCouple)
+{
+	UMMODataFinder* DataFinder = UMMODataFinder::Get();
+	return DataFinder->GetAnimSequence(WeaponCouple);
+}
+
+float UMMOGameplayUtils::PlayRateToFitAnimation(const UAnimSequenceBase* Anim, float TargetSeconds)
+{
+	if (Anim && !FMath::IsNearlyZero(TargetSeconds, KINDA_SMALL_NUMBER))
+	{
+		return Anim->GetPlayLength() / TargetSeconds;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("Cannot Fit Animation %s to seconds %f"), Anim ? *Anim->GetName() : TEXT("NULL"), TargetSeconds);
+	return 1.0f;
 }

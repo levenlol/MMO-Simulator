@@ -9,5 +9,7 @@ public class MMO_Simulator : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayTags", "NavigationSystem", "AIModule", "GameplayTasks" });
-    }
+
+		//OptimizeCode = CodeOptimization.InShippingBuildsOnly;
+	}
 }
