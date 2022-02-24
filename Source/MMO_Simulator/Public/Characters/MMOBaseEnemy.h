@@ -19,7 +19,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Aggro)
-	UMMOAggroManagerComponent* AggroSystem;
+	UMMOAggroManagerComponent* AggroManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Aggro)
 	USphereComponent* AggroSphere;

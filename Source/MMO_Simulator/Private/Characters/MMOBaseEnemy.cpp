@@ -8,7 +8,7 @@
 AMMOBaseEnemy::AMMOBaseEnemy()
 	: Super()
 {
-	AggroSystem = CreateDefaultSubobject<UMMOAggroManagerComponent>(TEXT("AggroManager"));
+	AggroManager = CreateDefaultSubobject<UMMOAggroManagerComponent>(TEXT("AggroManager"));
 	
 	AggroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AggroSphere"));
 	AggroSphere->SetupAttachment(RootComponent);

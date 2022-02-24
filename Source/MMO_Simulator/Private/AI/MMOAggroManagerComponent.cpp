@@ -85,5 +85,6 @@ void UMMOAggroManagerComponent::SortAggroList()
 void UMMOAggroManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 }
 
