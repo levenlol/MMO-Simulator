@@ -4,6 +4,7 @@
 #include "AI/MMOAggroManagerComponent.h"
 #include "Characters/MMOBaseCharacter.h"
 
+
 UMMOAggroManagerComponent::UMMOAggroManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -13,14 +14,23 @@ void UMMOAggroManagerComponent::AddDanger(AMMOBaseCharacter* InCharacter, float 
 {
 	if (!InCharacter)
 		return;
-
 	
 	if (!AggroList.FindByPredicate([InCharacter](const FMMOAggroData& Data) { return Data.Character == InCharacter; }))
 	{
-		AggroList.Emplace(InCharacter, AggroOnPull);
+		AggroList.Emplace(InCharacter, AggroList.Num() <= 0 ? AggroOnPull : 0.f);
 	}
 
 	SortAggroList();
+}
+
+AMMOBaseCharacter* UMMOAggroManagerComponent::GetMostDangerousCharacter() const
+{
+	if (AggroList.Num() > 0)
+	{
+		return AggroList.Last().Character;
+	}
+
+	return nullptr;
 }
 
 void UMMOAggroManagerComponent::BeginPlay()
@@ -81,10 +91,8 @@ void UMMOAggroManagerComponent::SortAggroList()
 	}
 }
 
-
 void UMMOAggroManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 }
-

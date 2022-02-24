@@ -10,6 +10,6 @@ public class MMO_Simulator : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayTags", "NavigationSystem", "AIModule", "GameplayTasks" });
 
-		//OptimizeCode = CodeOptimization.InShippingBuildsOnly;
+		OptimizeCode = CodeOptimization.InShippingBuildsOnly;
 	}
 }

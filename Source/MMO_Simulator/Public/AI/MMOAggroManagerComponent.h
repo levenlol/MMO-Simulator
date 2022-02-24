@@ -57,6 +57,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Aggro)
 	void AddDanger(AMMOBaseCharacter* InCharacter, float AggroBoost = 0.f);
 
+	UFUNCTION(BlueprintPure, Category = Aggro)
+	AMMOBaseCharacter* GetMostDangerousCharacter() const;
+
+	UFUNCTION(BlueprintPure, Category = Aggro)
+	const TArray<FMMOAggroData>& GetSortedAggroList() const { return AggroList; }
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -210,7 +210,11 @@ bool AMMOBaseCharacter::StartAttack(AMMOBaseCharacter* Target)
 
 bool AMMOBaseCharacter::CanAttackTarget(AMMOBaseCharacter* Target) const
 {
-	return Target && CanCharacterAttack() && (GetActorLocation() - Target->GetActorLocation()).SizeSquared() <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
+	if (!Target || !CanCharacterAttack())
+		return false;
+	
+	const float DistanceSq = (GetActorLocation() - Target->GetActorLocation()).SizeSquared();
+	return DistanceSq <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
 }
 
 // Called every frame

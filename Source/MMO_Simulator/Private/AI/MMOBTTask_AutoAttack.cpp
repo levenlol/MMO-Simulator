@@ -63,11 +63,12 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		{
 			UE_LOG(LogTemp, Error, TEXT("Unable to Complete Task: UMMOBTTask_AutoAttack"));
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+
+			return;
 		}
 
 		MyMemory->bDealtDamage = true;
 		const bool bAttackPerformed = Character->StartAttack(Target);
-		check(bAttackPerformed);
 	}
 
 	if (MyMemory->DamageDelayTime <= 0.f)
