@@ -9,6 +9,20 @@ UMMOAggroManagerComponent::UMMOAggroManagerComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UMMOAggroManagerComponent::AddDanger(AMMOBaseCharacter* InCharacter, float AggroBoost /*= 0.f*/)
+{
+	if (!InCharacter)
+		return;
+
+	
+	if (!AggroList.FindByPredicate([InCharacter](const FMMOAggroData& Data) { return Data.Character == InCharacter; }))
+	{
+		AggroList.Emplace(InCharacter, AggroOnPull);
+	}
+
+	SortAggroList();
+}
+
 void UMMOAggroManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -39,16 +53,32 @@ void UMMOAggroManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason
 void UMMOAggroManagerComponent::OnTakeDamage(AMMOBaseCharacter* Sender, FMMODamage Damage)
 {
 	FMMOAggroData* AggroData = AggroList.FindByPredicate([DamageDealer = Damage.DamageDealer](const FMMOAggroData& AggroData) { return AggroData.Character == DamageDealer; });
+
+	const float Aggro = FMath::Max(static_cast<float>(Damage.Damage), 0.f) * DamageAggroPercent + FMath::Max(static_cast<float>(-Damage.Damage), 0.f) * HealAggroPercent;
 	if (AggroData)
 	{
-		AggroData->Aggro += fabsf(static_cast<float>(Damage.Damage)) * DamageAggroPercent;
+		AggroData->Aggro += Aggro;
 	}
 	else
 	{
-		AggroList.Add(FMMOAggroData(Damage.DamageDealer, static_cast<float>(Damage.Damage)));
+		AggroList.Add(FMMOAggroData(Damage.DamageDealer, Aggro));
 	}
 
-	AggroList.Sort();
+	SortAggroList();
+}
+
+void UMMOAggroManagerComponent::SortAggroList()
+{
+	if (AggroList.Num() > 1)
+	{
+		AggroList.Sort([StealAggroThreshold = PercentToStealAggro, Top = AggroList[0].Character](const FMMOAggroData& A, const FMMOAggroData& B)
+		{
+			if (Top == A.Character)
+				return  A.Aggro < B.Aggro * StealAggroThreshold;
+
+			return A < B;
+		});
+	}
 }
 
 

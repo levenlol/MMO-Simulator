@@ -2,6 +2,17 @@
 
 
 #include "Characters/MMOBaseEnemy.h"
+#include "AI/MMOAggroManagerComponent.h"
+#include "Components/SphereComponent.h"
+
+AMMOBaseEnemy::AMMOBaseEnemy()
+	: Super()
+{
+	AggroSystem = CreateDefaultSubobject<UMMOAggroManagerComponent>(TEXT("AggroManager"));
+	
+	AggroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AggroSphere"));
+	AggroSphere->SetupAttachment(RootComponent);
+}
 
 void AMMOBaseEnemy::Tick(float DeltaSeconds)
 {

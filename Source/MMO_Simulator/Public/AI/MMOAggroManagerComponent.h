@@ -54,6 +54,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aggro)
 	float HealAggroPercent = 1.f;
 
+	UFUNCTION(BlueprintCallable, Category = Aggro)
+	void AddDanger(AMMOBaseCharacter* InCharacter, float AggroBoost = 0.f);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -61,6 +64,8 @@ protected:
 private:
 	UFUNCTION()
 	void OnTakeDamage(AMMOBaseCharacter* Sender, FMMODamage Damage);
+
+	void SortAggroList();
 
 	// sorted array.highest aggro first
 	UPROPERTY(VisibleAnywhere, Category = Aggro)
