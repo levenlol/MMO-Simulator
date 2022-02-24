@@ -12,7 +12,7 @@
 class AMMOBaseWeapon;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOStartAttack, AMMOBaseCharacter*, Sender);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOCharacterEvent, AMMOBaseCharacter*, Sender);
 
 
 UCLASS()
@@ -104,7 +104,10 @@ public:
 	FMMOOnDamageTaken OnDamageTaken;
 
 	UPROPERTY(BlueprintAssignable, Category = Combat)
-	FMMOStartAttack OnStartAttack;
+	FMMOCharacterEvent OnStartAttack;
+
+	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOCharacterEvent OnDeath;
 
 	UPROPERTY(VisibleAnywhere, Category = Status)
 	FGameplayTagContainer StatusTags;
@@ -121,6 +124,8 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual void Die();
+
 	bool TryAttack(AMMOBaseCharacter* Target);
 	void StopAttack();
 
@@ -136,6 +141,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AMMOBaseWeapon* OffHandWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	bool bAlive = true;
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	float LastAttackTime = 0.f;

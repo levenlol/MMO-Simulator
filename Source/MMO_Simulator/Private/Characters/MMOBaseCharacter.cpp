@@ -31,6 +31,11 @@ void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(RecuperateTimerHandle);
 }
 
+void AMMOBaseCharacter::Die()
+{
+	OnDeath.Broadcast(this);
+}
+
 FMMODamage AMMOBaseCharacter::ComputeAutoAttackDamage()
 {
 	FMMODamage Damage;
@@ -56,6 +61,12 @@ void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
 {
 	Stats.Health = FMath::Clamp(Stats.Health - InDamage.Damage, 0, Stats.MaxHealth);
 	OnDamageTaken.Broadcast(this, InDamage);
+
+	if (Stats.Health <= 0 && bAlive)
+	{
+		bAlive = false;
+		Die();
+	}
 }
 
 bool AMMOBaseCharacter::IsAttacking() const
