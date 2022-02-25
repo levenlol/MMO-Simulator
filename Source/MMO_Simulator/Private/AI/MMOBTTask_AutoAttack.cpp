@@ -71,9 +71,9 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		const bool bAttackPerformed = Character->StartAttack(Target);
 	}
 
-	if (MyMemory->DamageDelayTime <= 0.f)
+	if (MyMemory->AttackSpeed <= 0.f)
 	{
-		// animation finished
+		// Should also be synched with animation.
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }
