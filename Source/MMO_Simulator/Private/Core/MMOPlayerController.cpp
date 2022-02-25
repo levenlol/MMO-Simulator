@@ -9,6 +9,7 @@
 #include "Characters/MMOBaseEnemy.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
@@ -63,6 +64,12 @@ void AMMOPlayerController::SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHero
 	}
 }
 
+void AMMOPlayerController::TogglePause()
+{
+	const float TimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
+	UGameplayStatics::SetGlobalTimeDilation(this, FMath::IsNearlyZero(TimeDilation, 0.001f) ? 1.f : 0.f);
+}
+
 bool AMMOPlayerController::DeprojectMouseToTerrain(FVector& OutLocation, FVector& OutTerrainNormal) const
 {
 	FVector MouseLocation, Direction;
@@ -111,6 +118,8 @@ void AMMOPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Select", IE_Pressed, this, &AMMOPlayerController::OnSelectPressed);
 	InputComponent->BindAction("Select", IE_Released, this, &AMMOPlayerController::OnSelectReleased);
+
+	InputComponent->BindAction("Pause", IE_Released, this, &AMMOPlayerController::TogglePause);
 }
 
 void AMMOPlayerController::SetNewMoveDestination()

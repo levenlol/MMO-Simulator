@@ -48,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Selection)
 	void SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHeroes);
 
+	UFUNCTION(BlueprintCallable, Category = Selection)
+	void TogglePause();
+
 	FORCEINLINE const TArray<AMMOBaseHero*>& GetSelectedHeroes() const { return SelectedHeroes; }
 
 
