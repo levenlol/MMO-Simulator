@@ -104,6 +104,27 @@ FMMOWeaponTypeCouple AMMOBaseCharacter::GetCurrentEquippedWeaponsType() const
 	return CurrentEquippedWeapons;
 }
 
+float AMMOBaseCharacter::GetWeaponRange() const
+{
+	float WeaponRange = 0.f;
+	if (MainHandWeapon)
+	{
+		WeaponRange = MainHandWeapon->Stats.WeaponRange;
+	}
+
+	if (OffHandWeapon)
+	{
+		WeaponRange = FMath::Min(WeaponRange, OffHandWeapon->Stats.WeaponRange);
+	}
+
+	return WeaponRange;
+}
+
+bool AMMOBaseCharacter::HasEquippedAnyWeapons() const
+{
+	return !!MainHandWeapon;
+}
+
 bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand)
 {
 	if (!InWeaponClass)

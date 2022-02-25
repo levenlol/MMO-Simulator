@@ -87,6 +87,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
 	void DamageTake(FMMODamage InDamage);
 
+	// Get minimum range of current equipped weapon
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	float GetWeaponRange() const;
+
+	// Return if any weapon is equipped (only main hand weapon is checked).
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	bool HasEquippedAnyWeapons() const;
+
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand);
 

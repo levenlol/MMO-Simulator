@@ -3,6 +3,8 @@
 
 #include "Core/MMOCommon.h"
 #include "Data/MMODataFinder.h"
+#include "Weapons/MMOBaseWeapon.h"
+#include "Characters/MMOBaseCharacter.h"
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
 {
