@@ -225,6 +225,7 @@ bool AMMOBaseCharacter::CanAttackTarget(AMMOBaseCharacter* Target) const
 		return false;
 	
 	const float DistanceSq = (GetActorLocation() - Target->GetActorLocation()).SizeSquared();
+
 	return DistanceSq <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
 }
 
