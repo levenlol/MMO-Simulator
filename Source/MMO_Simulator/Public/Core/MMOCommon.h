@@ -7,6 +7,7 @@
 
 class UAnimSequenceBase;
 class AMMOBaseCharacter;
+class AMMOBaseHero;
 
 UENUM(BlueprintType)
 enum class EMMOCharacterClass : uint8
@@ -283,4 +284,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Animation, meta = (BlueprintThreadSafe))
 	static float PlayRateToFitAnimation(const UAnimSequenceBase* Anim, float TargetSeconds);
+	
+	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	static const TArray<AMMOBaseHero*>& GetHeroes(const UObject* WorldContextObject);
 };

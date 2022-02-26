@@ -5,6 +5,7 @@
 #include "Data/MMODataFinder.h"
 #include "Weapons/MMOBaseWeapon.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Core/MMOGameState.h"
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
 {
@@ -46,4 +47,15 @@ float UMMOGameplayUtils::PlayRateToFitAnimation(const UAnimSequenceBase* Anim, f
 
 	UE_LOG(LogTemp, Error, TEXT("Cannot Fit Animation %s to seconds %f"), Anim ? *Anim->GetName() : TEXT("NULL"), TargetSeconds);
 	return 1.0f;
+}
+
+const TArray<AMMOBaseHero*>& UMMOGameplayUtils::GetHeroes(const UObject* WorldContextObject)
+{
+	if (AMMOGameState* GameState = AMMOGameState::GetMMOGameState(WorldContextObject))
+	{
+		return GameState->Heroes;
+	}
+
+	static TArray<AMMOBaseHero*> NoHeroes;
+	return NoHeroes;
 }
