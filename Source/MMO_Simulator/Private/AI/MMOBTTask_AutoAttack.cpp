@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Core/MMOCommon.h"
 #include "Weapons/MMOBaseWeapon.h"
+#include "CombatSystem/MMOCombatSystem.h"
 
 UMMOBTTask_AutoAttack::UMMOBTTask_AutoAttack()
 	: Super()
@@ -22,7 +23,7 @@ EBTNodeResult::Type UMMOBTTask_AutoAttack::ExecuteTask(UBehaviorTreeComponent& O
 	AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(AIOwner->GetPawn());
 	UBlackboardComponent* BlackBoard = AIOwner->GetBlackboardComponent();
 
-	if (!Character || !BlackBoard)
+	if (!IsValid(Character) || !BlackBoard)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable to ExecuteTask: UMMOBTTask_AutoAttack"));
 		return EBTNodeResult::Failed;
@@ -30,7 +31,7 @@ EBTNodeResult::Type UMMOBTTask_AutoAttack::ExecuteTask(UBehaviorTreeComponent& O
 
 	AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(BlackBoard->GetValueAsObject(FName("TargetActor")));
 
-	if (Character->CanAttackTarget(Target))
+	if (Character->CombatSystem->CanAttackTarget(Target))
 	{
 		MyMemory->AttackSpeed = Character->GetMainHandWeapon()->Stats.AttackSpeed;
 		MyMemory->DamageDelayTime = MyMemory->AttackSpeed * DamageAtAnimPercentage;
@@ -58,8 +59,7 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(AIOwner->GetPawn());
 		AMMOBaseCharacter* Target = MyMemory->TargetWeak.Get();
 
-
-		if (!Character || !Target)
+		if (!IsValid(Character) || !IsValid(Target))
 		{
 			UE_LOG(LogTemp, Error, TEXT("Unable to Complete Task: UMMOBTTask_AutoAttack"));
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -68,7 +68,7 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		}
 
 		MyMemory->bDealtDamage = true;
-		const bool bAttackPerformed = Character->StartAttack(Target);
+		const bool bAttackPerformed = Character->CombatSystem->StartAttack(Target);
 	}
 
 	if (MyMemory->AttackSpeed <= 0.f)

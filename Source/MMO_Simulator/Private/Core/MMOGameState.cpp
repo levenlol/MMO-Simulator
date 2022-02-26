@@ -21,3 +21,25 @@ AMMOGameState* AMMOGameState::GetMMOGameState(const UObject* WorldContextObject)
 {
 	return Cast<AMMOGameState>(UGameplayStatics::GetGameState(WorldContextObject));
 }
+
+void AMMOGameState::NotifyStartAttack(AMMOBaseCharacter* Sender)
+{
+	if (!Sender)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cannot notify start attack."));
+		return;
+	}
+
+	OnStartAttack.Broadcast(Sender);
+}
+
+void AMMOGameState::NotifyDeath(AMMOBaseCharacter* Sender)
+{
+	if (!Sender)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cannot notify death."));
+		return;
+	}
+
+	OnDeath.Broadcast(Sender);
+}

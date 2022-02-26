@@ -10,9 +10,10 @@
 #include "MMOBaseCharacter.generated.h"
 
 class AMMOBaseWeapon;
+class UMMOCombatSystem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOCharacterEvent, AMMOBaseCharacter*, Sender);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FMMOOnEquipWeapon, AMMOBaseCharacter*, Sender, AMMOBaseWeapon*, NewWeapon, AMMOBaseWeapon*, OldWeapon);
 
 
 UCLASS()
@@ -23,6 +24,9 @@ class MMO_SIMULATOR_API AMMOBaseCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AMMOBaseCharacter();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	UMMOCombatSystem* CombatSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FName Name;
@@ -73,15 +77,6 @@ public:
 	FORCEINLINE AMMOBaseWeapon* GetOffHandWeapon() const { return OffHandWeapon; }
 
 	UFUNCTION(BlueprintPure, Category = Stats)
-	bool IsAttacking() const;
-
-	UFUNCTION(BlueprintPure, Category = Stats)
-	bool IsStunned() const;
-
-	UFUNCTION(BlueprintPure, Category = Stats)
-	bool CanCharacterAttack() const;
-
-	UFUNCTION(BlueprintPure, Category = Stats)
 	FMMOWeaponTypeCouple GetCurrentEquippedWeaponsType() const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
@@ -98,11 +93,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass, bool bMainHand);
 
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool StartAttack(AMMOBaseCharacter* Target);
+	UFUNCTION(BlueprintCallable, Category = Status)
+	void GiveTag(const FGameplayTag& InTag);
 
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
+	UFUNCTION(BlueprintCallable, Category = Status)
+	void RemoveTag(const FGameplayTag& InTag);
+
+	UFUNCTION(BlueprintPure, Category = Status)
+	bool HasTag(const FGameplayTag& InTag) const;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -111,20 +109,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOOnDamageTaken OnDamageTaken;
 
-	UPROPERTY(BlueprintAssignable, Category = Combat)
-	FMMOCharacterEvent OnStartAttack;
-
-	UPROPERTY(BlueprintAssignable, Category = Combat)
-	FMMOCharacterEvent OnDeath;
+	UPROPERTY(BlueprintAssignable, Category = Weapon)
+	FMMOOnEquipWeapon OnEquipWeapon;
 
 	UPROPERTY(VisibleAnywhere, Category = Status)
 	FGameplayTagContainer StatusTags;
-
-	UPROPERTY(EditAnywhere, Category = Status)
-	FGameplayTag AttackTag;
-
-	UPROPERTY(EditAnywhere, Category = Status)
-	FGameplayTag StunnedTag;
 
 protected:
 	// Called when the game starts or when spawned
@@ -132,12 +121,8 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void Die();
-
-	bool TryAttack(AMMOBaseCharacter* Target);
-	void StopAttack();
-
-	FMMODamage ComputeAutoAttackDamage();
+	UFUNCTION(BlueprintNativeEvent, Category = Status)
+	void Die();
 
 private:
 	FTimerHandle RecuperateTimerHandle;
@@ -152,7 +137,4 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	bool bAlive = true;
-
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	float LastAttackTime = 0.f;
 };
