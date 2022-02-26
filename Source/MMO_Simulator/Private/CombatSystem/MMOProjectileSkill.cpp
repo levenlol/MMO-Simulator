@@ -18,7 +18,7 @@ AMMOProjectile::AMMOProjectile()
 	ParticleComponent->SetupAttachment(RootComponent);
 
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 }
 
 void AMMOProjectile::Tick(float DeltaSeconds)
@@ -38,6 +38,19 @@ void AMMOProjectile::Tick(float DeltaSeconds)
 }
 
 
+void UMMOProjectileSkill::Setup(AMMOBaseCharacter* InOwner)
+{
+	Super::Setup(InOwner);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = OwnerCharacter;
+	Projectile = GetWorld()->SpawnActor<AMMOProjectile>(ProjectileClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
+	Projectile->SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &UMMOProjectileSkill::OnProjectileOverlap);
+
+	SetProjectileActive(false);
+}
+
 void UMMOProjectileSkill::CastAbility(FMMOSkillInputData Data)
 {
 	Super::CastAbility(Data);
@@ -48,20 +61,16 @@ void UMMOProjectileSkill::CastAbility(FMMOSkillInputData Data)
 		return;
 	}
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = OwnerCharacter;
-	Projectile = GetWorld()->SpawnActor<AMMOProjectile>(ProjectileClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
-	Projectile->SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &UMMOProjectileSkill::OnProjectileOverlap);
 	Projectile->SetTarget(Data.TargetActor);
+	Projectile->SetActorLocation(OwnerCharacter->GetActorLocation());
+	Projectile->ParticleComponent->KillParticlesForced();
+	SetProjectileActive(true);
 }
 
 void UMMOProjectileSkill::OnProjectileOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == Projectile->GetTarget())
 	{
-		Projectile->SphereComponent->OnComponentBeginOverlap.RemoveDynamic(this, &UMMOProjectileSkill::OnProjectileOverlap);
-
 		for (UMMOBaseSkill* Skill : TriggeredSkills)
 		{
 			FMMOSkillInputData Data;
@@ -70,7 +79,13 @@ void UMMOProjectileSkill::OnProjectileOverlap(UPrimitiveComponent* OverlappedCom
 			Skill->CastAbility(Data);
 		}
 
-		// TODO reuse it.
-		Projectile->Destroy();
+		SetProjectileActive(false);
 	}
+}
+
+void UMMOProjectileSkill::SetProjectileActive(bool bActive)
+{
+	Projectile->SetActorHiddenInGame(!bActive);
+	Projectile->SetActorEnableCollision(bActive);
+	Projectile->SetActorTickEnabled(bActive);
 }

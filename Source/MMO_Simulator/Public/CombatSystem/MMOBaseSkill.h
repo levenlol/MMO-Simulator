@@ -47,9 +47,12 @@ public:
 
 	// Only need to set the cooldown of "Root" skill.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
-	float Cooldown = 0.f;
+	float Cooldown = 5.f;
 
+	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 	virtual void CastAbility(FMMOSkillInputData Data) override;
 
 	bool IsInCooldown() const;
+private:
+	float LastCastTime = 0.f;
 };
