@@ -6,6 +6,7 @@
 #include "GameplayTagsManager.h"
 #include "Weapons/MMOBaseWeapon.h"
 #include "Core/MMOGameState.h"
+#include "CombatSystem/MMOBaseSkill.h"
 
 UMMOCombatSystem::UMMOCombatSystem()
 	: Super()
@@ -76,18 +77,12 @@ bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 
 bool UMMOCombatSystem::IsAttacking() const
 {
-	if (!OwnerCharacter)
-		return false;
-
-	return OwnerCharacter->HasTag(AttackTag);
+	return OwnerCharacter ? OwnerCharacter->HasTag(AttackTag) : false;
 }
 
 bool UMMOCombatSystem::IsStunned() const
 {
-	if (!OwnerCharacter)
-		return false;
-
-	return OwnerCharacter->HasTag(StunnedTag);
+	return OwnerCharacter ? OwnerCharacter->HasTag(StunnedTag) : false;
 }
 
 bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
