@@ -34,7 +34,7 @@ void AMMOProjectile::Tick(float DeltaSeconds)
 	const FVector Direction = (Target->GetActorLocation() - Location).GetSafeNormal();
 	
 	const FVector NewLocation = Location + Direction * Speed * DeltaSeconds;
-	SetActorLocation(NewLocation);
+	SetActorLocationAndRotation(NewLocation, Direction.Rotation());
 }
 
 
