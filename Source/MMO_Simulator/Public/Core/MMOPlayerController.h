@@ -99,4 +99,16 @@ private:
 
 	void MoveHeroTo(AController* InController, AActor* Target);
 	void MoveHeroTo(AController* InController, const FVector& Location);
+
+	/** Skill */
+	template<int32 Index>
+	void TryCastSkill();
+
+	void TryCastSkill(const int32 Index);
 };
+
+template<int32 Index>
+FORCEINLINE void AMMOPlayerController::TryCastSkill()
+{
+	TryCastSkill(Index);
+}

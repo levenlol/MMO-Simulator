@@ -10,6 +10,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "CombatSystem//MMOCombatSystem.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
@@ -120,6 +121,8 @@ void AMMOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Select", IE_Released, this, &AMMOPlayerController::OnSelectReleased);
 
 	InputComponent->BindAction("Pause", IE_Released, this, &AMMOPlayerController::TogglePause);
+	
+	InputComponent->BindAction("Skill_1", IE_Released, this, &AMMOPlayerController::TryCastSkill<0>);
 }
 
 void AMMOPlayerController::SetNewMoveDestination()
@@ -138,7 +141,6 @@ void AMMOPlayerController::SetNewMoveDestination()
 			const FVector& DestLocation = Points[i];
 
 			MoveHeroTo(CurrentHero->GetController(), DestLocation);
-			
 		}
 	}
 }
@@ -232,5 +234,18 @@ void AMMOPlayerController::MoveHeroTo(AController* InController, const FVector& 
 			BlackBoard->SetValueAsVector(FName("TargetLocation"), Location);
 			BlackBoard->ClearValue(FName("TargetActor"));
 		}
+	}
+}
+
+void AMMOPlayerController::TryCastSkill(const int32 Index)
+{
+	AMMOBaseEnemy* Enemy = GetEnemyUnderMouse();
+	FVector Location, Normal;
+	DeprojectMouseToTerrain(Location, Normal);
+
+	const TArray<AMMOBaseHero*>& Heroes = GetSelectedHeroes();
+	for (AMMOBaseHero* Hero : Heroes)
+	{
+		Hero->CombatSystem->TryCastSkill(Enemy, Location, Index);
 	}
 }

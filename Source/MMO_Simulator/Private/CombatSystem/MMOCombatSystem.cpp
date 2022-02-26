@@ -21,6 +21,11 @@ void UMMOCombatSystem::BeginPlay()
 
 	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
 	OwnerCharacter->OnEquipWeapon.AddDynamic(this, &UMMOCombatSystem::OnCharacterChangeWeapon);
+
+	for (UMMOBaseSkill* Skill : Skills)
+	{
+		Skill->Setup(OwnerCharacter);
+	}
 }
 
 void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -73,6 +78,18 @@ bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
 	return DistanceSq <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
+}
+
+void UMMOCombatSystem::TryCastSkill(AActor* Target, const FVector& Location, const int32 Index)
+{
+	FMMOSkillInputData InputData;
+	InputData.Location = Location;
+	InputData.TargetActor = Target;
+
+	if (Skills.IsValidIndex(Index))
+	{
+		Skills[Index]->CastAbility(InputData);
+	}
 }
 
 bool UMMOCombatSystem::IsAttacking() const

@@ -11,7 +11,7 @@
 
 class AMMOBaseHero;
 class AMMOBaseCharacter;
-class UMMOBaseSkill;
+class UMMOWrapperSkill;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MMO_SIMULATOR_API UMMOCombatSystem : public UActorComponent
@@ -29,6 +29,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void TryCastSkill(AActor* Target, const FVector& Location, const int32 Index);
+
+
 	UFUNCTION(BlueprintPure, Category = Stats)
 	bool IsAttacking() const;
 
@@ -39,7 +43,7 @@ public:
 	bool CanCharacterAttack() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, instanced, Category = Skill, meta = (AllowPrivateAccess))
-	TArray<UMMOBaseSkill*> Skills;
+	TArray<UMMOWrapperSkill*> Skills;
 
 private:
 	UPROPERTY(EditAnywhere, Category = Status, meta=(AllowPrivateAccess))
