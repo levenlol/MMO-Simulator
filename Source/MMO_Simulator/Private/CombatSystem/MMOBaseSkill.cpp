@@ -17,6 +17,22 @@ void UMMOBaseSkill::Tick(float DeltaSeconds)
 {
 }
 
+const UMMOBaseSkill* UMMOBaseSkill::GetOuterSkill() const
+{
+	return GetOuterSkill_Rec(this);
+}
+
+const UMMOBaseSkill* UMMOBaseSkill::GetOuterSkill_Rec(const UMMOBaseSkill* InSkill) const
+{
+	if (InSkill)
+	{
+		const UMMOBaseSkill* OuterSkill = Cast<UMMOBaseSkill>(InSkill->GetOuter());
+		return OuterSkill ? GetOuterSkill_Rec(OuterSkill) : InSkill;
+	}
+
+	return nullptr;
+}
+
 void UMMOWrapperSkill::Setup(AMMOBaseCharacter* InOwner)
 {
 	Super::Setup(InOwner);

@@ -37,6 +37,10 @@ public:
 protected:
 	UPROPERTY()
 	AMMOBaseCharacter* OwnerCharacter;
+
+	const UMMOBaseSkill* GetOuterSkill() const;
+private:
+	const UMMOBaseSkill* GetOuterSkill_Rec(const UMMOBaseSkill* InSkill) const;
 };
 
 UCLASS(DefaultToInstanced, EditInlineNew, Blueprintable, BlueprintType)
@@ -48,6 +52,9 @@ public:
 	// Only need to set the cooldown of "Root" skill.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	float Cooldown = 5.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
+	float Range = 1000.f;
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 	virtual void CastAbility(FMMOSkillInputData Data) override;

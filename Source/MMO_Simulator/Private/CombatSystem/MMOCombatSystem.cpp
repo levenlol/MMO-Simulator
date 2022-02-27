@@ -77,13 +77,18 @@ bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 
 void UMMOCombatSystem::TryCastSkill(AActor* Target, const FVector& Location, const int32 Index)
 {
-	FMMOSkillInputData InputData;
-	InputData.Location = Location;
-	InputData.TargetActor = Target;
-
-	if (Skills.IsValidIndex(Index))
+	if (Skills.IsValidIndex(Index) && OwnerCharacter)
 	{
-		Skills[Index]->CastAbility(InputData);
+		FMMOSkillInputData InputData;
+		InputData.Location = Location;
+		InputData.TargetActor = Target;
+
+		const bool bInRange = (OwnerCharacter->GetActorLocation() - Location).SizeSquared() <= (Skills[Index]->Range * Skills[Index]->Range);
+
+		if (bInRange)
+		{
+			Skills[Index]->CastAbility(InputData);
+		}
 	}
 }
 

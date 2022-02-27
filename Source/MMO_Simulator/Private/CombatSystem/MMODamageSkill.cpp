@@ -12,8 +12,8 @@ void UMMODamageSkill::CastAbility(FMMOSkillInputData Data)
 	}
 	else
 	{
-		// TODO: location.
-		ensure(0);
+		const FString SkillName = *GetOuterSkill()->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("Skill: %s cannot do damage to location, expected a target."), *SkillName);
 	}
 }
 
