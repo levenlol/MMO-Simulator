@@ -39,7 +39,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Happiness;
 
-	// How greedy is the character
+	// How greedy the character is.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Greediness;
 

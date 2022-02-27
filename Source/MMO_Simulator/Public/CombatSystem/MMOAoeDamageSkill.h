@@ -13,5 +13,8 @@ UCLASS()
 class MMO_SIMULATOR_API UMMOAoeDamageSkill : public UMMODamageSkill
 {
 	GENERATED_BODY()
-	
-};
+public:
+	virtual void CastAbility(FMMOSkillInputData Data) override;
+
+
+ };

@@ -4,10 +4,13 @@
 #include "Characters/MMOBaseEnemy.h"
 #include "AI/MMOAggroManagerComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 
 AMMOBaseEnemy::AMMOBaseEnemy()
 	: Super()
 {
+	GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
+
 	AggroManager = CreateDefaultSubobject<UMMOAggroManagerComponent>(TEXT("AggroManager"));
 	
 	AggroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AggroSphere"));
