@@ -35,6 +35,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	EMMOCharacterClass CharacterClass;
 
+	// Role of the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	EMMOCharacterRole CharacterRole;
+
 	// How happy is the character.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Happiness;

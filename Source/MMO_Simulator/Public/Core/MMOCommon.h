@@ -16,12 +16,22 @@ enum class EMMOCharacterClass : uint8
 	Paladin,
 	Berserker,
 	DeathKnight,
+	Hunter,
 	Shaman,
 	Monk,
 	Priest,
 	Druid,
 	Mage,
 	Warlock
+};
+
+UENUM(BlueprintType)
+enum class EMMOCharacterRole : uint8
+{
+	Tank,
+	Healer,
+	Melee,
+	Ranged
 };
 
 UENUM(BlueprintType)
