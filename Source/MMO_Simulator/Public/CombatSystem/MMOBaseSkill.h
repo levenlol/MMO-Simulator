@@ -54,6 +54,9 @@ public:
 	float Cooldown = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
+	TSoftObjectPtr<UTexture2D> Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	float Range = 1000.f;
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
