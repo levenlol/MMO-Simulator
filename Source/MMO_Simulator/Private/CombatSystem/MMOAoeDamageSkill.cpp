@@ -32,6 +32,7 @@ void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
 	// FX
 	if(ParticleToPlay)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleToPlay, FTransform(FRotator::ZeroRotator, Location));
+		const float Scale = Radius / ParticlesSize;
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleToPlay, FTransform(FRotator::ZeroRotator, Location, FVector(Scale, Scale, Scale)));
 	}
 }

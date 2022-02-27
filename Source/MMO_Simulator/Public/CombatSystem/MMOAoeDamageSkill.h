@@ -19,8 +19,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = Damage)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
-	UPROPERTY(EditAnywhere, Category = Damage)
+	UPROPERTY(EditAnywhere, Category = FX)
 	UParticleSystem* ParticleToPlay = nullptr;
+
+	// cm. Used to scale particle based on damage radius. Scale = Radius / ParticlesSize.
+	UPROPERTY(EditAnywhere, Category = FX, meta = (ClampMin = "1.0"))
+	float ParticlesSize = 100.f;
 
 	UPROPERTY(EditAnywhere, Category = Damage, meta=(ClampMin="1.0"))
 	float Radius = 100.f;
