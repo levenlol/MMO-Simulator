@@ -42,20 +42,23 @@ void UMMOProjectileSkill::Setup(AMMOBaseCharacter* InOwner)
 {
 	Super::Setup(InOwner);
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = OwnerCharacter;
-	Projectile = GetWorld()->SpawnActor<AMMOProjectile>(ProjectileClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
-	Projectile->SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &UMMOProjectileSkill::OnProjectileOverlap);
+	if (ProjectileClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = OwnerCharacter;
+		Projectile = GetWorld()->SpawnActor<AMMOProjectile>(ProjectileClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
+		Projectile->SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &UMMOProjectileSkill::OnProjectileOverlap);
 
-	SetProjectileActive(false);
+		SetProjectileActive(false);
+	}
 }
 
 void UMMOProjectileSkill::CastAbility(FMMOSkillInputData Data)
 {
 	Super::CastAbility(Data);
 
-	if (!Data.TargetActor || !ProjectileClass)
+	if (!Data.TargetActor || !Projectile)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Cannot spawn projectile"));
 		return;
@@ -85,7 +88,10 @@ void UMMOProjectileSkill::OnProjectileOverlap(UPrimitiveComponent* OverlappedCom
 
 void UMMOProjectileSkill::SetProjectileActive(bool bActive)
 {
-	Projectile->SetActorHiddenInGame(!bActive);
-	Projectile->SetActorEnableCollision(bActive);
-	Projectile->SetActorTickEnabled(bActive);
+	if (Projectile)
+	{
+		Projectile->SetActorHiddenInGame(!bActive);
+		Projectile->SetActorEnableCollision(bActive);
+		Projectile->SetActorTickEnabled(bActive);
+	}
 }

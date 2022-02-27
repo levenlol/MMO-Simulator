@@ -9,7 +9,7 @@
 AMMOBaseEnemy::AMMOBaseEnemy()
 	: Super()
 {
-	GetCapsuleComponent()->SetCollisionProfileName(FName("BlockAll"));
+	GetCapsuleComponent()->SetCollisionProfileName(FName("EnemyPawn"));
 
 	AggroManager = CreateDefaultSubobject<UMMOAggroManagerComponent>(TEXT("AggroManager"));
 	

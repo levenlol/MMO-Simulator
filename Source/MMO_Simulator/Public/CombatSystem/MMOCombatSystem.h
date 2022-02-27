@@ -32,6 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void TryCastSkill(AActor* Target, const FVector& Location, const int32 Index);
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills);
 
 	UFUNCTION(BlueprintPure, Category = Stats)
 	bool IsAttacking() const;
@@ -42,7 +44,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = Stats)
 	bool CanCharacterAttack() const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, instanced, Category = Skill, meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = Skill, meta = (AllowPrivateAccess))
 	TArray<UMMOWrapperSkill*> Skills;
 
 private:

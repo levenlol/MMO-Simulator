@@ -123,6 +123,9 @@ void AMMOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Pause", IE_Released, this, &AMMOPlayerController::TogglePause);
 	
 	InputComponent->BindAction("Skill_1", IE_Released, this, &AMMOPlayerController::TryCastSkill<0>);
+	InputComponent->BindAction("Skill_2", IE_Released, this, &AMMOPlayerController::TryCastSkill<1>);
+	InputComponent->BindAction("Skill_3", IE_Released, this, &AMMOPlayerController::TryCastSkill<2>);
+
 }
 
 void AMMOPlayerController::SetNewMoveDestination()

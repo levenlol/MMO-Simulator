@@ -21,11 +21,6 @@ void UMMOCombatSystem::BeginPlay()
 
 	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
 	OwnerCharacter->OnEquipWeapon.AddDynamic(this, &UMMOCombatSystem::OnCharacterChangeWeapon);
-
-	for (UMMOBaseSkill* Skill : Skills)
-	{
-		Skill->Setup(OwnerCharacter);
-	}
 }
 
 void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -89,6 +84,18 @@ void UMMOCombatSystem::TryCastSkill(AActor* Target, const FVector& Location, con
 	if (Skills.IsValidIndex(Index))
 	{
 		Skills[Index]->CastAbility(InputData);
+	}
+}
+
+void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills)
+{
+	Skills.Empty();
+	for (TSubclassOf<UMMOWrapperSkill> SkillClass : InSkills)
+	{
+		UMMOWrapperSkill* Skill = NewObject<UMMOWrapperSkill>(this, SkillClass);
+		Skill->Setup(OwnerCharacter);
+
+		Skills.Add(Skill);
 	}
 }
 
