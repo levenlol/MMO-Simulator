@@ -88,10 +88,5 @@ void UMMOProjectileSkill::OnProjectileOverlap(UPrimitiveComponent* OverlappedCom
 
 void UMMOProjectileSkill::SetProjectileActive(bool bActive)
 {
-	if (Projectile)
-	{
-		Projectile->SetActorHiddenInGame(!bActive);
-		Projectile->SetActorEnableCollision(bActive);
-		Projectile->SetActorTickEnabled(bActive);
-	}
+	UMMOGameplayUtils::SetActorActive(Projectile, bActive);
 }

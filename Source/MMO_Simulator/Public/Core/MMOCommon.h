@@ -297,4 +297,7 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static const TArray<AMMOBaseHero*>& GetHeroes(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	static void SetActorActive(AActor* InActor, bool bActive);
 };

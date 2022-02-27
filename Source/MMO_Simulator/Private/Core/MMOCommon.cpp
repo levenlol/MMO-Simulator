@@ -59,3 +59,13 @@ const TArray<AMMOBaseHero*>& UMMOGameplayUtils::GetHeroes(const UObject* WorldCo
 	static TArray<AMMOBaseHero*> NoHeroes;
 	return NoHeroes;
 }
+
+void UMMOGameplayUtils::SetActorActive(AActor* InActor, bool bActive)
+{
+	if (InActor)
+	{
+		InActor->SetActorHiddenInGame(!bActive);
+		InActor->SetActorEnableCollision(bActive);
+		InActor->SetActorTickEnabled(bActive);
+	}
+}
