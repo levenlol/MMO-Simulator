@@ -302,7 +302,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static void SetActorActive(AActor* InActor, bool bActive);
 	
-	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	UFUNCTION(BlueprintCallable, Category = Widget, meta = (WorldContext = WorldContextObject))
 	static void AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<UTexture2D> Texture);
+
+	UFUNCTION(BlueprintCallable, Category = Combat, meta = (WorldContext = WorldContextObject))
+	static bool AreOnTheSameSide(AMMOBaseCharacter* First, AMMOBaseCharacter* Second);
 
 };

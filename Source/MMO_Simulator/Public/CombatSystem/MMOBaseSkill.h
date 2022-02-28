@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
+#include "GameplayTagsManager.h"
 #include "MMOBaseSkill.generated.h"
 
 class AMMOBaseCharacter;
@@ -14,10 +16,35 @@ struct MMO_SIMULATOR_API FMMOSkillInputData
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadOnly, Category = Input)
-	AActor* TargetActor;
+	AMMOBaseCharacter* TargetActor;
 
 	UPROPERTY(BlueprintReadOnly, Category = Input)
 	FVector Location;
+};
+
+struct MMO_SIMULATOR_API FMMOSkillTags : public FGameplayTagNativeAdder
+{
+	FGameplayTag LocationTag;
+	FGameplayTag TargetTag;
+	FGameplayTag EnemyTag;
+	FGameplayTag FriendlyTag;
+	FGameplayTag Buff;
+
+	FORCEINLINE static const FMMOSkillTags& Get() { return SkillTags; }
+
+protected:
+	virtual void AddTags() override
+	{
+		UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
+
+		LocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location"));
+		TargetTag = Manager.AddNativeGameplayTag(FName("Skill.Target"));
+		FriendlyTag = Manager.AddNativeGameplayTag(FName("Skill.Friendly"));
+		EnemyTag = Manager.AddNativeGameplayTag(FName("Skill.Enemy"));
+		Buff = Manager.AddNativeGameplayTag(FName("Skill.Buff"));
+	}
+private:
+	static FMMOSkillTags SkillTags;
 };
 
 UCLASS(DefaultToInstanced, EditInlineNew, HideDropdown, Blueprintable, BlueprintType)
@@ -38,7 +65,7 @@ protected:
 	UPROPERTY()
 	AMMOBaseCharacter* OwnerCharacter;
 
-	const UMMOBaseSkill* GetOuterSkill() const;
+	const UMMOWrapperSkill* GetOuterSkill() const;
 private:
 	const UMMOBaseSkill* GetOuterSkill_Rec(const UMMOBaseSkill* InSkill) const;
 };
@@ -58,6 +85,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	float Range = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
+	FGameplayTagContainer Tags;
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 	virtual void CastAbility(FMMOSkillInputData Data) override;

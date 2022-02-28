@@ -5,6 +5,8 @@
 #include "Data/MMODataFinder.h"
 #include "Weapons/MMOBaseWeapon.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Characters/MMOBaseEnemy.h"
+#include "Characters/MMOBaseHero.h"
 #include "Core/MMOGameState.h"
 #include "Components/Button.h"
 #include "Engine/StreamableManager.h"
@@ -95,4 +97,12 @@ void UMMOGameplayUtils::AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<U
 				WeakButton->SetStyle(Style);
 			}
 		}));
+}
+
+bool UMMOGameplayUtils::AreOnTheSameSide(AMMOBaseCharacter* First, AMMOBaseCharacter* Second)
+{
+	if (!First || !Second)
+		return false;
+
+	return First->IsA<AMMOBaseHero>() == Second->IsA<AMMOBaseHero>();
 }

@@ -77,7 +77,7 @@ void UMMOProjectileSkill::OnProjectileOverlap(UPrimitiveComponent* OverlappedCom
 		for (UMMOBaseSkill* Skill : TriggeredSkills)
 		{
 			FMMOSkillInputData Data;
-			Data.TargetActor = OtherActor;
+			Data.TargetActor = Cast<AMMOBaseCharacter>(OtherActor);
 			
 			Skill->CastAbility(Data);
 		}

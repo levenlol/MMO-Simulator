@@ -3,6 +3,8 @@
 
 #include "CombatSystem/MMOBaseSkill.h"
 
+FMMOSkillTags FMMOSkillTags::SkillTags;
+
 void UMMOBaseSkill::Setup(AMMOBaseCharacter* InOwner)
 {
 	OwnerCharacter = InOwner;
@@ -17,9 +19,9 @@ void UMMOBaseSkill::Tick(float DeltaSeconds)
 {
 }
 
-const UMMOBaseSkill* UMMOBaseSkill::GetOuterSkill() const
+const UMMOWrapperSkill* UMMOBaseSkill::GetOuterSkill() const
 {
-	return GetOuterSkill_Rec(this);
+	return Cast<UMMOWrapperSkill>(GetOuterSkill_Rec(this));
 }
 
 const UMMOBaseSkill* UMMOBaseSkill::GetOuterSkill_Rec(const UMMOBaseSkill* InSkill) const

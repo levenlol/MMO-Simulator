@@ -19,6 +19,8 @@ AMMOPlayerController::AMMOPlayerController()
 
 	FormationManager = CreateDefaultSubobject<UMMOFormationManager>(TEXT("FormationManager"));
 	EnemyCollionChannel = ECollisionChannel::ECC_GameTraceChannel1; // Enemy Channel.
+	CharacterCollionChannel = ECollisionChannel::ECC_GameTraceChannel2; // Character Channel
+	HeroCollisionChannel = ECollisionChannel::ECC_GameTraceChannel3; // Hero Channel
 }
 
 void AMMOPlayerController::BeginPlay()
@@ -198,6 +200,21 @@ void AMMOPlayerController::OnSelectReleased()
 
 AMMOBaseEnemy* AMMOPlayerController::GetEnemyUnderMouse() const
 {
+	return Cast<AMMOBaseEnemy>(GetCharacterUnderMouse_Internal(EnemyCollionChannel));
+}
+
+AMMOBaseCharacter* AMMOPlayerController::GetCharacterUnderMouse() const
+{
+	return GetCharacterUnderMouse_Internal(CharacterCollionChannel);
+}
+
+AMMOBaseHero* AMMOPlayerController::GetHeroUnderMouse() const
+{
+	return Cast<AMMOBaseHero>(GetCharacterUnderMouse_Internal(HeroCollisionChannel));
+}
+
+AMMOBaseCharacter* AMMOPlayerController::GetCharacterUnderMouse_Internal(ECollisionChannel CollisionChannel) const
+{
 	FVector MouseLocation, Direction;
 	if (DeprojectMousePositionToWorld(MouseLocation, Direction))
 	{
@@ -205,11 +222,11 @@ AMMOBaseEnemy* AMMOPlayerController::GetEnemyUnderMouse() const
 		const FVector EndLocation = MouseLocation + Direction * 3500.f;
 
 		FCollisionQueryParams Params;
-		
+
 		FHitResult Hit;
-		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, EnemyCollionChannel))
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, CollisionChannel))
 		{
-			return Cast<AMMOBaseEnemy>(Hit.GetActor());
+			return Cast<AMMOBaseCharacter>(Hit.GetActor());
 		}
 	}
 
@@ -242,13 +259,13 @@ void AMMOPlayerController::MoveHeroTo(AController* InController, const FVector& 
 
 void AMMOPlayerController::TryCastSkill(const int32 Index)
 {
-	AMMOBaseEnemy* Enemy = GetEnemyUnderMouse();
+	AMMOBaseCharacter* Target = GetCharacterUnderMouse();
 	FVector Location, Normal;
 	DeprojectMouseToTerrain(Location, Normal);
 
 	const TArray<AMMOBaseHero*>& Heroes = GetSelectedHeroes();
 	for (AMMOBaseHero* Hero : Heroes)
 	{
-		Hero->CombatSystem->TryCastSkill(Enemy, Location, Index);
+		Hero->CombatSystem->TryCastSkill(Target, Location, Index);
 	}
 }

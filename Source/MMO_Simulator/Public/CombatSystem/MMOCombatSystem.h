@@ -13,6 +13,17 @@ class AMMOBaseHero;
 class AMMOBaseCharacter;
 class UMMOWrapperSkill;
 
+UENUM(BlueprintType)
+enum class EMMOSkillCastFailType : uint8
+{
+	WrongTarget,
+	Unavailable,
+	Cooldown,
+	OutOfRange
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOSkillFailedEvent, UMMOWrapperSkill*, Skill, EMMOSkillCastFailType, FailReason);
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MMO_SIMULATOR_API UMMOCombatSystem : public UActorComponent
 {
@@ -30,7 +41,7 @@ public:
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
-	void TryCastSkill(AActor* Target, const FVector& Location, const int32 Index);
+	void TryCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index);
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills);
@@ -46,6 +57,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = Skill, meta = (AllowPrivateAccess))
 	TArray<UMMOWrapperSkill*> Skills;
+
+	UPROPERTY(BlueprintAssignable, Category = Skill)
+	FMMOSkillFailedEvent OnSkillFailed;
 
 private:
 	UPROPERTY(EditAnywhere, Category = Status, meta=(AllowPrivateAccess))

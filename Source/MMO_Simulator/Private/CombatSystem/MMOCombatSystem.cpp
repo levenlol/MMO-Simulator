@@ -75,20 +75,44 @@ bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 	return DistanceSq <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
 }
 
-void UMMOCombatSystem::TryCastSkill(AActor* Target, const FVector& Location, const int32 Index)
+void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index)
 {
 	if (Skills.IsValidIndex(Index) && OwnerCharacter)
 	{
+		const FVector RangeLocation = Target ? Target->GetActorLocation() : Location;
+		const bool bInRange = (OwnerCharacter->GetActorLocation() - RangeLocation).SizeSquared() <= (Skills[Index]->Range * Skills[Index]->Range);
+
+		if (!bInRange)
+		{
+			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::OutOfRange);
+			return;
+		}
+
+		if (Skills[Index]->IsInCooldown())
+		{
+			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Cooldown);
+			return;
+		}
+
+		const bool bOnSameSide = UMMOGameplayUtils::AreOnTheSameSide(OwnerCharacter, Target);
+
+		const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
+		const bool bCanCastSkill = (Skills[Index]->Tags.HasTag(SkillTags.EnemyTag) && !bOnSameSide)
+			|| (Skills[Index]->Tags.HasTag(SkillTags.FriendlyTag) && bOnSameSide)
+			|| (Skills[Index]->Tags.HasTag(SkillTags.LocationTag))
+			|| (Skills[Index]->Tags.HasTag(SkillTags.Buff));
+
+		if (!bCanCastSkill)
+		{
+			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::WrongTarget);
+			return;
+		}
+
 		FMMOSkillInputData InputData;
 		InputData.Location = Location;
 		InputData.TargetActor = Target;
 
-		const bool bInRange = (OwnerCharacter->GetActorLocation() - Location).SizeSquared() <= (Skills[Index]->Range * Skills[Index]->Range);
-
-		if (bInRange)
-		{
-			Skills[Index]->CastAbility(InputData);
-		}
+		Skills[Index]->CastAbility(InputData);
 	}
 }
 

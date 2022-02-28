@@ -11,6 +11,7 @@
 class AMMOBaseHero;
 class UMMOFormationManager;
 class AMMOBaseEnemy;
+class AMMOBaseCharacter;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOPlayerController : public APlayerController
@@ -26,6 +27,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TEnumAsByte<ECollisionChannel> EnemyCollionChannel;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TEnumAsByte<ECollisionChannel> CharacterCollionChannel;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TEnumAsByte<ECollisionChannel> HeroCollisionChannel;
 
 	UFUNCTION(BlueprintPure, Category = Default)
 	FORCEINLINE AMMODummyPawn* GetDummyPawn() const { return Cast<AMMODummyPawn>(GetPawn()); }
@@ -95,7 +102,12 @@ private:
 	/** Input handlers for Select action. */
 	void OnSelectPressed();
 	void OnSelectReleased();
+
 	AMMOBaseEnemy* GetEnemyUnderMouse() const;
+	AMMOBaseCharacter* GetCharacterUnderMouse() const;
+	AMMOBaseHero* GetHeroUnderMouse() const;
+
+	AMMOBaseCharacter* GetCharacterUnderMouse_Internal(ECollisionChannel CollisionChannel) const;
 
 	void MoveHeroTo(AController* InController, AActor* Target);
 	void MoveHeroTo(AController* InController, const FVector& Location);
