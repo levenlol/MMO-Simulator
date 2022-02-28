@@ -6,6 +6,8 @@
 #include "Weapons/MMOBaseWeapon.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Core/MMOGameState.h"
+#include "Components/Button.h"
+#include "Engine/StreamableManager.h"
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
 {
@@ -68,4 +70,29 @@ void UMMOGameplayUtils::SetActorActive(AActor* InActor, bool bActive)
 		InActor->SetActorEnableCollision(bActive);
 		InActor->SetActorTickEnabled(bActive);
 	}
+}
+
+void UMMOGameplayUtils::AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<UTexture2D> Texture)
+{
+	if (!Button || Texture.IsNull())
+	{
+		return;
+	}
+	
+	static FStreamableManager AssetLoader;
+
+	TWeakObjectPtr<UButton> WeakButton = Button;
+	AssetLoader.RequestAsyncLoad(Texture.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([WeakButton, Texture]() 
+		{
+			if (WeakButton.IsValid())
+			{
+				FButtonStyle Style;
+				Style.Normal.SetResourceObject(Texture.Get());
+				Style.Disabled.SetResourceObject(Texture.Get());
+				Style.Hovered.SetResourceObject(Texture.Get());
+				Style.Pressed.SetResourceObject(Texture.Get());
+
+				WeakButton->SetStyle(Style);
+			}
+		}));
 }

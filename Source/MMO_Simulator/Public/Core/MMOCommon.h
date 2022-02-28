@@ -8,6 +8,7 @@
 class UAnimSequenceBase;
 class AMMOBaseCharacter;
 class AMMOBaseHero;
+class UButton;
 
 UENUM(BlueprintType)
 enum class EMMOCharacterClass : uint8
@@ -300,4 +301,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static void SetActorActive(AActor* InActor, bool bActive);
+	
+	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	static void AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<UTexture2D> Texture);
+
 };
