@@ -51,8 +51,16 @@ void UMMOBeamSkill::CastAbility(FMMOSkillInputData Data)
 				const FVector StartLocation = ThisStrong->OwnerCharacter->GetActorLocation();
 				const FVector EndLocation = Data.TargetActor->GetActorLocation();
 
+				const FVector BoxSize((StartLocation - EndLocation).Size() * 0.5f, 5.f, 5.f);
+				const FQuat Rotation = (EndLocation - StartLocation).Rotation().Quaternion();
+
+				const FVector MiddlePoint = (EndLocation + StartLocation) * 0.5f;
+
+				//DrawDebugBox(ThisStrong->GetWorld(), MiddlePoint, BoxSize, Rotation, FColor::Magenta, false, 5.f, 0, 10.f);
+
 				TArray<FHitResult> Hits;
-				if (ThisStrong->GetWorld()->LineTraceMultiByChannel(Hits, StartLocation, EndLocation, ThisStrong->CollisionChannel))
+				//if (ThisStrong->GetWorld()->LineTraceMultiByChannel(Hits, StartLocation, EndLocation, ThisStrong->CollisionChannel))
+				if(ThisStrong->GetWorld()->SweepMultiByChannel(Hits, MiddlePoint, MiddlePoint + FVector::UpVector, Rotation, ThisStrong->CollisionChannel, FCollisionShape::MakeBox(BoxSize)))
 				{
 					for (const FHitResult& Hit : Hits)
 					{

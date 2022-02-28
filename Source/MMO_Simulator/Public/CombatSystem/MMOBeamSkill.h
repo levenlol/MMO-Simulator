@@ -57,6 +57,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FX)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
+	AMMOBeam* GetBeam() const { return Beam; }
+
 private:
 	UPROPERTY(VisibleInstanceOnly, Category = FX)
 	AMMOBeam* Beam;
