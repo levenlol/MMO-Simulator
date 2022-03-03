@@ -35,4 +35,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Data)
 	TMap<FName, UDataTable*> DataTableMaps;
+
+	UPROPERTY
 };
