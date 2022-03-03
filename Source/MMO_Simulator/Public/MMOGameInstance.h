@@ -10,6 +10,7 @@
 
 class UDataTable;
 class UAnimSequenceBase;
+class UMMOGuildsManager;
 
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOAnimationDataTable : public FTableRowBase
@@ -31,8 +32,20 @@ public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
 
+	UFUNCTION(BlueprintPure, meta = (WorldContext = WorldContextObject))
+	static UMMOGameInstance* GetMMOGameInstance(const UObject* WorldContextObject);
+
 	UDataTable* RetrieveDataTable(FName Key) const;
 
 	UPROPERTY(EditDefaultsOnly, Category = Data)
 	TMap<FName, UDataTable*> DataTableMaps;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Guild)
+	TSubclassOf<UMMOGuildsManager> GuildsManagerClass;
+
+	UMMOGuildsManager* GetGuildsManager() const { return GuildsManager; }
+private:
+	UPROPERTY(VisibleAnywhere, Category = Guild)
+	UMMOGuildsManager* GuildsManager;
+
 };
