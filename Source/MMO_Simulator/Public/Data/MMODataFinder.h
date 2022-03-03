@@ -4,8 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "MMOGameInstance.h"
+#include "Engine/DataTable.h"
+#include "Core/MMOCommon.h"
 #include "MMODataFinder.generated.h"
+
+class UAnimSequenceBase;
+
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOAnimationDataTable : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FMMOWeaponTypeCouple WeaponsType;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimSequenceBase* WeaponAnimation;
+};
 
 UCLASS(config = game, defaultconfig)
 class MMO_SIMULATOR_API UMMODataFinder : public UObject

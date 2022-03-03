@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "Guilds/MMOGuild.h"
 #include "MMOGuildsManager.generated.h"
 
-/**
- * 
- */
+
 UCLASS(Blueprintable, Abstract)
 class MMO_SIMULATOR_API UMMOGuildsManager : public UObject
 {
@@ -19,4 +18,7 @@ public:
 
     UFUNCTION(BlueprintPure, meta = (WorldContext = WorldContextObject))
     static UMMOGuildsManager* GetGuildsManager(const UObject* WorldContextObject);
+
+    UPROPERTY(VisibleAnywhere, Category = Guilds)
+    TMap<FName, FMMOGuild> GuildMap;
 };

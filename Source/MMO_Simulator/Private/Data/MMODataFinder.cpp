@@ -4,6 +4,7 @@
 #include "Data/MMODataFinder.h"
 #include "Misc/MessageDialog.h"
 #include "Engine/DataTable.h"
+#include "MMOGameInstance.h"
 
 UMMODataFinder* UMMODataFinder::Instance{ nullptr };
 

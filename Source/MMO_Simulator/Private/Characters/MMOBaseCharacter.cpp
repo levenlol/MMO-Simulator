@@ -22,7 +22,7 @@ void AMMOBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(Stats.RecuperateEverySeconds), true, -1.f);
+	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(CharacterInfo.Stats.RecuperateEverySeconds), true, -1.f);
 }
 
 void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -42,15 +42,15 @@ void AMMOBaseCharacter::Die_Implementation()
 
 void AMMOBaseCharacter::OnRecuperate()
 {
-	Stats.Recuperate(Stats.RecuperateEverySeconds);
+	CharacterInfo.Stats.Recuperate(CharacterInfo.Stats.RecuperateEverySeconds);
 }
 
 void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
 {
-	Stats.Health = FMath::Clamp(Stats.Health - InDamage.Damage, 0, Stats.MaxHealth);
+	CharacterInfo.Stats.Health = FMath::Clamp(CharacterInfo.Stats.Health - InDamage.Damage, 0, CharacterInfo.Stats.MaxHealth);
 	OnDamageTaken.Broadcast(this, InDamage);
 
-	if (Stats.Health <= 0 && bAlive)
+	if (CharacterInfo.Stats.Health <= 0 && bAlive)
 	{
 		bAlive = false;
 		Die();

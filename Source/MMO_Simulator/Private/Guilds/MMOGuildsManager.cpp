@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/MMOGuildsManager.h"
+#include "Guilds/MMOGuildsManager.h"
 #include "MMOGameInstance.h"
 
 void UMMOGuildsManager::Init()

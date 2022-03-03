@@ -180,6 +180,47 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOCharacter
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FName Name;
+
+	// Class of the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	EMMOCharacterClass CharacterClass;
+
+	// Role of the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	EMMOCharacterRole CharacterRole;
+
+	// How happy is the character.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	int32 Happiness;
+
+	// How greedy the character is.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	int32 Greediness;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	FMMOCharacterAttributes Attributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FMMOCharacterStats Stats;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistances)
+	FMMOResistances Resistances;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 Gold;
+};
+
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMODamage
 {
 	GENERATED_BODY()

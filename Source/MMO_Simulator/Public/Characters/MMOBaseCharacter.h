@@ -28,27 +28,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	UMMOCombatSystem* CombatSystem;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	FName Name;
-
-	// Class of the character
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	EMMOCharacterClass CharacterClass;
-
-	// Role of the character
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	EMMOCharacterRole CharacterRole;
-
-	// How happy is the character.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	int32 Happiness;
-
-	// How greedy the character is.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	int32 Greediness;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Level;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Info)
+	FMMOCharacter CharacterInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	FName MainHandSocket = ("hand_r");
@@ -56,23 +37,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	FName OffHandSocket = ("hand_l");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	FMMOCharacterAttributes Attributes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	FMMOCharacterStats Stats;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistances)
-	FMMOResistances Resistances;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 Gold;
+	UFUNCTION(BlueprintPure, Category = Stats)
+	FORCEINLINE float GetHealthPercent() const { return static_cast<float>(CharacterInfo.Stats.Health) / static_cast<float>(CharacterInfo.Stats.MaxHealth); }
 
 	UFUNCTION(BlueprintPure, Category = Stats)
-	FORCEINLINE float GetHealthPercent() const { return static_cast<float>(Stats.Health) / static_cast<float>(Stats.MaxHealth); }
-
-	UFUNCTION(BlueprintPure, Category = Stats)
-	FORCEINLINE float GetResourcePercent() const { return static_cast<float>(Stats.Resources) / static_cast<float>(Stats.MaxResources); }
+	FORCEINLINE float GetResourcePercent() const { return static_cast<float>(CharacterInfo.Stats.Resources) / static_cast<float>(CharacterInfo.Stats.MaxResources); }
 
 	UFUNCTION(BlueprintPure, Category = Stats)
 	FORCEINLINE AMMOBaseWeapon* GetMainHandWeapon() const { return MainHandWeapon; }
