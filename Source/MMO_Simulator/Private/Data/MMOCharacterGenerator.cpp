@@ -7,7 +7,7 @@
 
 UMMOCharacterGenerator* UMMOCharacterGenerator::Instance;
 
-int32 FCharacterStatsGenerator::GetRandomValue() const
+int32 FMMOGaussianGenerator::GetRandomValue() const
 {
 	static std::default_random_engine generator;
 	std::normal_distribution<float> distribution(Mu, StdDev);
@@ -34,14 +34,16 @@ void UMMOCharacterGenerator::Shutdown()
 
 FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InClass) const
 {
+	const FCharacterAttributesGenerator& Generator = AttributesGeneratorMap[InClass];
+
 	FMMOCharacter Character;
 	Character.Name = Names[FMath::RandRange(0, Names.Num() - 1)]; // TODO, avoid duplicate names.
 	Character.CharacterClass = InClass;
-	Character.Gold = 100;
-	Character.Greediness = 5;
-	Character.Happiness = 5;
-	Character.Level = 10;
-	Character.Attributes = AttributesGeneratorMap[InClass].GenerateAttributes();
+	Character.Gold = FMath::Max(0, Generator.GoldGenerator.GetRandomValue());
+	Character.Greediness = FMath::Max(0, Generator.GredinessGenerator.GetRandomValue());
+	Character.Happiness = FMath::Max(0, Generator.HappinessGenerator.GetRandomValue());
+	Character.Level = 1;
+	Character.Attributes =  Generator.GenerateAttributes();
 	return Character;
 }
 

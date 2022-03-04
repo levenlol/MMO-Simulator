@@ -12,7 +12,7 @@
 enum class EMMOCharacterClass : uint8;
 
 USTRUCT(BlueprintType)
-struct MMO_SIMULATOR_API FCharacterStatsGenerator
+struct MMO_SIMULATOR_API FMMOGaussianGenerator
 {
 	GENERATED_BODY()
 public:
@@ -32,19 +32,31 @@ struct MMO_SIMULATOR_API FCharacterAttributesGenerator
 public:
 	// Gaussian generator
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
-	FCharacterStatsGenerator StrengthGenerator;
+	FMMOGaussianGenerator StrengthGenerator;
 
 	// Gaussian generator
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	FCharacterStatsGenerator ConstitutionGenerator;
+	FMMOGaussianGenerator ConstitutionGenerator;
 
 	// Gaussian generator
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	FCharacterStatsGenerator IntellectGenerator;
+	FMMOGaussianGenerator IntellectGenerator;
 
 	// Gaussian generator
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	FCharacterStatsGenerator DexterityGenerator;
+	FMMOGaussianGenerator DexterityGenerator;
+
+	// Gaussian generator
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	FMMOGaussianGenerator GoldGenerator;
+
+	// Gaussian generator
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	FMMOGaussianGenerator GredinessGenerator;
+
+	// Gaussian generator
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	FMMOGaussianGenerator HappinessGenerator;
 
 	FMMOCharacterAttributes GenerateAttributes() const;
 };
