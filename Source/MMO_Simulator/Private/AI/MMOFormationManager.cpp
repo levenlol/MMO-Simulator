@@ -81,16 +81,17 @@ void UMMOFormationManager::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& InHeroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview /* = true */)
+TArray<FVector> UMMOFormationManager::ComputeFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview /* = true */)
 {
-	const int32 HeroesNum = InHeroes.Num();
+	if (CharactersNum <= 0)
+		return {};
 
 	TArray<FVector> Points;
-	Points.Reserve(HeroesNum);
+	Points.Reserve(CharactersNum);
 	
-	const float InitialLateralOffset = HeroesNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
-	const int32 InitialLateralNum = (HeroesNum - 1)/ 2;
-	const int32 ColumnsNum = (HeroesNum / MaxHeroesPerRow) + 1;
+	const float InitialLateralOffset = CharactersNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
+	const int32 InitialLateralNum = (CharactersNum - 1)/ 2;
+	const int32 ColumnsNum = (CharactersNum / MaxHeroesPerRow) + 1;
 
 	FVector Tangent = FMath::IsNearlyZero((LastPoint - AnchorPoint).SizeSquared()) ? FVector::ForwardVector : (LastPoint - AnchorPoint);
 	Tangent.Z = 0.f;
@@ -98,7 +99,7 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero
 
 	const FVector Side(-Tangent.Y, Tangent.X, 0.f);
 
-	for (int32 j = 0; j < HeroesNum; j++)
+	for (int32 j = 0; j < CharactersNum; j++)
 	{
 		const int32 ColumnNum = j % MaxHeroesPerRow;
 		const int32 RowNum = j / MaxHeroesPerRow;

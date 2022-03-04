@@ -21,6 +21,12 @@ public:
 	UFUNCTION(BlueprintPure, meta = (WorldContext = WorldContextObject))
 	static UMMOGameInstance* GetMMOGameInstance(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintCallable, Category = Dungeon)
+	void AddCharacterForRaid(const FMMOCharacter& InCharacter);
+
+	UFUNCTION(BlueprintPure, Category = Dungeon)
+	const TArray<FMMOCharacter>& GetRaidCharacters() const { return RaidCharacters; }
+
 	UDataTable* RetrieveDataTable(FName Key) const;
 
 	UPROPERTY(EditDefaultsOnly, Category = Data)
@@ -34,4 +40,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Guild)
 	UMMOGuildsManager* GuildsManager;
 
+	UPROPERTY(VisibleAnywhere, Category = Dungeon)
+	TArray<FMMOCharacter> RaidCharacters;
 };

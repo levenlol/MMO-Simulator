@@ -15,6 +15,7 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CombatSystem = CreateDefaultSubobject<UMMOCombatSystem>(TEXT("CombatSystem"));
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 // Called when the game starts or when spawned

@@ -34,6 +34,11 @@ UMMOGameInstance* UMMOGameInstance::GetMMOGameInstance(const UObject* WorldConte
 	return Cast<UMMOGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
 }
 
+void UMMOGameInstance::AddCharacterForRaid(const FMMOCharacter& InCharacter)
+{
+	RaidCharacters.Add(InCharacter);
+}
+
 UDataTable* UMMOGameInstance::RetrieveDataTable(FName Key) const
 {
 	if (DataTableMaps.Contains(Key))

@@ -22,7 +22,7 @@ public:
 
 	// return an array of points, each for every actors passed as input
 	UFUNCTION(BlueprintCallable, Category = Formation)
-	TArray<FVector> ComputeFormation(const TArray<AMMOBaseHero*>& InHeroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+	TArray<FVector> ComputeFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void ShowPreview(const TArray<FVector>& Points);
