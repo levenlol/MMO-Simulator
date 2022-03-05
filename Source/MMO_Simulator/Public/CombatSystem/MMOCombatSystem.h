@@ -19,10 +19,12 @@ enum class EMMOSkillCastFailType : uint8
 	WrongTarget,
 	Unavailable,
 	Cooldown,
-	OutOfRange
+	OutOfRange, 
+	AlreadyCasting
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOSkillFailedEvent, UMMOWrapperSkill*, Skill, EMMOSkillCastFailType, FailReason);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOSkillStartEvent, UMMOWrapperSkill*, Skill);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MMO_SIMULATOR_API UMMOCombatSystem : public UActorComponent
@@ -61,6 +63,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Skill)
 	FMMOSkillFailedEvent OnSkillFailed;
 
+	UPROPERTY(BlueprintAssignable, Category = Skill)
+	FMMOSkillStartEvent OnSkillStart;
+
 private:
 	UPROPERTY(EditAnywhere, Category = Status, meta=(AllowPrivateAccess))
 	FGameplayTag AttackTag;
@@ -73,6 +78,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	float LastAttackTime = 0.f;
+
+	bool IsCasting() const;
 
 	bool TryAttack(AMMOBaseCharacter* Target);
 	void StopAttack();

@@ -60,7 +60,6 @@ class MMO_SIMULATOR_API UMMOBaseSkill : public UObject
 public:
 	virtual void Setup(AMMOBaseCharacter* InOwner);
 
-	virtual void Tick(float DeltaSeconds);
 	virtual void CastAbility(FMMOSkillInputData Data) {};
 
 	// Triggered Skills from this.
@@ -81,16 +80,20 @@ class MMO_SIMULATOR_API UMMOWrapperSkill : public UMMOBaseSkill
 {
 	GENERATED_BODY()
 public:
-
-	// Only need to set the cooldown of "Root" skill.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
+	FName AbilityName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta = (ClampMin = "0"))
 	float Cooldown = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	TSoftObjectPtr<UTexture2D> Icon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta = (ClampMin = "0"))
 	float Range = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta=(ClampMin="0"))
+	float CastTime = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	FGameplayTagContainer Tags;
@@ -98,7 +101,26 @@ public:
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 	virtual void CastAbility(FMMOSkillInputData Data) override;
 
+	void Tick(float DeltaSeconds);
+
+	UFUNCTION(BlueprintPure, Category = Skill)
 	bool IsInCooldown() const;
+	
+	UFUNCTION(BlueprintPure, Category = Skill)
+	bool IsLocked() const { return bLocked; };
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	bool IsCasting() const { return bCasting; }
+	
+	UFUNCTION(BlueprintPure, Category = Skill)
+	float GetCastingPercent() const;
 private:
-	float LastCastTime = 0.f;
+	float LastCastTime = 0.f; // used to track cooldown
+	float CurrentCastingTime = 0.f; // used to cast the ability (if cast time > 0)
+
+	bool bLocked = false;
+	bool bCasting = false;
+
+	void FinishCastAbility();
+	FMMOSkillInputData SavedInputData; // Copy of InputData params
 };

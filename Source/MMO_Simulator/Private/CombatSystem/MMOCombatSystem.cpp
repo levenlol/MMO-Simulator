@@ -13,6 +13,9 @@ UMMOCombatSystem::UMMOCombatSystem()
 {
 	AttackTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Status.Action.Attack"));
 	StunnedTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Status.Malus.Stunned"));
+
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
 void UMMOCombatSystem::BeginPlay()
@@ -26,6 +29,11 @@ void UMMOCombatSystem::BeginPlay()
 void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	for (UMMOWrapperSkill* Skill : Skills)
+	{
+		Skill->Tick(DeltaTime);
+	}
 }
 
 bool UMMOCombatSystem::StartAttack(AMMOBaseCharacter* Target)
@@ -94,6 +102,18 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 			return;
 		}
 
+		if (IsCasting())
+		{
+			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::AlreadyCasting);
+			return;
+		}
+
+		if (Skills[Index]->IsLocked())
+		{
+			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Unavailable);
+			return;
+		}
+
 		const bool bOnSameSide = UMMOGameplayUtils::AreOnTheSameSide(OwnerCharacter, Target);
 
 		const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
@@ -115,6 +135,7 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		InputData.SourceLocation = OwnerCharacter->GetActorLocation();
 
 		Skills[Index]->CastAbility(InputData);
+		OnSkillStart.Broadcast(Skills[Index]);
 	}
 }
 
@@ -138,6 +159,17 @@ bool UMMOCombatSystem::IsAttacking() const
 bool UMMOCombatSystem::IsStunned() const
 {
 	return OwnerCharacter ? OwnerCharacter->HasTag(StunnedTag) : false;
+}
+
+bool UMMOCombatSystem::IsCasting() const
+{
+	for (UMMOWrapperSkill* Skill : Skills)
+	{
+		if (Skill->IsCasting())
+			return true;
+	}
+
+	return false;
 }
 
 bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)

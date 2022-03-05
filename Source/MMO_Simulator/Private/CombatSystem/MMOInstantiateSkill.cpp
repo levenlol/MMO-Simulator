@@ -68,13 +68,13 @@ void UMMOInstantiateSkill::CacheTriggeredSkills(const int32 Num)
 	{
 		UMMOWrapperSkill* NewSkill = NewObject<UMMOWrapperSkill>(this, SkillsToPropagateClass ? SkillsToPropagateClass : UMMOWrapperSkill::StaticClass());
 		NewSkill->Setup(OwnerCharacter);
+		NewSkill->CastTime = 0.f; // We do not support cast time on instanced skills. Yet?
 		SkillsToPropagate.Add(NewSkill);
 	}
 }
 
 FCollisionShape UMMOInstantiateSkill::MakeCollisionShape() const
 {
-
 	switch (CollisionShape)
 	{
 	case EMMOCollisionShape::Sphere:

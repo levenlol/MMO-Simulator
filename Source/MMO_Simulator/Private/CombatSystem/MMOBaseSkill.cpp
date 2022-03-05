@@ -15,10 +15,6 @@ void UMMOBaseSkill::Setup(AMMOBaseCharacter* InOwner)
 	}
 }
 
-void UMMOBaseSkill::Tick(float DeltaSeconds)
-{
-}
-
 const UMMOWrapperSkill* UMMOBaseSkill::GetOuterSkill() const
 {
 	return Cast<UMMOWrapperSkill>(GetOuterSkill_Rec(this));
@@ -50,10 +46,45 @@ void UMMOWrapperSkill::CastAbility(FMMOSkillInputData Data)
 		return;
 	}
 
-	LastCastTime = GetWorld()->GetTimeSeconds();
-	for (UMMOBaseSkill* Skill : TriggeredSkills)
+	if (IsLocked())
 	{
-		Skill->CastAbility(Data);
+		UE_LOG(LogTemp, Warning, TEXT("Requested to cast %s ability but failed because it is locked."), *GetName());
+		return;
+	}
+
+	if (IsCasting())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Requested to cast %s ability but failed because it is already being casted."), *GetName());
+		return;
+	}
+
+	SavedInputData = Data;
+
+	if (FMath::IsNearlyZero(CastTime, KINDA_SMALL_NUMBER))
+	{
+		FinishCastAbility();
+	}
+	else
+	{
+		// start cast
+		CurrentCastingTime = 0.f;
+		bCasting = true;
+	}
+}
+
+void UMMOWrapperSkill::Tick(float DeltaSeconds)
+{
+	if (!bCasting)
+		return;
+
+	CurrentCastingTime += DeltaSeconds;
+
+	if (CurrentCastingTime >= CastTime)
+	{
+		FinishCastAbility();
+
+		CurrentCastingTime = CastTime;
+		bCasting = false;
 	}
 }
 
@@ -62,5 +93,25 @@ bool UMMOWrapperSkill::IsInCooldown() const
 	const float CurrentTime = GetWorld()->GetTimeSeconds();
 
 	return CurrentTime - LastCastTime <= Cooldown;
+}
+
+float UMMOWrapperSkill::GetCastingPercent() const
+{
+	if (bCasting)
+	{
+		return CurrentCastingTime / CastTime;
+	}
+
+	return 0.0f;
+}
+
+void UMMOWrapperSkill::FinishCastAbility()
+{
+	LastCastTime = GetWorld()->GetTimeSeconds();
+
+	for (UMMOBaseSkill* Skill : TriggeredSkills)
+	{
+		Skill->CastAbility(SavedInputData);
+	}
 }
 
