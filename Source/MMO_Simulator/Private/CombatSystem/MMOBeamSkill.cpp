@@ -64,8 +64,8 @@ void UMMOBeamSkill::CastAbility(FMMOSkillInputData Data)
 				{
 					for (const FHitResult& Hit : Hits)
 					{
-						FMMOSkillInputData BeamInput;
-						BeamInput.Location = Hit.ImpactPoint;
+						FMMOSkillInputData BeamInput = Data;
+						BeamInput.TargetLocation = Hit.ImpactPoint;
 						BeamInput.TargetActor = Cast<AMMOBaseCharacter>(Hit.GetActor());
 
 						for (UMMOBaseSkill* Skill : ThisWeak->TriggeredSkills)

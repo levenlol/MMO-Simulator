@@ -14,7 +14,7 @@ UMMOAoeDamageSkill::UMMOAoeDamageSkill()
 
 void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
 {
-	const FVector Location = Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.Location;
+	const FVector Location = Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.TargetLocation;
 
 	TArray<FHitResult> Hits;
 	if (GetWorld()->SweepMultiByChannel(Hits, Location, Location + FVector::UpVector, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(Radius)))

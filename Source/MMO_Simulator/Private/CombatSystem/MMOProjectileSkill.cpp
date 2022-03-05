@@ -65,7 +65,7 @@ void UMMOProjectileSkill::CastAbility(FMMOSkillInputData Data)
 	}
 
 	Projectile->SetTarget(Data.TargetActor);
-	Projectile->SetActorLocation(OwnerCharacter->GetActorLocation());
+	Projectile->SetActorLocation(Data.SourceActor ? Data.SourceActor->GetActorLocation() : Data.SourceLocation);
 	Projectile->ParticleComponent->KillParticlesForced();
 	SetProjectileActive(true);
 }

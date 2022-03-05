@@ -109,8 +109,10 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		}
 
 		FMMOSkillInputData InputData;
-		InputData.Location = Location;
+		InputData.TargetLocation = Location;
 		InputData.TargetActor = Target;
+		InputData.SourceActor = OwnerCharacter;
+		InputData.SourceLocation = OwnerCharacter->GetActorLocation();
 
 		Skills[Index]->CastAbility(InputData);
 	}

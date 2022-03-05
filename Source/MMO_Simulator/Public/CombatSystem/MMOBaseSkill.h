@@ -19,7 +19,13 @@ public:
 	AMMOBaseCharacter* TargetActor;
 
 	UPROPERTY(BlueprintReadOnly, Category = Input)
-	FVector Location;
+	FVector TargetLocation;
+
+	UPROPERTY(BlueprintReadOnly, Category = Input)
+	AMMOBaseCharacter* SourceActor;
+
+	UPROPERTY(BlueprintReadOnly, Category = Input)
+	FVector SourceLocation;
 };
 
 struct MMO_SIMULATOR_API FMMOSkillTags : public FGameplayTagNativeAdder
