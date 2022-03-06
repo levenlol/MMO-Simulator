@@ -7,6 +7,7 @@
 #include "Core/MMOCommon.h"
 #include "GameplayTagContainer.h"
 #include "Containers/Map.h"
+#include "Tools/MMOMathExpression.h"
 #include "MMOBaseCharacter.generated.h"
 
 class AMMOBaseWeapon;
@@ -88,7 +89,18 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Status)
 	FGameplayTagContainer StatusTags;
 
+	// TODO: More structured Character Stats initialization.
+	UPROPERTY(EditDefaultsOnly, Category = Initialization)
+	FMMOMathExpression HealthExpression;
+
+	UPROPERTY(EditDefaultsOnly, Category = Initialization)
+	FMMOMathExpression ManaExpression;
+
 protected:
+#if WITH_EDITORONLY_DATA
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

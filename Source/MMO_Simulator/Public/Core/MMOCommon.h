@@ -203,7 +203,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Greediness;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta=(ClampMin="1"))
 	int32 Level;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)

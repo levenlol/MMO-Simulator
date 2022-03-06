@@ -7,6 +7,8 @@
 #include "TimerManager.h"
 #include "CombatSystem/MMOCombatSystem.h"
 #include "Core/MMOGameState.h"
+#include "ThirdParty/tinyexpr.h"
+
 
 // Sets default values
 AMMOBaseCharacter::AMMOBaseCharacter()
@@ -18,12 +20,33 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
+#if WITH_EDITORONLY_DATA
+void AMMOBaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+#endif
+
 // Called when the game starts or when spawned
 void AMMOBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(CharacterInfo.Stats.RecuperateEverySeconds), true, -1.f);
+
+	HealthExpression.Init(this);
+	if (HealthExpression.IsValid())
+	{
+		CharacterInfo.Stats.MaxHealth = HealthExpression.Eval<int32>(false);
+		CharacterInfo.Stats.Health = CharacterInfo.Stats.MaxHealth;
+	}
+
+	ManaExpression.Init(this);
+	if (ManaExpression.IsValid())
+	{
+		CharacterInfo.Stats.MaxResources = ManaExpression.Eval<int32>(false);
+		CharacterInfo.Stats.Resources = CharacterInfo.Stats.MaxResources;
+	}
 }
 
 void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -31,6 +54,9 @@ void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	GetWorld()->GetTimerManager().ClearTimer(RecuperateTimerHandle);
+
+	HealthExpression.Release();
+	ManaExpression.Release();
 }
 
 void AMMOBaseCharacter::Die_Implementation()

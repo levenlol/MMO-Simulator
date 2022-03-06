@@ -17,7 +17,6 @@ public:
 	
 	AMMOBaseHero();
 
-
 	UFUNCTION(BlueprintNativeEvent, Category = Selection)
 	void OnSelected();
 
