@@ -4,6 +4,13 @@
 #include "CombatSystem/MMODamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
 
+void UMMODamageSkill::Setup(AMMOBaseCharacter* InOwner)
+{
+	Super::Setup(InOwner);
+
+	DamageExpression.Init(this);
+}
+
 void UMMODamageSkill::CastAbility(FMMOSkillInputData Data)
 {
 	if (AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(Data.TargetActor))
@@ -17,7 +24,15 @@ void UMMODamageSkill::CastAbility(FMMOSkillInputData Data)
 	}
 }
 
-FMMODamage UMMODamageSkill::ComputeDamage() const
+FMMODamage UMMODamageSkill::ComputeDamage()
 {
-	return FMMODamage(FMath::RandRange(Damage.X, Damage.Y), DamageType, false, OwnerCharacter);
+	int32 TotalDamage = FMath::RandRange(Damage.X, Damage.Y);
+	if (DamageExpression.IsValid())
+	{
+		Dmg = static_cast<double>(TotalDamage);
+
+		TotalDamage = DamageExpression.Eval<int32>();
+	}
+
+	return FMMODamage(TotalDamage, DamageType, false, OwnerCharacter);
 }

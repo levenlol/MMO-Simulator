@@ -28,6 +28,10 @@ double FMMOPropertyBlob::GetValue() const
 	{
 		return static_cast<double>(*GetValue<float>());
 	}
+	else if (Property->IsA<FDoubleProperty>())
+	{
+		return *GetValue<double>();
+	}
 
 	return 0.0;
 }
