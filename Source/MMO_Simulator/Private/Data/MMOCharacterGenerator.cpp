@@ -3,6 +3,7 @@
 
 #include "Data/MMOCharacterGenerator.h"
 #include "MMOGameInstance.h"
+#include "Data/MMODataFinder.h"
 #include <random>
 
 UMMOCharacterGenerator* UMMOCharacterGenerator::Instance;
@@ -43,8 +44,15 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Gold = FMath::Max(0, Generator.GoldGenerator.GetRandomValue());
 	Character.Greediness = FMath::Max(0, Generator.GredinessGenerator.GetRandomValue());
 	Character.Happiness = FMath::Max(0, Generator.HappinessGenerator.GetRandomValue());
-	Character.Level = 1;
+	Character.Level = Level;
 	Character.Attributes =  Generator.GenerateAttributes();
+
+	FMMOCharacterAttributes AttributesProgress = UMMODataFinder::Get()->GetCharacterProgressionForLevels(InClass, 1, Level);
+	Character.Attributes.Strength += AttributesProgress.Strength;
+	Character.Attributes.Intellect += AttributesProgress.Intellect;
+	Character.Attributes.Constitution += AttributesProgress.Constitution;
+	Character.Attributes.Dexterity += AttributesProgress.Dexterity;
+
 	return Character;
 }
 
