@@ -92,6 +92,14 @@ struct MMO_SIMULATOR_API FMMOCharacterAttributes
 {
 	GENERATED_BODY()
 public:
+	FMMOCharacterAttributes()
+	{
+		Strength = 0;
+		Constitution = 0;
+		Intellect = 0;
+		Dexterity = 0;
+	}
+
 	// Strength: affects physical damage, block.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Strength;

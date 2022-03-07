@@ -24,6 +24,31 @@ void UMMODataFinder::Shutdown()
 	Instance = nullptr;
 }
 
+FMMOCharacterAttributes UMMODataFinder::GetCharacterProgressionForLevels(const EMMOCharacterClass CharacterClass, int32 StartLevel, int32 EndLevel) const
+{
+	FMMOCharacterAttributes Progression;
+
+	if (AttributesIncreasePerLevel.Contains(CharacterClass))
+	{
+		const TArray<FMMOCharacterAttributes>& AttributesPerLevel = AttributesIncreasePerLevel[CharacterClass].AttributesIncreasePerLevel;
+		const int32 StartIndex = FMath::Max(StartLevel - 1, 0);
+		const int32 EndIndex = FMath::Max(EndLevel - 1, 0);
+
+		for (int32 i = StartIndex; i <= EndIndex; i++)
+		{
+			if (AttributesPerLevel.IsValidIndex(i))
+			{
+				Progression.Strength += AttributesPerLevel[i].Strength;
+				Progression.Dexterity += AttributesPerLevel[i].Dexterity;
+				Progression.Intellect += AttributesPerLevel[i].Intellect;
+				Progression.Constitution += AttributesPerLevel[i].Constitution;
+			}
+		}
+	}
+
+	return Progression;
+}
+
 UAnimSequenceBase* UMMODataFinder::GetAnimSequence(const FMMOWeaponTypeCouple& WeaponCouple) const
 {
 	if (AnimationsMap.Contains(WeaponCouple))
@@ -37,6 +62,7 @@ UAnimSequenceBase* UMMODataFinder::GetAnimSequence(const FMMOWeaponTypeCouple& W
 void UMMODataFinder::Init()
 {
 	ParseAnimationDataTable();
+	ParseCharacterProgressionDataTable();
 }
 
 void UMMODataFinder::Uninit()
@@ -73,4 +99,59 @@ void UMMODataFinder::ParseAnimationDataTable()
 			AnimationsMap.Add(WeaponType, Row->WeaponAnimation);
 		}
 	}
+}
+
+void UMMODataFinder::ParseCharacterProgressionDataTable()
+{
+	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());
+	UDataTable* CharacterProgressionDataTable = GameInstance->RetrieveDataTable(CharacterProgressionTableName);
+
+	if (!CharacterProgressionDataTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DataFinder: cannot find CharacterProgressionDataTable"));
+		return;
+	}
+
+	TArray<FMMOCharacterProgressionDataTable*> AllRows;
+	CharacterProgressionDataTable->GetAllRows<FMMOCharacterProgressionDataTable>(TEXT("DATA_RETRIEVER"), AllRows);
+
+	for (FMMOCharacterProgressionDataTable* Row : AllRows)
+	{
+		AttributesIncreasePerLevel.FindOrAdd(Row->Class) = Row->AttributesIncreasePerLevel;
+	}
+
+#if WITH_EDITOR
+	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterClass"));
+	if (Enum)
+	{
+		bool bFoundError = false;
+		int32 ExpectedValue = -1;
+
+		const int32 EnumNum = Enum->NumEnums();
+		for (int32 i = 0; i < EnumNum - 1; i++)
+		{
+			EMMOCharacterClass CurrenClass = static_cast<EMMOCharacterClass>(i);
+			if (!AttributesIncreasePerLevel.Contains(CurrenClass))
+			{
+				const FText Title = FText::FromString(TEXT("Ciavola Fixa"));
+				FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Missing entries for: ") + Enum->GetNameStringByIndex(i)), &Title);
+				continue;
+			}
+
+			if (ExpectedValue < 0) ExpectedValue = AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num();
+
+			if (ExpectedValue != AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num())
+			{
+				bFoundError = true;
+				ExpectedValue = AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num();
+			}
+		}
+
+		if (bFoundError)
+		{
+			const FText Title = FText::FromString(TEXT("Ciavola Fixa"));
+			FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Found error: Inconsistent CharacterProgression data, different levels Num.")), &Title);
+		}
+	}
+#endif
 }

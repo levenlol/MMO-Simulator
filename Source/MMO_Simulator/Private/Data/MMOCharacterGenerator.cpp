@@ -32,8 +32,9 @@ void UMMOCharacterGenerator::Shutdown()
 	Instance = nullptr;
 }
 
-FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InClass) const
+FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InClass, int32 Level) const
 {
+	Level = FMath::Max(Level, 1);
 	const FCharacterAttributesGenerator& Generator = AttributesGeneratorMap[InClass];
 
 	FMMOCharacter Character;

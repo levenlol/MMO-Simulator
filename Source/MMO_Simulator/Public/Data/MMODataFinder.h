@@ -11,6 +11,28 @@
 class UAnimSequenceBase;
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOCharacterProgressionContainer
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	TArray<FMMOCharacterAttributes> AttributesIncreasePerLevel;
+};
+
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOCharacterProgressionDataTable : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	EMMOCharacterClass Class;
+
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	FMMOCharacterProgressionContainer AttributesIncreasePerLevel;
+};
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOAnimationDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
@@ -33,6 +55,12 @@ public:
 	UPROPERTY(config)
 	FName AnimationDataTableName;
 
+	UPROPERTY(config)
+	FName CharacterProgressionTableName;
+
+	UFUNCTION(BlueprintPure, Category = CharacterProgression)
+	FMMOCharacterAttributes GetCharacterProgressionForLevels(const EMMOCharacterClass CharacterClass, int32 StartLevel, int32 EndLevel) const;
+
 	static UMMODataFinder* Get() { check(Instance); return Instance; }
 
 	UAnimSequenceBase* GetAnimSequence(const FMMOWeaponTypeCouple& WeaponCouple) const;
@@ -43,8 +71,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Animation)
 	TMap<FMMOWeaponTypeCouple, UAnimSequenceBase*> AnimationsMap;
 
+	UPROPERTY(VisibleAnywhere, Category = Animation)
+	TMap<EMMOCharacterClass, FMMOCharacterProgressionContainer> AttributesIncreasePerLevel;
+
 	void Init();
 	void Uninit();
 
 	void ParseAnimationDataTable();
+	void ParseCharacterProgressionDataTable();
 };
