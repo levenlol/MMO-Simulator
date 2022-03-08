@@ -95,6 +95,18 @@ bool UMMOWrapperSkill::IsInCooldown() const
 	return CurrentTime - LastCastTime <= Cooldown;
 }
 
+float UMMOWrapperSkill::GetCooldownPercent() const
+{
+	if (IsInCooldown())
+	{
+		const float CurrentTime = GetWorld()->GetTimeSeconds();
+
+		return FMath::Clamp((CurrentTime - LastCastTime) / Cooldown, 0.f, 1.f);
+	}
+
+	return 1.0f;
+}
+
 float UMMOWrapperSkill::GetCastingPercent() const
 {
 	if (bCasting)
