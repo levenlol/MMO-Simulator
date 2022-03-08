@@ -10,6 +10,8 @@
 #include "Core/MMOGameState.h"
 #include "Components/Button.h"
 #include "Engine/StreamableManager.h"
+#include "Data/MMODataFinder.h"
+
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
 {
@@ -105,4 +107,9 @@ bool UMMOGameplayUtils::AreOnTheSameSide(AMMOBaseCharacter* First, AMMOBaseChara
 		return false;
 
 	return First->IsA<AMMOBaseHero>() == Second->IsA<AMMOBaseHero>();
+}
+
+FMMOCharacter::FMMOCharacter(const FName& InName)
+	: Name(InName)
+{
 }

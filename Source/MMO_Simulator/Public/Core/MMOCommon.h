@@ -118,6 +118,27 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOCombatAttributes
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 SpellCritChanceRating;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 AttackCritChanceRating;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 DodgeRating;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 ParryRating;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 BlockRating;
+};
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOCharacterStats
 {
 	GENERATED_BODY()
@@ -192,6 +213,9 @@ struct MMO_SIMULATOR_API FMMOCharacter
 {
 	GENERATED_BODY()
 public:
+	FMMOCharacter() = default;
+	FMMOCharacter(const FName& InName);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FName Name;
 
@@ -214,19 +238,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta=(ClampMin="1"))
 	int32 Level;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
-	FMMOCharacterAttributes Attributes;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FMMOCharacterStats Stats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistances)
 	FMMOResistances Resistances;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes, meta = (AllowPrivateAccess))
+	FMMOCharacterAttributes Attributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	FMMOCombatAttributes CombatAttributes;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;
-};
+private:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attributes, meta=(AllowPrivateAccess))
+	FMMOCharacterAttributes InitialAttributes;
+};
 
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMODamage

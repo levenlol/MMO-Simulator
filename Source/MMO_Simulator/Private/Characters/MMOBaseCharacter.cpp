@@ -7,7 +7,7 @@
 #include "TimerManager.h"
 #include "CombatSystem/MMOCombatSystem.h"
 #include "Core/MMOGameState.h"
-#include "ThirdParty/tinyexpr.h"
+#include "Data/MMOStatsManager.h"
 
 
 // Sets default values
@@ -17,6 +17,7 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CombatSystem = CreateDefaultSubobject<UMMOCombatSystem>(TEXT("CombatSystem"));
+	StatsManager = CreateDefaultSubobject<UMMOStatsManager>(TEXT("StatsManager"));
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
@@ -99,6 +100,13 @@ FMMOWeaponTypeCouple AMMOBaseCharacter::GetCurrentEquippedWeaponsType() const
 	}
 
 	return CurrentEquippedWeapons;
+}
+
+void AMMOBaseCharacter::InitializeCharacter(const FMMOCharacter& InCharacter)
+{
+	CharacterInfo = InCharacter;
+
+	OnCharacterInitialized.Broadcast(this);
 }
 
 float AMMOBaseCharacter::GetWeaponRange() const

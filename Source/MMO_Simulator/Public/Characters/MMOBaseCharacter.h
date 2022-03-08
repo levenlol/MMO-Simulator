@@ -12,7 +12,9 @@
 
 class AMMOBaseWeapon;
 class UMMOCombatSystem;
+class UMMOStatsManager;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharacter*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FMMOOnEquipWeapon, AMMOBaseCharacter*, Sender, AMMOBaseWeapon*, NewWeapon, AMMOBaseWeapon*, OldWeapon);
 
@@ -26,8 +28,11 @@ public:
 	// Sets default values for this character's properties
 	AMMOBaseCharacter();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
 	UMMOCombatSystem* CombatSystem;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Stats)
+	UMMOStatsManager* StatsManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Info)
 	FMMOCharacter CharacterInfo;
@@ -52,6 +57,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Stats)
 	FMMOWeaponTypeCouple GetCurrentEquippedWeaponsType() const;
+
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void InitializeCharacter(const FMMOCharacter& InCharacter);
 
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
 	void DamageTake(FMMODamage InDamage);
@@ -80,6 +88,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	// Events
+	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOOnCharacterEvent OnCharacterInitialized;
+
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOOnDamageTaken OnDamageTaken;
 
