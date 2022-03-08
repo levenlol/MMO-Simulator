@@ -8,6 +8,7 @@
 UMMOStatsManager::UMMOStatsManager()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	bWantsInitializeComponent = true;
 }
 
 void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
@@ -43,6 +44,8 @@ void UMMOStatsManager::BeginPlay()
 
 void UMMOStatsManager::InitializeComponent()
 {
+	Super::InitializeComponent();
+
 	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
 
 	if (OwnerCharacter)
@@ -59,6 +62,8 @@ void UMMOStatsManager::InitializeComponent()
 
 void UMMOStatsManager::UninitializeComponent()
 {
+	Super::UninitializeComponent();
+
 	if (OwnerCharacter)
 	{
 		OwnerCharacter->OnCharacterInitialized.RemoveDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
