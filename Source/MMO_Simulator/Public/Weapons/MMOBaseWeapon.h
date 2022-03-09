@@ -28,10 +28,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	FMMOWeaponStats Stats;
 
-	// 0 - 100
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (ClampMin = "0", ClampMax = "100"))
-	int32 CritChance;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

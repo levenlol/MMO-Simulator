@@ -26,10 +26,7 @@ struct MMO_SIMULATOR_API FMMOCharacterProgressionDataTable : public FTableRowBas
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, Category = Progression)
-	EMMOCharacterClass Class;
-
-	UPROPERTY(EditDefaultsOnly, Category = Progression)
-	FMMOCharacterProgressionContainer AttributesIncreasePerLevel;
+	FMMOCharacterAttributes AttributesIncrease;
 };
 
 USTRUCT(BlueprintType)
@@ -56,7 +53,7 @@ public:
 	FName AnimationDataTableName;
 
 	UPROPERTY(config)
-	FName CharacterProgressionTableName;
+	FString CharacterProgressionTableName;
 
 	UFUNCTION(BlueprintPure, Category = CharacterProgression)
 	FMMOCharacterAttributes GetCharacterProgressionForLevels(const EMMOCharacterClass CharacterClass, int32 StartLevel, int32 EndLevel) const;

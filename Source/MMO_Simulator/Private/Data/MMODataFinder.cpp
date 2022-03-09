@@ -104,54 +104,67 @@ void UMMODataFinder::ParseAnimationDataTable()
 void UMMODataFinder::ParseCharacterProgressionDataTable()
 {
 	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());
-	UDataTable* CharacterProgressionDataTable = GameInstance->RetrieveDataTable(CharacterProgressionTableName);
 
-	if (!CharacterProgressionDataTable)
+	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterClass"));
+	if (!Enum)
 	{
-		UE_LOG(LogTemp, Error, TEXT("DataFinder: cannot find CharacterProgressionDataTable"));
+		UE_LOG(LogTemp, Fatal, TEXT("UMMODataFinder Cannot Find EMMOCharacterClass."));
 		return;
 	}
 
-	TArray<FMMOCharacterProgressionDataTable*> AllRows;
-	CharacterProgressionDataTable->GetAllRows<FMMOCharacterProgressionDataTable>(TEXT("DATA_RETRIEVER"), AllRows);
-
-	for (FMMOCharacterProgressionDataTable* Row : AllRows)
+	const int32 EnumNum = Enum->NumEnums();
+	for (int32 i = 0; i < EnumNum - 1; i++)
 	{
-		AttributesIncreasePerLevel.FindOrAdd(Row->Class) = Row->AttributesIncreasePerLevel;
+		EMMOCharacterClass CurrenClass = static_cast<EMMOCharacterClass>(i);
+		const FString CharacterEnumStr = Enum->GetNameStringByIndex(i);
+		const FName DataTableName = *(CharacterEnumStr + CharacterProgressionTableName);
+
+		UDataTable* CharacterProgressionDataTable = GameInstance->RetrieveDataTable(DataTableName);
+		if (!CharacterProgressionDataTable)
+		{
+			UE_LOG(LogTemp, Error, TEXT("DataFinder: cannot find %sDataTable"), *DataTableName.ToString());
+			continue;
+		}
+
+		TArray<FMMOCharacterProgressionDataTable*> AllRows;
+		CharacterProgressionDataTable->GetAllRows<FMMOCharacterProgressionDataTable>(TEXT("DATA_RETRIEVER"), AllRows);
+
+		auto& IncreasePerLevel = AttributesIncreasePerLevel.FindOrAdd(CurrenClass);
+		for (FMMOCharacterProgressionDataTable* Row : AllRows)
+		{
+			IncreasePerLevel.AttributesIncreasePerLevel.Add(Row->AttributesIncrease);
+		}
 	}
 
+
 #if WITH_EDITOR
-	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterClass"));
-	if (Enum)
+	
+	bool bFoundError = false;
+	int32 ExpectedValue = -1;
+
+	for (int32 i = 0; i < EnumNum - 1; i++)
 	{
-		bool bFoundError = false;
-		int32 ExpectedValue = -1;
-
-		const int32 EnumNum = Enum->NumEnums();
-		for (int32 i = 0; i < EnumNum - 1; i++)
-		{
-			EMMOCharacterClass CurrenClass = static_cast<EMMOCharacterClass>(i);
-			if (!AttributesIncreasePerLevel.Contains(CurrenClass))
-			{
-				const FText Title = FText::FromString(TEXT("Ciavola Fixa"));
-				FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Missing entries for: ") + Enum->GetNameStringByIndex(i)), &Title);
-				continue;
-			}
-
-			if (ExpectedValue < 0) ExpectedValue = AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num();
-
-			if (ExpectedValue != AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num())
-			{
-				bFoundError = true;
-				ExpectedValue = AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num();
-			}
-		}
-
-		if (bFoundError)
+		EMMOCharacterClass CurrenClass = static_cast<EMMOCharacterClass>(i);
+		if (!AttributesIncreasePerLevel.Contains(CurrenClass))
 		{
 			const FText Title = FText::FromString(TEXT("Ciavola Fixa"));
-			FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Found error: Inconsistent CharacterProgression data, different levels Num.")), &Title);
+			FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Missing entries for: ") + Enum->GetNameStringByIndex(i)), &Title);
+			continue;
 		}
+
+		if (ExpectedValue < 0) ExpectedValue = AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num();
+
+		if (ExpectedValue != AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num())
+		{
+			bFoundError = true;
+			ExpectedValue = AttributesIncreasePerLevel[CurrenClass].AttributesIncreasePerLevel.Num();
+		}
+	}
+
+	if (bFoundError)
+	{
+		const FText Title = FText::FromString(TEXT("Ciavola Fixa"));
+		FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Found error: Inconsistent CharacterProgression data, different levels Num.")), &Title);
 	}
 #endif
 }
