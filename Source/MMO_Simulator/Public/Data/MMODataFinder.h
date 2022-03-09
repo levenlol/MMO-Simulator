@@ -26,7 +26,16 @@ struct MMO_SIMULATOR_API FMMOCharacterProgressionDataTable : public FTableRowBas
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, Category = Progression)
-	FMMOCharacterAttributes AttributesIncrease;
+	int32 Strength = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	int32 Constitution = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	int32 Intellect = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	int32 Dexterity = 0;
 };
 
 USTRUCT(BlueprintType)

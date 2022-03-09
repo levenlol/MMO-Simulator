@@ -132,7 +132,13 @@ void UMMODataFinder::ParseCharacterProgressionDataTable()
 		auto& IncreasePerLevel = AttributesIncreasePerLevel.FindOrAdd(CurrenClass);
 		for (FMMOCharacterProgressionDataTable* Row : AllRows)
 		{
-			IncreasePerLevel.AttributesIncreasePerLevel.Add(Row->AttributesIncrease);
+			FMMOCharacterAttributes Attribute;
+			Attribute.Strength = Row->Strength;
+			Attribute.Intellect = Row->Intellect;
+			Attribute.Dexterity = Row->Dexterity;
+			Attribute.Constitution = Row->Constitution;
+
+			IncreasePerLevel.AttributesIncreasePerLevel.Add(Attribute);
 		}
 	}
 
