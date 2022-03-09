@@ -32,7 +32,7 @@ void AMMOBaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 void AMMOBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(CharacterInfo.Stats.RecuperateEverySeconds), true, -1.f);
 
 	HealthExpression.Init(this);
