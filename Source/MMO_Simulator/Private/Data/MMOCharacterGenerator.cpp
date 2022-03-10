@@ -53,7 +53,7 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Attributes.Intellect += AttributesProgress.Intellect;
 	Character.Attributes.Constitution += AttributesProgress.Constitution;
 	Character.Attributes.Dexterity += AttributesProgress.Dexterity;
-
+ 
 	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(InRace);
 	Character.Attributes.Strength += RaceAttributes.Strength;
 	Character.Attributes.Intellect += RaceAttributes.Intellect;
