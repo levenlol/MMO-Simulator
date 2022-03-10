@@ -33,7 +33,7 @@ void UMMOCharacterGenerator::Shutdown()
 	Instance = nullptr;
 }
 
-FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InClass, int32 Level) const
+FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InClass, EMMOCharacterRace InRace, int32 Level) const
 {
 	Level = FMath::Max(Level, 1);
 	const FCharacterAttributesGenerator& Generator = AttributesGeneratorMap[InClass];
@@ -41,6 +41,7 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	FMMOCharacter Character;
 	Character.Name = Names[FMath::RandRange(0, Names.Num() - 1)]; // TODO, avoid duplicate names.
 	Character.CharacterClass = InClass;
+	Character.Race = InRace;
 	Character.Gold = FMath::Max(0, Generator.GoldGenerator.GetRandomValue());
 	Character.Greediness = FMath::Max(0, Generator.GredinessGenerator.GetRandomValue());
 	Character.Happiness = FMath::Max(0, Generator.HappinessGenerator.GetRandomValue());
@@ -52,6 +53,12 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Attributes.Intellect += AttributesProgress.Intellect;
 	Character.Attributes.Constitution += AttributesProgress.Constitution;
 	Character.Attributes.Dexterity += AttributesProgress.Dexterity;
+
+	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(InRace);
+	Character.Attributes.Strength += RaceAttributes.Strength;
+	Character.Attributes.Intellect += RaceAttributes.Intellect;
+	Character.Attributes.Constitution += RaceAttributes.Constitution;
+	Character.Attributes.Dexterity += RaceAttributes.Dexterity;
 
 	return Character;
 }

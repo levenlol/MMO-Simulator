@@ -88,7 +88,7 @@ public:
 	TArray<FName> Names;
 
 	UFUNCTION(BlueprintPure, Category = Generator)
-	FMMOCharacter GenerateCharacter(EMMOCharacterClass InClass, int32 Level = 1) const;
+	FMMOCharacter GenerateCharacter(EMMOCharacterClass InClass, EMMOCharacterRace InRace, int32 Level = 1) const;
 
 	UFUNCTION(BlueprintPure, Category = Generator)
 	static UMMOCharacterGenerator* GetCharacterGenerator() { return UMMOCharacterGenerator::Get(); }

@@ -39,6 +39,15 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMORaceProgressionDataTable : public FMMOCharacterProgressionDataTable
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditDefaultsOnly, Category = Progression)
+	EMMOCharacterRace Race;
+};
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOAnimationDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
@@ -62,10 +71,16 @@ public:
 	FName AnimationDataTableName;
 
 	UPROPERTY(config)
+	FName RaceDataTableName;
+
+	UPROPERTY(config)
 	FString CharacterProgressionTableName;
 
 	UFUNCTION(BlueprintPure, Category = CharacterProgression)
 	FMMOCharacterAttributes GetCharacterProgressionForLevels(const EMMOCharacterClass CharacterClass, int32 StartLevel, int32 EndLevel) const;
+
+	UFUNCTION(BlueprintPure, Category = CharacterProgression)
+	FMMOCharacterAttributes GetRaceAttributes(const EMMOCharacterRace InRace) const;
 
 	static UMMODataFinder* Get() { check(Instance); return Instance; }
 
@@ -80,9 +95,13 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Animation)
 	TMap<EMMOCharacterClass, FMMOCharacterProgressionContainer> AttributesIncreasePerLevel;
 
+	UPROPERTY(VisibleAnywhere, Category = Animation)
+	TMap<EMMOCharacterRace, FMMOCharacterAttributes> RaceAttributes;
+
 	void Init();
 	void Uninit();
 
 	void ParseAnimationDataTable();
+	void ParseRaceCharacterDataTable();
 	void ParseCharacterProgressionDataTable();
 };

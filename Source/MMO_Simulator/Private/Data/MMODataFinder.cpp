@@ -49,6 +49,16 @@ FMMOCharacterAttributes UMMODataFinder::GetCharacterProgressionForLevels(const E
 	return Progression;
 }
 
+FMMOCharacterAttributes UMMODataFinder::GetRaceAttributes(const EMMOCharacterRace InRace) const
+{
+	if (RaceAttributes.Contains(InRace))
+	{
+		return RaceAttributes[InRace];
+	}
+
+	return FMMOCharacterAttributes();
+}
+
 UAnimSequenceBase* UMMODataFinder::GetAnimSequence(const FMMOWeaponTypeCouple& WeaponCouple) const
 {
 	if (AnimationsMap.Contains(WeaponCouple))
@@ -62,6 +72,7 @@ UAnimSequenceBase* UMMODataFinder::GetAnimSequence(const FMMOWeaponTypeCouple& W
 void UMMODataFinder::Init()
 {
 	ParseAnimationDataTable();
+	ParseRaceCharacterDataTable();
 	ParseCharacterProgressionDataTable();
 }
 
@@ -99,6 +110,62 @@ void UMMODataFinder::ParseAnimationDataTable()
 			AnimationsMap.Add(WeaponType, Row->WeaponAnimation);
 		}
 	}
+}
+
+void UMMODataFinder::ParseRaceCharacterDataTable()
+{
+	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());
+	UDataTable* CharacterRaceDataTable = GameInstance->RetrieveDataTable(RaceDataTableName);
+
+	if (!CharacterRaceDataTable)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DataFinder: cannot find CharacterRaceDataTable"));
+		return;
+	}
+
+	TArray<FMMORaceProgressionDataTable*> AllRows;
+	CharacterRaceDataTable->GetAllRows<FMMORaceProgressionDataTable>(TEXT("DATA_RETRIEVER"), AllRows);
+
+	for (FMMORaceProgressionDataTable* Row : AllRows)
+	{
+		FMMOCharacterAttributes Attributes;
+		Attributes.Strength = Row->Strength;
+		Attributes.Intellect = Row->Intellect;
+		Attributes.Dexterity = Row->Dexterity;
+		Attributes.Constitution = Row->Constitution;
+
+		RaceAttributes.FindOrAdd(Row->Race) = Attributes;
+	}
+
+#if WITH_EDITOR
+	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterRace"));
+	if (!Enum)
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("UMMODataFinder Cannot Find EMMOCharacterRace."));
+		return;
+	}
+
+	const int32 EnumNum = Enum->NumEnums();
+
+	FString ErrorString;
+
+	for (int32 i = 0; i < EnumNum - 1; i++)
+	{
+		EMMOCharacterRace CurrenRace = static_cast<EMMOCharacterRace>(i);
+
+		if (!RaceAttributes.Contains(CurrenRace))
+		{
+			ErrorString += Enum->GetNameStringByIndex(i) + TEXT(", ");
+		}
+	}
+
+	if (!ErrorString.IsEmpty())
+	{
+		const FText Title = FText::FromString(TEXT("Ciavola Fixa"));
+		FMessageDialog::Open(EAppMsgType::Type::Ok, FText::FromString(TEXT("Found error: Missing CharacterRaceProgression for races: ") + ErrorString), &Title);
+	}
+
+#endif
 }
 
 void UMMODataFinder::ParseCharacterProgressionDataTable()

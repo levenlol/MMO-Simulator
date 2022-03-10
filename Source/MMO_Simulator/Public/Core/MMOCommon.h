@@ -27,6 +27,24 @@ enum class EMMOCharacterClass : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMMOCharacterRace : uint8
+{
+	Human,
+	Elf,
+	Dwarf,
+	Gnome,
+	Fairy,
+	Orc,
+	Goblin,
+	Troll,
+	Minotaur,
+	Reptilian, // Trump
+	Draconic,
+	Ogre,
+	Undead
+};
+
+UENUM(BlueprintType)
 enum class EMMOCharacterRole : uint8
 {
 	Tank,
@@ -222,6 +240,10 @@ public:
 	// Class of the character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	EMMOCharacterClass CharacterClass;
+
+	// Race of the character
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
+	EMMOCharacterRace Race;
 
 	// Role of the character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
