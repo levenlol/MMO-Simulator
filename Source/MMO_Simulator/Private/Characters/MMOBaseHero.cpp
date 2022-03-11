@@ -7,6 +7,7 @@
 #include "Materials/Material.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/DecalComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 AMMOBaseHero::AMMOBaseHero()
 	: Super()

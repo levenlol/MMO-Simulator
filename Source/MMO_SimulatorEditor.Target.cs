@@ -10,5 +10,13 @@ public class MMO_SimulatorEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("MMO_Simulator");
+
+		ExtraModuleNames.AddRange(
+		new string[]
+		{
+				"MMO_SimulatorEditor"
+		});
 	}
+
+
 }
