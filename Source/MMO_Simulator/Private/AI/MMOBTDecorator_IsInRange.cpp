@@ -31,14 +31,11 @@ bool UMMOBTDecorator_IsInRange::CalculateRawConditionValue(UBehaviorTreeComponen
 		AcceptableRadius = BaseCharacter->GetWeaponRange();
 	}
 
-	AActor* Target = Cast<AActor>(BlackBoard->GetValueAsObject(GetSelectedBlackboardKey()));
-	if (Target)
-	{
-		const FVector Location = BaseCharacter->GetActorLocation();
-		const FVector EndLocation = Target->GetActorLocation();
 
-		return (EndLocation - Location).SizeSquared() <= AcceptableRadius * AcceptableRadius;
-	}
+	const FVector Location = BaseCharacter->GetActorLocation();
+	const FVector EndLocation = GetEndLocation(BlackBoard);
+
+	return (EndLocation - Location).SizeSquared() <= AcceptableRadius * AcceptableRadius;
 
 	return false;
 }
@@ -53,6 +50,19 @@ FString UMMOBTDecorator_IsInRange::GetStaticDescription() const
 	}
 
 	return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *KeyDesc);
+}
+
+FVector UMMOBTDecorator_IsInRange::GetEndLocation(UBlackboardComponent* BlackBoard) const
+{
+	if (AActor* Target = Cast<AActor>(BlackBoard->GetValueAsObject(GetSelectedBlackboardKey())))
+	{
+		return Target->GetActorLocation();
+	}
+	else
+	{
+		// Try with fvector blackboard key
+		return BlackBoard->GetValueAsVector(GetSelectedBlackboardKey());
+	}
 }
 
 #if WITH_EDITOR

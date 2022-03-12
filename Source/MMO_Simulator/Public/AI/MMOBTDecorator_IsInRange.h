@@ -6,9 +6,8 @@
 #include "BehaviorTree/Decorators/BTDecorator_BlackboardBase.h"
 #include "MMOBTDecorator_IsInRange.generated.h"
 
-/**
- * 
- */
+class UBlackboardComponent;
+
 UCLASS()
 class MMO_SIMULATOR_API UMMOBTDecorator_IsInRange : public UBTDecorator_BlackboardBase
 {
@@ -27,4 +26,7 @@ public:
 #if WITH_EDITOR
 	virtual FName GetNodeIconName() const override;
 #endif // WITH_EDITOR
+
+private:
+	FVector GetEndLocation(UBlackboardComponent* BlackBoard) const;
 };
