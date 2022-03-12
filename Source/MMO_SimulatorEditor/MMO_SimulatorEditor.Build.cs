@@ -8,7 +8,9 @@ public class MMO_SimulatorEditor : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayTags", "NavigationSystem", "AIModule", "GameplayTasks", "UMG", "Slate", "SlateCore", "UnrealEd", "ClassViewer" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayTags", 
+            "NavigationSystem", "AIModule", "GameplayTasks", "UMG", "Slate", "SlateCore", "UnrealEd", "ClassViewer", 
+            "Blutility", "UMGEditor", "EditorScriptingUtilities" });
 
 		OptimizeCode = CodeOptimization.InShippingBuildsOnly;
 		

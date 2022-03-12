@@ -4,37 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "ThirdParty/tinyexpr.h"
-
+#include "Tools/MMOFunctionLibrary.h"
 #include "MMOMathExpression.generated.h"
 
 class AMMOBaseCharacter;
-
-struct MMO_SIMULATOR_API FMMOPropertyBlob
-{
-public:
-	void* Leaf = nullptr;
-	int32 Index = 0;
-
-	FProperty* Property = nullptr;
-
-	double GetValue() const;
-
-private:
-	template<typename ValueType>
-	ValueType* GetValue() const;
-};
-
-template<typename ValueType>
-ValueType* FMMOPropertyBlob::GetValue() const
-{
-	if (Property)
-	{
-		ValueType* SourceAddr = Property->ContainerPtrToValuePtr<ValueType>(Leaf, Index);
-		return SourceAddr;
-	}
-
-	return nullptr;
-}
 
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOMathExpression

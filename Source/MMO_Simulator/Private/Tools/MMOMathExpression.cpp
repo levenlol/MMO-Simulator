@@ -76,8 +76,7 @@ void FMMOMathExpression::Init(const UObject* InObject)
 			continue;
 
 		// Find the property we want to track by reflection.
-		FMMOPropertyBlob Blob;
-		Blob.Property = UMMOFunctionLibrary::FindProperty(ReferenceObject, Value, Blob.Leaf, Blob.Index);
+		FMMOPropertyBlob Blob = UMMOFunctionLibrary::FindProperty(ReferenceObject, Value);
 		if (!Blob.Property->IsA<FNumericProperty>())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("FMMOMathExpression: %s only numerical uproperties are supported."), *Value);

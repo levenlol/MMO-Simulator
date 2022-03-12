@@ -11,13 +11,17 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"AIModule",
-				"CoreUObject"
+				"CoreUObject",
+				"Blutility"
 			]
 		},
 		{
-            "Name": "MMO_SimulatorEditor",
-            "Type": "Editor",
-            "LoadingPhase":  "PostEngineInit"
-        }
+			"Name": "MMO_SimulatorEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"AdditionalDependencies": [
+				"Blutility"
+			]
+		}
 	]
 }
