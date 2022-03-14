@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/MMOBTDecorator_IsInRange.h"
+#include "AI/Decorators/MMOBTDecorator_IsInRange.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"

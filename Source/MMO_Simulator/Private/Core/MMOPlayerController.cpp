@@ -7,10 +7,9 @@
 #include "Core/MMOBaseHUD.h"
 #include "AI/MMOFormationManager.h"
 #include "Characters/MMOBaseEnemy.h"
-#include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "CombatSystem//MMOCombatSystem.h"
+#include "AI/MMOAIController.h"
 
 AMMOPlayerController::AMMOPlayerController()
 {
@@ -264,6 +263,10 @@ void AMMOPlayerController::TryCastSkill(const int32 Index)
 	const TArray<AMMOBaseHero*>& Heroes = GetSelectedHeroes();
 	for (AMMOBaseHero* Hero : Heroes)
 	{
-		Hero->CombatSystem->TryCastSkill(Target, Location, Index);
+		// Skills are handled by AI.
+		if (AMMOAIController* AIController = Cast<AMMOAIController>(Hero->GetController()))
+		{
+			AIController->RequestCastSpell(Target, Location, Index);
+		}
 	}
 }

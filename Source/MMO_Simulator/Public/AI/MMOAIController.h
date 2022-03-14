@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "MMOAIController.generated.h"
 
 /**
@@ -14,12 +15,21 @@ class MMO_SIMULATOR_API AMMOAIController : public AAIController
 {
 	GENERATED_BODY()
 public:
+	AMMOAIController(const FObjectInitializer& ObjInit);
+
 	UFUNCTION(BlueprintCallable, Category = Spell)
-	void RequestCastSpell(int32 SpellIndex);
+	void RequestCastSpell(AActor* Target, const FVector& Location, int32 SpellIndex);
 
 	UFUNCTION(BlueprintPure, Category = Spell)
-	bool HasPendingSpell() const { return PendingSpell >= 0; }
+	bool HasPendingSpell() const;
 private:
-	UPROPERTY(VisibleAnywhere, Category = Spell)
-	int32 PendingSpell;
+
+	UPROPERTY(EditAnywhere, Category = Spell, meta=(AllowPrivateAccess))
+	FName SpellRequestKey;
+
+	UPROPERTY(EditAnywhere, Category = Spell, meta = (AllowPrivateAccess))
+	FName SpellActorTargetKey;
+
+	UPROPERTY(EditAnywhere, Category = Spell, meta = (AllowPrivateAccess))
+	FName SpellLocationTargetKey;
 };

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/MMOBTDecorator_CanAutoAttack.h"
+#include "AI/Decorators/MMOBTDecorator_CanAutoAttack.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "AIController.h"

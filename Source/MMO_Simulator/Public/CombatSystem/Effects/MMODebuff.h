@@ -13,5 +13,6 @@ UCLASS()
 class MMO_SIMULATOR_API UMMODebuff : public UObject
 {
 	GENERATED_BODY()
-	
+public:
+
 };

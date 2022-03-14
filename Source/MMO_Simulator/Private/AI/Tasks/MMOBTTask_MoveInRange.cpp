@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/MMOBTTask_MoveInRange.h"
+#include "AI/Tasks/MMOBTTask_MoveInRange.h"
 #include "AIController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Characters/MMOBaseCharacter.h"

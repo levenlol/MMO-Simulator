@@ -13,5 +13,5 @@ UCLASS()
 class MMO_SIMULATOR_API UMMOBuff : public UObject
 {
 	GENERATED_BODY()
-	
+public:
 };
