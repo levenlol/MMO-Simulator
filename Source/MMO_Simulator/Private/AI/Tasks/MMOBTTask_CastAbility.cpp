@@ -52,12 +52,6 @@ void UMMOBTTask_CastAbility::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 
-	//if (BlackBoard->IsValidKey(SpellSelectorKey.GetSelectedKeyID()))
-	//{
-	//	ClearBlackboardKeys(BlackBoard);
-	//	return;
-	//}
-
 	if (!Character->CombatSystem->IsCasting())
 	{
 		ClearBlackboardKeys(BlackBoard);

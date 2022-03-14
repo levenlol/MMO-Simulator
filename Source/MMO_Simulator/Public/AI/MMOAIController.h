@@ -20,6 +20,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Spell)
 	void RequestCastSpell(AActor* Target, const FVector& Location, int32 SpellIndex);
 
+	UFUNCTION(BlueprintCallable, Category = Spell)
+	void AddPlayerHandledAbility(const int32 AbilityIndex);
+
+	UFUNCTION(BlueprintCallable, Category = Spell)
+	void RemovePlayerHandledAbility(const int32 AbilityIndex);
+
+	UFUNCTION(BlueprintPure, Category = Spell)
+	bool IsSpellHandledByThePlayer(const int32 AbilityIndex) const;
+
 	UFUNCTION(BlueprintPure, Category = Spell)
 	bool HasPendingSpell() const;
 private:
@@ -32,4 +41,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Spell, meta = (AllowPrivateAccess))
 	FName SpellLocationTargetKey;
+
+	UPROPERTY(VisibleAnywhere, Category = Spell)
+	TArray<int32> PlayerHandledSpellIndex;
 };

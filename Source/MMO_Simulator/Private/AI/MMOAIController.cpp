@@ -27,6 +27,24 @@ void AMMOAIController::RequestCastSpell(AActor* Target, const FVector& Location,
 	}
 }
 
+void AMMOAIController::AddPlayerHandledAbility(const int32 AbilityIndex)
+{
+	if (AbilityIndex >= 0)
+	{
+		PlayerHandledSpellIndex.AddUnique(AbilityIndex);
+	}
+}
+
+void AMMOAIController::RemovePlayerHandledAbility(const int32 AbilityIndex)
+{
+	PlayerHandledSpellIndex.Remove(AbilityIndex);
+}
+
+bool AMMOAIController::IsSpellHandledByThePlayer(const int32 AbilityIndex) const
+{
+	return PlayerHandledSpellIndex.Contains(AbilityIndex);
+}
+
 bool AMMOAIController::HasPendingSpell() const
 {
 	if (UBlackboardComponent* BB = Blackboard.Get())
