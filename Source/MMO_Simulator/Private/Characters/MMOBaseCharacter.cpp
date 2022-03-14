@@ -9,6 +9,7 @@
 #include "Core/MMOGameState.h"
 #include "Data/MMOStatsManager.h"
 
+FMMOStatusTags FMMOStatusTags::StatusTags;
 
 // Sets default values
 AMMOBaseCharacter::AMMOBaseCharacter()
@@ -188,6 +189,11 @@ bool AMMOBaseCharacter::TryEquipWeapon(TSubclassOf<AMMOBaseWeapon> InWeaponClass
 
 void AMMOBaseCharacter::GiveTag(const FGameplayTag& InTag)
 {
+	if (InTag == FMMOStatusTags::Get().StunnedTag)
+	{
+		OnCharacterStunned.Broadcast(this);
+	}
+
 	StatusTags.AddTag(InTag);
 }
 

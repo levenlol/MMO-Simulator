@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatSystem/MMOBaseSkill.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
 
 FMMOSkillTags FMMOSkillTags::SkillTags;
 
@@ -60,6 +60,8 @@ void UMMOWrapperSkill::CastAbility(FMMOSkillInputData Data)
 
 	SavedInputData = Data;
 
+	OnSkillStart.Broadcast(this);
+
 	if (FMath::IsNearlyZero(CastTime, KINDA_SMALL_NUMBER))
 	{
 		FinishCastAbility();
@@ -70,6 +72,16 @@ void UMMOWrapperSkill::CastAbility(FMMOSkillInputData Data)
 		CurrentCastingTime = 0.f;
 		bCasting = true;
 	}
+}
+
+void UMMOWrapperSkill::AbortAbility()
+{
+	if (!bCasting)
+		return;
+
+	// dont cast ability.
+	CurrentCastingTime = CastTime;
+	bCasting = false;
 }
 
 void UMMOWrapperSkill::Tick(float DeltaSeconds)
@@ -125,5 +137,7 @@ void UMMOWrapperSkill::FinishCastAbility()
 	{
 		Skill->CastAbility(SavedInputData);
 	}
+
+	OnSkillFinish.Broadcast(this);
 }
 

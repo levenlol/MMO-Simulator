@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/MMODamageSkill.h"
+#include "CombatSystem/Skills/MMODamageSkill.h"
 #include "MMOAoeDamageSkill.generated.h"
 
 class UParticleSystem;

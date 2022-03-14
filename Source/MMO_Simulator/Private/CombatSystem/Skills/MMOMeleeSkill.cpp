@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatSystem/MMOMeleeSkill.h"
+#include "CombatSystem/Skills/MMOMeleeSkill.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimationAsset.h"

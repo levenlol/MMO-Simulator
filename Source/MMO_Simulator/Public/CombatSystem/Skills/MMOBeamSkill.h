@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/MMOBaseSkill.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "MMOBeamSkill.generated.h"
 
 class UParticleSystemComponent;

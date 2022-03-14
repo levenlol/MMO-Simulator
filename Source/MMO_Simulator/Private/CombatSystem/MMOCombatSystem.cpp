@@ -6,13 +6,14 @@
 #include "GameplayTagsManager.h"
 #include "Weapons/MMOBaseWeapon.h"
 #include "Core/MMOGameState.h"
-#include "CombatSystem/MMOBaseSkill.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
 
 UMMOCombatSystem::UMMOCombatSystem()
 	: Super()
 {
-	AttackTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Status.Action.Attack"));
-	StunnedTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Status.Malus.Stunned"));
+	AttackTag = FMMOStatusTags::Get().AttackTag;
+	StunnedTag = FMMOStatusTags::Get().StunnedTag;
+	CastTag = FMMOStatusTags::Get().CastTag;
 
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -24,6 +25,7 @@ void UMMOCombatSystem::BeginPlay()
 
 	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
 	OwnerCharacter->OnEquipWeapon.AddDynamic(this, &UMMOCombatSystem::OnCharacterChangeWeapon);
+	OwnerCharacter->OnCharacterStunned.AddDynamic(this, &UMMOCombatSystem::OnCharacterStunned);
 }
 
 void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -92,25 +94,25 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 
 		if (!bInRange)
 		{
-			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::OutOfRange);
+			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::OutOfRange);
 			return;
 		}
 
 		if (Skills[Index]->IsInCooldown())
 		{
-			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Cooldown);
+			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Cooldown);
 			return;
 		}
 
 		if (IsCasting())
 		{
-			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::AlreadyCasting);
+			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::AlreadyCasting);
 			return;
 		}
 
 		if (Skills[Index]->IsLocked())
 		{
-			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Unavailable);
+			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Unavailable);
 			return;
 		}
 
@@ -124,7 +126,7 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 
 		if (!bCanCastSkill)
 		{
-			OnSkillFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::WrongTarget);
+			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::WrongTarget);
 			return;
 		}
 
@@ -135,12 +137,17 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		InputData.SourceLocation = OwnerCharacter->GetActorLocation();
 
 		Skills[Index]->CastAbility(InputData);
-		OnSkillStart.Broadcast(Skills[Index]);
 	}
 }
 
 void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills)
 {
+	for (UMMOWrapperSkill* Skill : Skills)
+	{
+		Skill->OnSkillStart.RemoveDynamic(this, &UMMOCombatSystem::OnSkillStart);
+		Skill->OnSkillFinish.RemoveDynamic(this, &UMMOCombatSystem::OnSkillFinish);
+	}
+
 	Skills.Empty();
 	for (TSubclassOf<UMMOWrapperSkill> SkillClass : InSkills)
 	{
@@ -148,6 +155,9 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 		Skill->Setup(OwnerCharacter);
 
 		Skills.Add(Skill);
+
+		Skill->OnSkillStart.AddDynamic(this, &UMMOCombatSystem::OnSkillStart);
+		Skill->OnSkillFinish.AddDynamic(this, &UMMOCombatSystem::OnSkillFinish);
 	}
 }
 
@@ -163,18 +173,12 @@ bool UMMOCombatSystem::IsStunned() const
 
 bool UMMOCombatSystem::IsCasting() const
 {
-	for (UMMOWrapperSkill* Skill : Skills)
-	{
-		if (Skill->IsCasting())
-			return true;
-	}
-
-	return false;
+	return OwnerCharacter ? OwnerCharacter->HasTag(CastTag) : false;
 }
 
 bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
 {
-	if (!CanAttackTarget(Target))
+	if (!CanAttackTarget(Target) || !IsAttacking())
 	{
 		StopAttack();
 		return false;
@@ -235,6 +239,28 @@ AMMOBaseWeapon* UMMOCombatSystem::GetEquippedOffHandWeapon() const
 void UMMOCombatSystem::OnCharacterChangeWeapon(AMMOBaseCharacter* Sender, AMMOBaseWeapon* New, AMMOBaseWeapon* Old)
 {
 	LastAttackTime = GetWorld()->GetTimeSeconds();
+}
+
+void UMMOCombatSystem::OnSkillStart(UMMOWrapperSkill* Sender)
+{
+	OwnerCharacter->GiveTag(CastTag);
+}
+
+void UMMOCombatSystem::OnSkillFinish(UMMOWrapperSkill* Sender)
+{
+	OwnerCharacter->RemoveTag(CastTag);
+}
+
+void UMMOCombatSystem::OnCharacterStunned(AMMOBaseCharacter* Sender)
+{
+	// we clearly have to stop everything we are doing.
+	for (UMMOWrapperSkill* Skill : Skills)
+	{
+		Skill->AbortAbility();
+	}
+
+	OwnerCharacter->RemoveTag(AttackTag);
+	OwnerCharacter->RemoveTag(CastTag);
 }
 
 bool UMMOCombatSystem::CanCharacterAttack() const

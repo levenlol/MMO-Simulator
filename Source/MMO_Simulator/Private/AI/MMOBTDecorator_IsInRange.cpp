@@ -36,8 +36,6 @@ bool UMMOBTDecorator_IsInRange::CalculateRawConditionValue(UBehaviorTreeComponen
 	const FVector EndLocation = GetEndLocation(BlackBoard);
 
 	return (EndLocation - Location).SizeSquared() <= AcceptableRadius * AcceptableRadius;
-
-	return false;
 }
 
 FString UMMOBTDecorator_IsInRange::GetStaticDescription() const

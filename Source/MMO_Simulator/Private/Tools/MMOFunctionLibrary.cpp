@@ -149,7 +149,7 @@ FMMOPropertyBlob UMMOFunctionLibrary::FindPropertyOfType(UStruct* InClass, const
 	{
 		FProperty* Property = *PropIt;
 
-		if (FStructProperty* StructProp = Cast<FStructProperty>(Property))
+		if (FStructProperty* StructProp = CastField<FStructProperty>(Property))
 		{
 			if (StructProp->Struct->GetName() == PropertyType)
 			{
@@ -175,7 +175,7 @@ TArray<FMMOPropertyBlob> UMMOFunctionLibrary::FindPropertiesOfType(UStruct* InCl
 	{
 		FProperty* Property = *PropIt;
 
-		if (FStructProperty* StructProp = Cast<FStructProperty>(Property))
+		if (FStructProperty* StructProp = CastField<FStructProperty>(Property))
 		{
 			if (StructProp->Struct->GetName() == PropertyType)
 			{

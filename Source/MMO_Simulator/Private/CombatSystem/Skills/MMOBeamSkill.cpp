@@ -1,5 +1,5 @@
 
-#include "CombatSystem/MMOBeamSkill.h"
+#include "CombatSystem/Skills/MMOBeamSkill.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Core/MMOCommon.h"

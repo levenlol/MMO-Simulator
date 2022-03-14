@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatSystem/MMOAoeDamageSkill.h"
+#include "CombatSystem/Skills/MMOAoeDamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"

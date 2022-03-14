@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/MMOBaseSkill.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "Core/MMOCommon.h"
 #include "Tools/MMOMathExpression.h"
 #include "MMODamageSkill.generated.h"

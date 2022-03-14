@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatSystem/MMODamageSkill.h"
+#include "CombatSystem/Skills/MMODamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
 
 void UMMODamageSkill::Setup(AMMOBaseCharacter* InOwner)

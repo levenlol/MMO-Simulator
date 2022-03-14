@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatSystem/MMOInstantiateSkill.h"
+#include "CombatSystem/Skills/MMOInstantiateSkill.h"
 #include "Characters/MMOBaseCharacter.h"
 
 #if WITH_EDITORONLY_DATA

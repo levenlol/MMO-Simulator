@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "Containers/Map.h"
 #include "Tools/MMOMathExpression.h"
+#include "GameplayTagsManager.h"
 #include "MMOBaseCharacter.generated.h"
 
 class AMMOBaseWeapon;
@@ -18,6 +19,31 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharac
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FMMOOnEquipWeapon, AMMOBaseCharacter*, Sender, AMMOBaseWeapon*, NewWeapon, AMMOBaseWeapon*, OldWeapon);
 
+
+struct MMO_SIMULATOR_API FMMOStatusTags : public FGameplayTagNativeAdder
+{
+	FGameplayTag RootedTag;
+	FGameplayTag StunnedTag;
+	FGameplayTag SlowedTag;
+	FGameplayTag AttackTag;
+	FGameplayTag CastTag;
+
+	FORCEINLINE static const FMMOStatusTags& Get() { return StatusTags; }
+
+protected:
+	virtual void AddTags() override
+	{
+		UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
+
+		RootedTag = Manager.AddNativeGameplayTag(FName("Status.Malus.Rooted"));
+		StunnedTag = Manager.AddNativeGameplayTag(FName("Status.Malus.Stunned"));
+		SlowedTag = Manager.AddNativeGameplayTag(FName("Status.Malus.Slowed"));
+		AttackTag = Manager.AddNativeGameplayTag(FName("Status.Action.Attack"));
+		CastTag = Manager.AddNativeGameplayTag(FName("Status.Action.Cast"));
+	}
+private:
+	static FMMOStatusTags StatusTags;
+};
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseCharacter : public ACharacter
@@ -90,6 +116,9 @@ public:
 	// Events
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOOnCharacterEvent OnCharacterInitialized;
+
+	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOOnCharacterEvent OnCharacterStunned;
 
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOOnDamageTaken OnDamageTaken;

@@ -48,38 +48,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills);
 
-	UFUNCTION(BlueprintPure, Category = Stats)
+	UFUNCTION(BlueprintPure, Category = Status)
 	bool IsAttacking() const;
 
-	UFUNCTION(BlueprintPure, Category = Stats)
+	UFUNCTION(BlueprintPure, Category = Status)
+	bool IsCasting() const;
+
+	UFUNCTION(BlueprintPure, Category = Status)
 	bool IsStunned() const;
 
-	UFUNCTION(BlueprintPure, Category = Stats)
+	UFUNCTION(BlueprintPure, Category = Status)
 	bool CanCharacterAttack() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = Skill, meta = (AllowPrivateAccess))
 	TArray<UMMOWrapperSkill*> Skills;
 
 	UPROPERTY(BlueprintAssignable, Category = Skill)
-	FMMOSkillFailedEvent OnSkillFailed;
-
-	UPROPERTY(BlueprintAssignable, Category = Skill)
-	FMMOSkillStartEvent OnSkillStart;
+	FMMOSkillFailedEvent OnSkillStartFailed;
 
 private:
-	UPROPERTY(EditAnywhere, Category = Status, meta=(AllowPrivateAccess))
 	FGameplayTag AttackTag;
-
-	UPROPERTY(EditAnywhere, Category = Status, meta = (AllowPrivateAccess))
 	FGameplayTag StunnedTag;
+	FGameplayTag CastTag;
 
 	UPROPERTY(VisibleAnywhere, Category = Default)
 	AMMOBaseCharacter* OwnerCharacter = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	float LastAttackTime = 0.f;
-
-	bool IsCasting() const;
 
 	bool TryAttack(AMMOBaseCharacter* Target);
 	void StopAttack();
@@ -91,4 +87,13 @@ private:
 
 	UFUNCTION()
 	void OnCharacterChangeWeapon(AMMOBaseCharacter* Sender, AMMOBaseWeapon* New, AMMOBaseWeapon* Old);
+
+	UFUNCTION()
+	void OnSkillStart(UMMOWrapperSkill* Sender);
+
+	UFUNCTION()
+	void OnSkillFinish(UMMOWrapperSkill* Sender);
+
+	UFUNCTION()
+	void OnCharacterStunned(AMMOBaseCharacter* Sender);
 };

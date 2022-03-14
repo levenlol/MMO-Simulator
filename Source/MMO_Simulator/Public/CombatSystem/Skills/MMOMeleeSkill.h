@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/MMOBaseSkill.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "MMOMeleeSkill.generated.h"
 
 class UAnimationAsset;

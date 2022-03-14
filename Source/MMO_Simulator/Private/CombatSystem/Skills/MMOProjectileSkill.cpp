@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatSystem/MMOProjectileSkill.h"
+#include "CombatSystem/Skills/MMOProjectileSkill.h"
 #include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Characters/MMOBaseCharacter.h"

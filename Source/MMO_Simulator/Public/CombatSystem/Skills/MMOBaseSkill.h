@@ -10,6 +10,10 @@
 
 class AMMOBaseCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillStart, UMMOWrapperSkill*, Sender);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillFinish, UMMOWrapperSkill*, Sender);
+
+
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOSkillInputData
 {
@@ -61,6 +65,7 @@ public:
 	virtual void Setup(AMMOBaseCharacter* InOwner);
 
 	virtual void CastAbility(FMMOSkillInputData Data) {};
+	virtual void AbortAbility() {};
 
 	// Triggered Skills from this.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = Skills)
@@ -101,6 +106,8 @@ public:
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 	virtual void CastAbility(FMMOSkillInputData Data) override;
 
+	virtual void AbortAbility() override;
+
 	void Tick(float DeltaSeconds);
 
 	UFUNCTION(BlueprintPure, Category = Skill)
@@ -117,6 +124,13 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = Skill)
 	float GetCastingPercent() const;
+
+	UPROPERTY(BlueprintAssignable, Category = Skill)
+	FMMOOnSkillStart OnSkillStart;
+	
+	UPROPERTY(BlueprintAssignable, Category = Skill)
+	FMMOOnSkillFinish OnSkillFinish;
+
 private:
 	float LastCastTime = 0.f; // used to track cooldown
 	float CurrentCastingTime = 0.f; // used to cast the ability (if cast time > 0)
