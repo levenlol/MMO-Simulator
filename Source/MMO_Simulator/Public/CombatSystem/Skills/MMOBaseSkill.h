@@ -115,6 +115,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Skill)
 	float GetCooldownPercent() const;
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	float GetRemainingCooldown() const;
 	
 	UFUNCTION(BlueprintPure, Category = Skill)
 	bool IsLocked() const { return bLocked; };

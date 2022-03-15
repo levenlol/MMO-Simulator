@@ -60,6 +60,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = Status)
 	bool CanCharacterAttack() const;
 
+	UFUNCTION(BlueprintPure, Category = Skill)
+	float GetRemainingGlobalCooldown() const;
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	float GetRemainingCooldown(int32 SpellIndex) const;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
+	float GlobalCooldown = 1.f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = Skill, meta = (AllowPrivateAccess))
 	TArray<UMMOWrapperSkill*> Skills;
 
@@ -76,6 +85,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	float LastAttackTime = 0.f;
+
+	UPROPERTY(VisibleAnywhere, Category = Spell)
+	float LastSpellCastTime = 0.f;
 
 	bool TryAttack(AMMOBaseCharacter* Target);
 	void StopAttack();

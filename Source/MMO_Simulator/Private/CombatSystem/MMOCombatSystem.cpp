@@ -98,7 +98,7 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 			return;
 		}
 
-		if (Skills[Index]->IsInCooldown())
+		if (GetRemainingCooldown(Index) > 0.f)
 		{
 			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Cooldown);
 			return;
@@ -119,8 +119,8 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		const bool bOnSameSide = UMMOGameplayUtils::AreOnTheSameSide(OwnerCharacter, Target);
 
 		const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
-		const bool bCanCastSkill = (Skills[Index]->Tags.HasTag(SkillTags.EnemyTag) && !bOnSameSide)
-			|| (Skills[Index]->Tags.HasTag(SkillTags.FriendlyTag) && bOnSameSide)
+		const bool bCanCastSkill = (Skills[Index]->Tags.HasTag(SkillTags.EnemyTag) && !bOnSameSide && Target)
+			|| (Skills[Index]->Tags.HasTag(SkillTags.FriendlyTag) && bOnSameSide && Target)
 			|| (Skills[Index]->Tags.HasTag(SkillTags.LocationTag))
 			|| (Skills[Index]->Tags.HasTag(SkillTags.Buff));
 
@@ -137,6 +137,8 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		InputData.SourceLocation = OwnerCharacter->GetActorLocation();
 
 		Skills[Index]->CastAbility(InputData);
+
+		LastSpellCastTime = GetWorld()->GetTimeSeconds();
 	}
 }
 
@@ -273,4 +275,26 @@ bool UMMOCombatSystem::CanCharacterAttack() const
 	const bool bIsStunned = IsStunned();
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
 	return MainHandWeapon && !bIsStunned && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
+}
+
+float UMMOCombatSystem::GetRemainingGlobalCooldown() const
+{
+	if (GlobalCooldown <= 0.f)
+		return 0.f;
+
+	const float CurrentTime = GetWorld()->GetTimeSeconds();
+
+	const float Delta = (CurrentTime - LastSpellCastTime);
+	return FMath::Max(0.f, GlobalCooldown - Delta);
+}
+
+float UMMOCombatSystem::GetRemainingCooldown(int32 SpellIndex) const
+{
+	if (Skills.IsValidIndex(SpellIndex) && Skills[SpellIndex]->IsInCooldown())
+	{
+		// if spell is in cooldown we also check for global cooldown as it might be higher than the remaining global cooldown
+		return FMath::Max(Skills[SpellIndex]->GetRemainingCooldown(), GetRemainingGlobalCooldown());
+	}
+
+	return GetRemainingGlobalCooldown();
 }
