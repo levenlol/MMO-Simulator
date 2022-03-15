@@ -52,6 +52,12 @@ void UMMOBTTask_CastAbility::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
 
+	if (Character->CombatSystem->IsStunned())
+	{
+		ClearBlackboardKeys(BlackBoard);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	}
+
 	if (!Character->CombatSystem->IsCasting())
 	{
 		ClearBlackboardKeys(BlackBoard);

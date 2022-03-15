@@ -16,5 +16,18 @@ class MMO_SIMULATOR_API UMMOBTService_SelectAbility : public UBTService
 public:
 	UMMOBTService_SelectAbility();
 	
+	UPROPERTY(EditAnywhere, Category = Spell)
+	FBlackboardKeySelector SpellSelector;
+
+	UPROPERTY(EditAnywhere, Category = Spell)
+	FBlackboardKeySelector SpellLocationSelector;
+
+	UPROPERTY(EditAnywhere, Category = Spell)
+	FBlackboardKeySelector SpellTargetSelector;
+
+	UPROPERTY(EditAnywhere, Category = Spell)
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+
+	virtual void OnSearchStart(FBehaviorTreeSearchData& SearchData) override;
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

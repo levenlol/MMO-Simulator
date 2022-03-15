@@ -17,3 +17,15 @@ void UMMOCheatManager::Cheat_SetPropertyValue(FString PropertyPath, float Value)
         }
     }
 }
+
+void UMMOCheatManager::Cheat_StunHeroes(float Seconds)
+{
+    AMMOPlayerController* PC = Cast<AMMOPlayerController>(GetPlayerController());
+    if (PC)
+    {
+        for (AMMOBaseHero* Hero : PC->GetSelectedHeroes())
+        {
+            Hero->Stun(Seconds);
+        }
+    }
+}

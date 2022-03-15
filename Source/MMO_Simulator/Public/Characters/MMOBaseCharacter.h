@@ -136,10 +136,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Initialization)
 	FMMOMathExpression ManaExpression;
 
+	UFUNCTION(BlueprintCallable, Category = Status)
+	void Stun(float InDuration);
+
 protected:
-#if WITH_EDITORONLY_DATA
-	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -154,11 +154,14 @@ private:
 
 	void OnRecuperate();
 
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	UPROPERTY(VisibleAnywhere, Transient, Category = Weapon)
 	AMMOBaseWeapon* MainHandWeapon;
 
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	UPROPERTY(VisibleAnywhere, Transient, Category = Weapon)
 	AMMOBaseWeapon* OffHandWeapon;
+
+	UPROPERTY(VisibleAnywhere, Transient, Category = Weapon)
+	float StunTimerRemaining = 0.f;
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	bool bAlive = true;

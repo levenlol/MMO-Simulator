@@ -52,14 +52,20 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	MyMemory->AttackSpeed -= DeltaSeconds;
 	MyMemory->DamageDelayTime -= DeltaSeconds;
 
+	AAIController* AIOwner = OwnerComp.GetAIOwner();
+	AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(AIOwner->GetPawn());
+
+	if (!IsValid(Character) || Character->CombatSystem->IsStunned())
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	}
+
 	if (!MyMemory->bDealtDamage && MyMemory->DamageDelayTime <= 0.0f)
 	{
 		// continue execution from this node
-		AAIController* AIOwner = OwnerComp.GetAIOwner();
-		AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(AIOwner->GetPawn());
 		AMMOBaseCharacter* Target = MyMemory->TargetWeak.Get();
 
-		if (!IsValid(Character) || !IsValid(Target))
+		if (!IsValid(Target))
 		{
 			UE_LOG(LogTemp, Error, TEXT("Unable to Complete Task: UMMOBTTask_AutoAttack"));
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -76,6 +82,17 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		// Should also be synched with animation.
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
+}
+
+EBTNodeResult::Type UMMOBTTask_AutoAttack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	FMMOBTTask_AutoAttackData* MyMemory = CastInstanceNodeMemory<FMMOBTTask_AutoAttackData>(NodeMemory);
+	MyMemory->DamageDelayTime = 0.f;
+	MyMemory->bDealtDamage = true;
+
+	FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
+
+	return EBTNodeResult::Aborted;
 }
 
 void UMMOBTTask_AutoAttack::DescribeRuntimeValues(const UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTDescriptionVerbosity::Type Verbosity, TArray<FString>& Values) const

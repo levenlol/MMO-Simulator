@@ -16,4 +16,7 @@ class MMO_SIMULATOR_API UMMOCheatManager : public UCheatManager
 public:
 	UFUNCTION(exec)
 	void Cheat_SetPropertyValue(FString PropertyPath, float Value);
+
+	UFUNCTION(exec)
+	void Cheat_StunHeroes(float Seconds);
 };

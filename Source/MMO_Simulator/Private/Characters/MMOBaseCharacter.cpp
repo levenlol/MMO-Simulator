@@ -22,12 +22,14 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
-#if WITH_EDITORONLY_DATA
-void AMMOBaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void AMMOBaseCharacter::Stun(float InDuration)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+	if (InDuration <= 0.f)
+		return;
+
+	GiveTag(FMMOStatusTags::Get().StunnedTag);
+	StunTimerRemaining = FMath::Max(StunTimerRemaining, InDuration);
 }
-#endif
 
 // Called when the game starts or when spawned
 void AMMOBaseCharacter::BeginPlay()
@@ -211,4 +213,14 @@ bool AMMOBaseCharacter::HasTag(const FGameplayTag& InTag) const
 void AMMOBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (HasTag(FMMOStatusTags::Get().StunnedTag))
+	{
+		StunTimerRemaining -= DeltaTime;
+		if (StunTimerRemaining < 0.f)
+		{
+			StunTimerRemaining = 0.f;
+			RemoveTag(FMMOStatusTags::Get().StunnedTag);
+		}
+	}
 }
