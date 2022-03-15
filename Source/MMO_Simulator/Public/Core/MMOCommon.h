@@ -406,7 +406,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Widget, meta = (WorldContext = WorldContextObject))
 	static void AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<UTexture2D> Texture);
 
-	UFUNCTION(BlueprintCallable, Category = Combat, meta = (WorldContext = WorldContextObject))
+	UFUNCTION(BlueprintCallable, Category = Combat)
 	static bool AreOnTheSameSide(AMMOBaseCharacter* First, AMMOBaseCharacter* Second);
+
+	UFUNCTION(BlueprintPure, Category = UI, meta = (WorldContext = WorldContextObject))
+	static TArray<FName> GetKeysForAction(const UObject* WorldContextObject, const FName& InputName, int32 PlayerIndex = 0);
 
 };

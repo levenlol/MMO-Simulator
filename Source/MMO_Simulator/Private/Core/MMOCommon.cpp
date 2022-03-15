@@ -11,6 +11,7 @@
 #include "Components/Button.h"
 #include "Engine/StreamableManager.h"
 #include "Data/MMODataFinder.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
@@ -107,6 +108,42 @@ bool UMMOGameplayUtils::AreOnTheSameSide(AMMOBaseCharacter* First, AMMOBaseChara
 		return false;
 
 	return First->IsA<AMMOBaseHero>() == Second->IsA<AMMOBaseHero>();
+}
+
+TArray<FName> UMMOGameplayUtils::GetKeysForAction(const UObject* WorldContextObject, const FName& InputName, int32 PlayerIndex)
+{
+	static const TMap<FName, FName> TranslationUnit = { 
+		{"Zero", "0"}, 
+		{"One", "1"},
+		{"Two", "2"},
+		{"Three", "3"},
+		{"Four", "4"},
+		{"Five", "5"},
+		{"Six", "6"},
+		{"Seven", "7"},
+		{"Eigth", "8"},
+		{"Nine", "9"},
+	};
+ 
+	TArray<FName> Names;
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, PlayerIndex))
+	{
+		const TArray<FInputActionKeyMapping>& ActionKeys = PlayerController->PlayerInput->GetKeysForAction(InputName);
+
+		for (const FInputActionKeyMapping& Key : ActionKeys)
+		{
+			FName Name = Key.Key.GetFName();
+
+			if (TranslationUnit.Contains(Name))
+			{
+				Name = TranslationUnit[Name];
+			}
+
+			Names.Add(Name);
+		}
+	}
+
+	return Names;
 }
 
 FMMOCharacter::FMMOCharacter(const FName& InName)
