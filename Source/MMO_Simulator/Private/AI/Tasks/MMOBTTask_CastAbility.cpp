@@ -59,6 +59,20 @@ void UMMOBTTask_CastAbility::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 	}
 }
 
+EBTNodeResult::Type UMMOBTTask_CastAbility::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+	UBlackboardComponent* BlackBoard = OwnerComp.GetAIOwner()->GetBlackboardComponent();
+	
+	if (BlackBoard)
+	{
+		ClearBlackboardKeys(BlackBoard);
+	}
+
+	FinishLatentTask(OwnerComp, EBTNodeResult::Aborted);
+
+	return EBTNodeResult::Aborted;
+}
+
 void UMMOBTTask_CastAbility::ClearBlackboardKeys(UBlackboardComponent* BlackBoard)
 {
 	BlackBoard->ClearValue(SpellSelectorKey.SelectedKeyName);

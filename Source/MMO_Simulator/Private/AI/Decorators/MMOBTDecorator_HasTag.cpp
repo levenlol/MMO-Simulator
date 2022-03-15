@@ -17,7 +17,22 @@ bool UMMOBTDecorator_HasTag::CalculateRawConditionValue(UBehaviorTreeComponent& 
 	AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (IsValid(Character))
 	{
-		return Character->HasTag(Tag);
+		if (TagCheck == EMMOTagCheckType::HasAny)
+		{
+			return Character->StatusTags.HasAny(Tags);
+		}
+		else if (TagCheck == EMMOTagCheckType::HasAll)
+		{
+			return Character->StatusTags.HasAll(Tags);
+		}
+		else if (TagCheck == EMMOTagCheckType::HasAllExact)
+		{
+			return Character->StatusTags.HasAllExact(Tags);
+		}
+		else if (TagCheck == EMMOTagCheckType::HasAnyExact)
+		{
+			return Character->StatusTags.HasAnyExact(Tags);
+		}
 	}
 
 	return false;
@@ -25,5 +40,5 @@ bool UMMOBTDecorator_HasTag::CalculateRawConditionValue(UBehaviorTreeComponent& 
 
 FString UMMOBTDecorator_HasTag::GetStaticDescription() const
 {
-	return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *Tag.ToString());
+	return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *Tags.ToStringSimple());
 }
