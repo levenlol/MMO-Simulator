@@ -40,6 +40,12 @@ public:
 	FMMOMathExpression DodgeExpression;
 
 	UPROPERTY(EditAnywhere, Category = Attributes)
+	FMMOMathExpression AttackPowerExpression;
+
+	UPROPERTY(EditAnywhere, Category = Attributes)
+	FMMOMathExpression SpellPowerExpression;
+
+	UPROPERTY(EditAnywhere, Category = Attributes)
 	FMMOMathExpression AttackCritExpression;
 
 	UPROPERTY(EditAnywhere, Category = Attributes)
@@ -67,6 +73,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
 	float SpellCritChance;
+
+	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
+	int32 SpellPowerValue;
+
+	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
+	int32 AttackPowerValue;
 
 	UPROPERTY()
 	AMMOBaseCharacter* OwnerCharacter;

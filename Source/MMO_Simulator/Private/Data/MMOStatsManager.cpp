@@ -58,6 +58,8 @@ void UMMOStatsManager::InitializeComponent()
 	DodgeExpression.Init(this);
 	AttackCritExpression.Init(this);
 	SpellCritExpression.Init(this);
+	AttackPowerExpression.Init(this);
+	SpellPowerExpression.Init(this);
 }
 
 void UMMOStatsManager::UninitializeComponent()
@@ -114,6 +116,16 @@ void UMMOStatsManager::RecomputeCombatAttributesChances()
 		if (SpellCritExpression.IsValid())
 		{
 			SpellCritChance = SpellCritExpression.Eval<float>();
+		}
+
+		if (AttackPowerExpression.IsValid())
+		{
+			AttackPowerValue = AttackPowerExpression.Eval<int32>();
+		}
+
+		if (SpellPowerExpression.IsValid())
+		{
+			SpellPowerValue = SpellPowerExpression.Eval<int32>();
 		}
 	}
 }

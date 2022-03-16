@@ -154,6 +154,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
 	int32 BlockRating;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 AttackPower;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	int32 SpellPower;
 };
 
 USTRUCT(BlueprintType)
