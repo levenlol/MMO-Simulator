@@ -24,29 +24,21 @@ void UMMODataFinder::Shutdown()
 	Instance = nullptr;
 }
 
-FMMOCharacterAttributes UMMODataFinder::GetCharacterProgressionForLevels(const EMMOCharacterClass CharacterClass, int32 StartLevel, int32 EndLevel) const
+FMMOCharacterAttributes UMMODataFinder::GetCharacterProgressionAtLevel(const EMMOCharacterClass CharacterClass, int32 Level) const
 {
-	FMMOCharacterAttributes Progression;
 
 	if (AttributesIncreasePerLevel.Contains(CharacterClass))
 	{
 		const TArray<FMMOCharacterAttributes>& AttributesPerLevel = AttributesIncreasePerLevel[CharacterClass].AttributesIncreasePerLevel;
-		const int32 StartIndex = FMath::Max(StartLevel - 1, 0);
-		const int32 EndIndex = FMath::Max(EndLevel - 1, 0);
 
-		for (int32 i = StartIndex; i <= EndIndex; i++)
+		if (AttributesPerLevel.IsValidIndex(Level))
 		{
-			if (AttributesPerLevel.IsValidIndex(i))
-			{
-				Progression.Strength += AttributesPerLevel[i].Strength;
-				Progression.Dexterity += AttributesPerLevel[i].Dexterity;
-				Progression.Intellect += AttributesPerLevel[i].Intellect;
-				Progression.Constitution += AttributesPerLevel[i].Constitution;
-			}
+			return AttributesPerLevel[Level];
 		}
 	}
-
-	return Progression;
+	
+	UE_LOG(LogTemp, Error, TEXT("Didnt find a CharacterProgression for level: %d"), Level);
+	return FMMOCharacterAttributes();
 }
 
 FMMOCharacterAttributes UMMODataFinder::GetRaceAttributes(const EMMOCharacterRace InRace) const

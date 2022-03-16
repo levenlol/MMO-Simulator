@@ -48,7 +48,7 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Level = Level;
 	Character.Attributes =  Generator.GenerateAttributes();
 
-	FMMOCharacterAttributes AttributesProgress = UMMODataFinder::Get()->GetCharacterProgressionForLevels(InClass, 1, Level);
+	FMMOCharacterAttributes AttributesProgress = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(InClass, Level);
 	Character.Attributes.Strength += AttributesProgress.Strength;
 	Character.Attributes.Intellect += AttributesProgress.Intellect;
 	Character.Attributes.Constitution += AttributesProgress.Constitution;

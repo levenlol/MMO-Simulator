@@ -77,7 +77,7 @@ public:
 	FString CharacterProgressionTableName;
 
 	UFUNCTION(BlueprintPure, Category = CharacterProgression)
-	FMMOCharacterAttributes GetCharacterProgressionForLevels(const EMMOCharacterClass CharacterClass, int32 StartLevel, int32 EndLevel) const;
+	FMMOCharacterAttributes GetCharacterProgressionAtLevel(const EMMOCharacterClass CharacterClass, int32 Level) const;
 
 	UFUNCTION(BlueprintPure, Category = CharacterProgression)
 	FMMOCharacterAttributes GetRaceAttributes(const EMMOCharacterRace InRace) const;

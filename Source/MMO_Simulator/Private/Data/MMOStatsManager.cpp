@@ -21,7 +21,7 @@ void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Character Has been initialized with a level > 1. Automatic Fixing MMOStatsManager"));
 		FMMOCharacterAttributes Attributes = BaseCharacterInfo.Attributes;
-		const FMMOCharacterAttributes ProgressionAttributes = UMMODataFinder::Get()->GetCharacterProgressionForLevels(BaseCharacterInfo.CharacterClass, 1, BaseCharacterInfo.Level);
+		const FMMOCharacterAttributes ProgressionAttributes = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(BaseCharacterInfo.CharacterClass, BaseCharacterInfo.Level);
 
 		Attributes.Strength -= ProgressionAttributes.Strength;
 		Attributes.Intellect -= ProgressionAttributes.Intellect;
