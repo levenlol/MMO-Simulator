@@ -29,5 +29,4 @@ public:
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
 	virtual void OnSearchStart(FBehaviorTreeSearchData& SearchData) override;
-	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

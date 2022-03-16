@@ -14,8 +14,6 @@ UMMOBTService_SelectAbility::UMMOBTService_SelectAbility()
 	NodeName = "Select Ability";
 
 	INIT_SERVICE_NODE_NOTIFY_FLAGS();
-	bNotifyTick = true;
-
 }
 
 void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchData)
@@ -58,9 +56,4 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 			}
 		}
 	}
-}
-
-void UMMOBTService_SelectAbility::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-	
 }
