@@ -139,6 +139,7 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		Skills[Index]->CastAbility(InputData);
 
 		LastSpellCastTime = GetWorld()->GetTimeSeconds();
+		LastAttackTime = LastSpellCastTime;
 	}
 }
 
@@ -273,8 +274,9 @@ bool UMMOCombatSystem::CanCharacterAttack() const
 	const float CurrentTime = GetWorld()->GetTimeSeconds();
 
 	const bool bIsStunned = IsStunned();
+	const bool bIsAttacking = IsAttacking();
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
-	return MainHandWeapon && !bIsStunned && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
+	return MainHandWeapon && !bIsAttacking && !bIsStunned && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
 }
 
 float UMMOCombatSystem::GetRemainingGlobalCooldown() const
