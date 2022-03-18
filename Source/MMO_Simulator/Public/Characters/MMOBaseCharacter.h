@@ -130,11 +130,14 @@ public:
 	FGameplayTagContainer StatusTags;
 
 	// TODO: More structured Character Stats initialization.
-	UPROPERTY(EditDefaultsOnly, Category = Initialization)
+	UPROPERTY(EditAnywhere, Category = Initialization)
 	FMMOMathExpression HealthExpression;
 
-	UPROPERTY(EditDefaultsOnly, Category = Initialization)
+	UPROPERTY(EditAnywhere, Category = Initialization)
 	FMMOMathExpression ManaExpression;
+
+	UPROPERTY(EditDefaultsOnly, Category = Initialization)
+	TSubclassOf<UMMOStatsManager> StatsManagerClass;
 
 	UFUNCTION(BlueprintCallable, Category = Status)
 	void Stun(float InDuration);

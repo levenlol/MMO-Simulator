@@ -18,8 +18,9 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CombatSystem = CreateDefaultSubobject<UMMOCombatSystem>(TEXT("CombatSystem"));
-	StatsManager = CreateDefaultSubobject<UMMOStatsManager>(TEXT("StatsManager"));
+	//StatsManager = CreateDefaultSubobject<UMMOStatsManager>(TEXT("StatsManager"));
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	StatsManagerClass = UMMOStatsManager::StaticClass();
 }
 
 void AMMOBaseCharacter::Stun(float InDuration)
@@ -36,6 +37,8 @@ void AMMOBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	StatsManager = NewObject<UMMOStatsManager>(this, StatsManagerClass);
+
 	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(CharacterInfo.Stats.RecuperateEverySeconds), true, -1.f);
 
 	HealthExpression.Init(this);

@@ -10,7 +10,7 @@
 
 class AMMOBaseCharacter;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(BlueprintType, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MMO_SIMULATOR_API UMMOStatsManager : public UActorComponent
 {
 	GENERATED_BODY()
