@@ -20,15 +20,18 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// compute attributes and combat attributes and then set it to the character.
-	UFUNCTION(BlueprintCallable, Category = Stats)
-	void UpdateCharacterAttributes(const FMMOCharacterAttributes& InAttributes, const FMMOCombatAttributes& InCombatAttributes);
-
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	void RecomputeCombatAttributesChances();
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
-	void OnLevelUp();
+	void ComputeAttributes();
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void LevelUp();
+
+	// return stats of the character at current level ( equip stats excluded )
+	UFUNCTION(BlueprintPure, Category = Stats)
+	const FMMOCharacterAttributes& GetCharacterNakedAttributes() const { return BaseAttributes; }
 
 	UPROPERTY(EditAnywhere, Category = Attributes)
 	FMMOMathExpression ParryExpression;
@@ -51,13 +54,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = Attributes)
 	FMMOMathExpression SpellCritExpression;
 
+	UPROPERTY(EditAnywhere, Category = Initialization)
+	FMMOMathExpression HealthExpression;
+
+	UPROPERTY(EditAnywhere, Category = Initialization)
+	FMMOMathExpression ManaExpression;
+
 protected:
 	UFUNCTION()
 	void OnCharacterInitialized(AMMOBaseCharacter* Sender);
 
 	virtual void BeginPlay() override;
-	virtual void InitializeComponent() override;
-	virtual void UninitializeComponent() override;
+	virtual void OnRegister() override;
+	virtual void OnUnregister() override;
 
 	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
 	float ParryChance;
@@ -83,6 +92,11 @@ protected:
 	UPROPERTY()
 	AMMOBaseCharacter* OwnerCharacter;
 
-	UPROPERTY()
-	FMMOCharacter BaseCharacterInfo;
+	UPROPERTY(VisibleAnywhere, Category = Stats)
+	FMMOCharacterAttributes BaseAttributes;
+
+	void RecomputeHealthAndResources();
+
+	// compute attributes and combat attributes and then set it to the character.
+	void UpdateCharacterAttributes();
 };

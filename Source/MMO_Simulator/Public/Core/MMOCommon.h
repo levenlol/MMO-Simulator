@@ -133,6 +133,17 @@ public:
 	// Affects dodge and crit chance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	int32 Dexterity;
+
+	FMMOCharacterAttributes operator+(const FMMOCharacterAttributes& Other) const
+	{
+		FMMOCharacterAttributes ReturnAttributes = *this;
+		ReturnAttributes.Strength += Other.Strength;
+		ReturnAttributes.Intellect += Other.Intellect;
+		ReturnAttributes.Constitution += Other.Constitution;
+		ReturnAttributes.Dexterity += Other.Dexterity;
+
+		return ReturnAttributes;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -280,10 +291,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;
-private:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attributes, meta=(AllowPrivateAccess))
-	FMMOCharacterAttributes InitialAttributes;
+	FMMOCharacterAttributes GetInitialAttributes() const;
 };
 
 USTRUCT(BlueprintType)

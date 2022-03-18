@@ -14,44 +14,6 @@ UMMOStatsManager::UMMOStatsManager()
 void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
 {
 	check(Sender == OwnerCharacter);
-	BaseCharacterInfo = OwnerCharacter->CharacterInfo;
-
-	// if Character has an higher level we need to compute the base stats.
-	if (BaseCharacterInfo.Level > 1)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Character Has been initialized with a level > 1. Automatic Fixing MMOStatsManager"));
-		FMMOCharacterAttributes Attributes = BaseCharacterInfo.Attributes;
-		const FMMOCharacterAttributes ProgressionAttributes = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(BaseCharacterInfo.CharacterClass, BaseCharacterInfo.Level);
-
-		Attributes.Strength -= ProgressionAttributes.Strength;
-		Attributes.Intellect -= ProgressionAttributes.Intellect;
-		Attributes.Constitution -= ProgressionAttributes.Constitution;
-		Attributes.Dexterity -= ProgressionAttributes.Dexterity;
-
-		// this is the base stats
-		BaseCharacterInfo.Attributes = Attributes;
-		BaseCharacterInfo.Level = 1;
-	}
-
-	RecomputeCombatAttributesChances();
-}
-
-void UMMOStatsManager::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void UMMOStatsManager::InitializeComponent()
-{
-	Super::InitializeComponent();
-
-	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
-
-	if (OwnerCharacter)
-	{
-		OwnerCharacter->OnCharacterInitialized.AddDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
-	}
 
 	ParryExpression.Init(this);
 	BlockExpression.Init(this);
@@ -60,15 +22,64 @@ void UMMOStatsManager::InitializeComponent()
 	SpellCritExpression.Init(this);
 	AttackPowerExpression.Init(this);
 	SpellPowerExpression.Init(this);
+	HealthExpression.Init(this);
+	ManaExpression.Init(this);
+
+	ComputeAttributes();
 }
 
-void UMMOStatsManager::UninitializeComponent()
+void UMMOStatsManager::BeginPlay()
 {
-	Super::UninitializeComponent();
+	Super::BeginPlay();
+	
+}
+
+void UMMOStatsManager::OnRegister()
+{
+	Super::OnRegister();
+
+	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
+
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->OnCharacterInitialized.AddUniqueDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
+	}
+}
+
+void UMMOStatsManager::OnUnregister()
+{
+	Super::OnUnregister();
 
 	if (OwnerCharacter)
 	{
 		OwnerCharacter->OnCharacterInitialized.RemoveDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
+	}
+
+
+	ParryExpression.Release();
+	BlockExpression.Release();
+	DodgeExpression.Release();
+	AttackCritExpression.Release();
+	SpellCritExpression.Release();
+	AttackPowerExpression.Release();
+	SpellPowerExpression.Release();
+	HealthExpression.Release();
+	ManaExpression.Release();
+}
+
+void UMMOStatsManager::RecomputeHealthAndResources()
+{
+	if (!OwnerCharacter)
+		return;
+
+	if (HealthExpression.IsValid())
+	{
+		OwnerCharacter->CharacterInfo.Stats.MaxHealth = HealthExpression.Eval<int32>(false);
+	}
+
+	if (ManaExpression.IsValid())
+	{
+		OwnerCharacter->CharacterInfo.Stats.MaxResources = ManaExpression.Eval<int32>(false);
 	}
 }
 
@@ -78,14 +89,18 @@ void UMMOStatsManager::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UMMOStatsManager::UpdateCharacterAttributes(const FMMOCharacterAttributes& InAttributes, const FMMOCombatAttributes& InCombatAttributes)
+void UMMOStatsManager::UpdateCharacterAttributes()
 {
 	if (OwnerCharacter)
 	{
-		OwnerCharacter->CharacterInfo.Attributes = InAttributes;
-		OwnerCharacter->CharacterInfo.CombatAttributes = InCombatAttributes;
-		
-		RecomputeCombatAttributesChances();
+		// TODO: sum equip stats.
+		FMMOCharacterAttributes FullAttributes = BaseAttributes;
+		// ... sum equip attributes...
+
+		OwnerCharacter->CharacterInfo.Attributes = FullAttributes;
+
+		// recompute all other stuff
+		ComputeAttributes();
 	}
 }
 
@@ -130,8 +145,21 @@ void UMMOStatsManager::RecomputeCombatAttributesChances()
 	}
 }
 
-void UMMOStatsManager::OnLevelUp()
+void UMMOStatsManager::ComputeAttributes()
 {
-	// todo
+	RecomputeCombatAttributesChances();
+	RecomputeHealthAndResources();
+}
+
+void UMMOStatsManager::LevelUp()
+{
+	// Compute new base stats
+	const FMMOCharacterAttributes& InitialAttributes = OwnerCharacter->CharacterInfo.GetInitialAttributes();
+	OwnerCharacter->CharacterInfo.Level++;
+
+	const FMMOCharacterAttributes ProgressionAttributes = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(OwnerCharacter->CharacterInfo.CharacterClass, OwnerCharacter->CharacterInfo.Level);
+
+	BaseAttributes = InitialAttributes + ProgressionAttributes;
+	UpdateCharacterAttributes();
 }
 

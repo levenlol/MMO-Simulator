@@ -148,5 +148,23 @@ TArray<FName> UMMOGameplayUtils::GetKeysForAction(const UObject* WorldContextObj
 
 FMMOCharacter::FMMOCharacter(const FName& InName)
 	: Name(InName)
+{}
+
+FMMOCharacterAttributes FMMOCharacter::GetInitialAttributes() const
 {
+	FMMOCharacterAttributes BaseAttributes = Attributes;
+
+	// if Character has an higher level we need to compute the base stats.
+	if (Level > 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Character Has been initialized with a level > 1. Automatic Fixing MMOStatsManager"));
+		const FMMOCharacterAttributes ProgressionAttributes = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(CharacterClass, Level);
+
+		BaseAttributes.Strength -= ProgressionAttributes.Strength;
+		BaseAttributes.Intellect -= ProgressionAttributes.Intellect;
+		BaseAttributes.Constitution -= ProgressionAttributes.Constitution;
+		BaseAttributes.Dexterity -= ProgressionAttributes.Dexterity;
+	}
+
+	return BaseAttributes;
 }
