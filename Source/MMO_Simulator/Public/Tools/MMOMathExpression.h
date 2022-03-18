@@ -18,11 +18,11 @@ public:
 	~FMMOMathExpression();
 
 	// Map of variable: VariableName -> PropertyPath.
-	UPROPERTY(EditDefaultsOnly, Category = MathIsMagic)
+	UPROPERTY(EditAnywhere, Category = MathIsMagic)
 	TMap<FString, FString> VariableMap;
 
 	// Description of expression
-	UPROPERTY(EditDefaultsOnly, Category = MathIsMagic)
+	UPROPERTY(EditAnywhere, Category = MathIsMagic)
 	FString Expression;
 
 	void Init(const UObject* InObject);
