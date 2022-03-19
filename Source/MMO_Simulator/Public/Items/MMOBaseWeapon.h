@@ -17,7 +17,6 @@ public:
 	// Sets default values for this actor's properties
 	AMMOBaseWeapon();
 
-	// Weapon Type
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	EMMOWeaponType WeaponType;
 

@@ -1,0 +1,5 @@
+---,ArmorType,Armor,FireResistance,IceResistance,ShadowResistance,HolyResistance,NatureResistance,ArcaneResistance,Strength,Constitution,Intellect,Dexterity,HPS,MPS,MeleeCritRating,SpellCritRating,DodgeRating,BlockRating,AttackPower,SpellPower
+Cloth,"Cloth","20","100","100","100","100","100","100","0","60","100","100","100","100","0","100","0","0","0","100"
+Leather,"Leather","40","100","100","100","100","100","100","100","80","100","100","100","100","100","100","100","50","100","100"
+Mail,"Mail","60","100","100","100","100","100","100","100","100","80","100","100","100","100","100","80","80","100","100"
+Plate,"Plate","100","100","100","100","100","100","100","100","100","60","100","100","100","100","100","60","100","100","100"

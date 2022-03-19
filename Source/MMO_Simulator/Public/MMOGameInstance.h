@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Core/MMOCommon.h"
 #include "MMOGameInstance.generated.h"
 
 class UDataTable;

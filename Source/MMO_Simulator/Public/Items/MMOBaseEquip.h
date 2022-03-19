@@ -18,7 +18,7 @@ public:
 	AMMOBaseEquip();
 
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
-	UStaticMeshComponent* WeaponMesh;
+	UStaticMeshComponent* Mesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	FMMOItemStats EquipStats;

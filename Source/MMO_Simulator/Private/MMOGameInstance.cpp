@@ -6,6 +6,8 @@
 #include "Guilds/MMOGuildsManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Data/MMOCharacterGenerator.h"
+#include "Data/MMOEquipGenerator.h"
+
 
 void UMMOGameInstance::Init()
 {
@@ -13,6 +15,7 @@ void UMMOGameInstance::Init()
 
 	UMMODataFinder::Startup(this);
 	UMMOCharacterGenerator::Startup(this);
+	UMMOEquipGenerator::Startup(this);
 
 	GuildsManager = NewObject<UMMOGuildsManager>(this, GuildsManagerClass ? GuildsManagerClass : UMMOGuildsManager::StaticClass());
 	GuildsManager->Init();
@@ -24,6 +27,7 @@ void UMMOGameInstance::Shutdown()
 
 	UMMODataFinder::Shutdown();
 	UMMOCharacterGenerator::Shutdown();
+	UMMOEquipGenerator::Shutdown();
 	
 	GuildsManager->Uninit();
 	GuildsManager = nullptr;

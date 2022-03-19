@@ -26,7 +26,6 @@ void UMMODataFinder::Shutdown()
 
 FMMOCharacterAttributes UMMODataFinder::GetCharacterProgressionAtLevel(const EMMOCharacterClass CharacterClass, int32 Level) const
 {
-
 	if (AttributesIncreasePerLevel.Contains(CharacterClass))
 	{
 		const TArray<FMMOCharacterAttributes>& AttributesPerLevel = AttributesIncreasePerLevel[CharacterClass].AttributesIncreasePerLevel;

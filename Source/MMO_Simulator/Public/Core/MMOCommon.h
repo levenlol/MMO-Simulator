@@ -86,6 +86,15 @@ enum class EMMOWeaponType : uint8
 UENUM(BlueprintType)
 enum class EMMOArmorType : uint8
 {
+	Cloth,
+	Leather,
+	Mail,
+	Plate
+};
+
+UENUM(BlueprintType)
+enum class EMMOArmorSlotType : uint8
+{
 	Head,
 	Shoulder,
 	Chest,
@@ -338,7 +347,10 @@ public:
 	FMMOCombatAttributes CombatAttributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	EMMORarityType Rarity;
+	EMMORarityType Rarity = EMMORarityType::Common;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 ItemLevel = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Durability = 100;

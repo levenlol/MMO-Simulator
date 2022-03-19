@@ -11,9 +11,9 @@ AMMOBaseEquip::AMMOBaseEquip()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(RootComponent);
-	WeaponMesh->SetGenerateOverlapEvents(false);
-	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
-	WeaponMesh->SetCollisionProfileName(FName("NoCollision"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Mesh->SetupAttachment(RootComponent);
+	Mesh->SetGenerateOverlapEvents(false);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+	Mesh->SetCollisionProfileName(FName("NoCollision"));
 }
