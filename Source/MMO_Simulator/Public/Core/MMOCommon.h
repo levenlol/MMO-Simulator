@@ -283,16 +283,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resistances)
 	FMMOResistances Resistances;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes, meta = (AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attributes)
 	FMMOCharacterAttributes Attributes;
+
+	// Initial attributes of the character, (The random generated one).
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
+	FMMOCharacterAttributes InitialAttributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attributes)
 	FMMOCombatAttributes CombatAttributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 Gold;
-
-	FMMOCharacterAttributes GetInitialAttributes() const;
 };
 
 USTRUCT(BlueprintType)

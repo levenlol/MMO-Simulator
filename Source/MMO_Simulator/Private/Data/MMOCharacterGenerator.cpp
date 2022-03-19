@@ -46,7 +46,8 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Greediness = FMath::Max(0, Generator.GredinessGenerator.GetRandomValue());
 	Character.Happiness = FMath::Max(0, Generator.HappinessGenerator.GetRandomValue());
 	Character.Level = Level;
-	Character.Attributes =  Generator.GenerateAttributes();
+	Character.InitialAttributes = Generator.GenerateAttributes();
+	Character.Attributes = Character.InitialAttributes;
 
 	FMMOCharacterAttributes AttributesProgress = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(InClass, Level);
 	Character.Attributes.Strength += AttributesProgress.Strength;
@@ -55,10 +56,10 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Attributes.Dexterity += AttributesProgress.Dexterity;
  
 	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(InRace);
-	Character.Attributes.Strength += RaceAttributes.Strength;
-	Character.Attributes.Intellect += RaceAttributes.Intellect;
-	Character.Attributes.Constitution += RaceAttributes.Constitution;
-	Character.Attributes.Dexterity += RaceAttributes.Dexterity;
+	Character.Attributes.Strength += FMath::RoundToInt(RaceAttributes.Strength * Character.Attributes.Strength / 100.f);
+	Character.Attributes.Intellect += FMath::RoundToInt(RaceAttributes.Intellect * Character.Attributes.Intellect / 100.f);
+	Character.Attributes.Constitution += FMath::RoundToInt(RaceAttributes.Constitution * Character.Attributes.Constitution / 100.f);
+	Character.Attributes.Dexterity += FMath::RoundToInt(RaceAttributes.Dexterity * Character.Attributes.Dexterity / 100.f);
 
 	return Character;
 }

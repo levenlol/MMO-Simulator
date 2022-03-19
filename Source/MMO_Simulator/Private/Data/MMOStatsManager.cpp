@@ -13,7 +13,17 @@ UMMOStatsManager::UMMOStatsManager()
 
 void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
 {
-	check(Sender == OwnerCharacter);
+	if (HasBegunPlay())
+	{
+		check(Sender == OwnerCharacter);
+
+		RecomputeAttributes();
+	}
+}
+
+void UMMOStatsManager::BeginPlay()
+{
+	Super::BeginPlay();
 
 	ParryExpression.Init(this);
 	BlockExpression.Init(this);
@@ -25,13 +35,22 @@ void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
 	HealthExpression.Init(this);
 	ManaExpression.Init(this);
 
-	ComputeAttributes();
+	RecomputeAttributes();
 }
 
-void UMMOStatsManager::BeginPlay()
+void UMMOStatsManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::BeginPlay();
-	
+	Super::EndPlay(EndPlayReason);
+
+	ParryExpression.Release();
+	BlockExpression.Release();
+	DodgeExpression.Release();
+	AttackCritExpression.Release();
+	SpellCritExpression.Release();
+	AttackPowerExpression.Release();
+	SpellPowerExpression.Release();
+	HealthExpression.Release();
+	ManaExpression.Release();
 }
 
 void UMMOStatsManager::OnRegister()
@@ -54,17 +73,28 @@ void UMMOStatsManager::OnUnregister()
 	{
 		OwnerCharacter->OnCharacterInitialized.RemoveDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
 	}
+}
 
+void UMMOStatsManager::RecomputeAttributes()
+{
+	RecomputeBaseAttributes();
+	UpdateCharacterAttributes();
+	ComputeSecondaryAttributes();
+}
 
-	ParryExpression.Release();
-	BlockExpression.Release();
-	DodgeExpression.Release();
-	AttackCritExpression.Release();
-	SpellCritExpression.Release();
-	AttackPowerExpression.Release();
-	SpellPowerExpression.Release();
-	HealthExpression.Release();
-	ManaExpression.Release();
+void UMMOStatsManager::RecomputeBaseAttributes()
+{
+	// Compute new base stats
+	BaseAttributes = OwnerCharacter->CharacterInfo.InitialAttributes;
+	// add attributes gained from level
+	BaseAttributes = BaseAttributes + UMMODataFinder::Get()->GetCharacterProgressionAtLevel(OwnerCharacter->CharacterInfo.CharacterClass, OwnerCharacter->CharacterInfo.Level);
+
+	// add attributes for race
+	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(OwnerCharacter->CharacterInfo.Race);
+	BaseAttributes.Strength += FMath::RoundToInt(RaceAttributes.Strength * BaseAttributes.Strength / 100.f);
+	BaseAttributes.Intellect += FMath::RoundToInt(RaceAttributes.Intellect * BaseAttributes.Intellect / 100.f);
+	BaseAttributes.Constitution += FMath::RoundToInt(RaceAttributes.Constitution * BaseAttributes.Constitution / 100.f);
+	BaseAttributes.Dexterity += FMath::RoundToInt(RaceAttributes.Dexterity * BaseAttributes.Dexterity / 100.f);
 }
 
 void UMMOStatsManager::RecomputeHealthAndResources()
@@ -83,7 +113,6 @@ void UMMOStatsManager::RecomputeHealthAndResources()
 	}
 }
 
-
 void UMMOStatsManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -100,7 +129,7 @@ void UMMOStatsManager::UpdateCharacterAttributes()
 		OwnerCharacter->CharacterInfo.Attributes = FullAttributes;
 
 		// recompute all other stuff
-		ComputeAttributes();
+		ComputeSecondaryAttributes();
 	}
 }
 
@@ -145,7 +174,7 @@ void UMMOStatsManager::RecomputeCombatAttributesChances()
 	}
 }
 
-void UMMOStatsManager::ComputeAttributes()
+void UMMOStatsManager::ComputeSecondaryAttributes()
 {
 	RecomputeCombatAttributesChances();
 	RecomputeHealthAndResources();
@@ -153,13 +182,10 @@ void UMMOStatsManager::ComputeAttributes()
 
 void UMMOStatsManager::LevelUp()
 {
-	// Compute new base stats
-	const FMMOCharacterAttributes& InitialAttributes = OwnerCharacter->CharacterInfo.GetInitialAttributes();
 	OwnerCharacter->CharacterInfo.Level++;
 
-	const FMMOCharacterAttributes ProgressionAttributes = UMMODataFinder::Get()->GetCharacterProgressionAtLevel(OwnerCharacter->CharacterInfo.CharacterClass, OwnerCharacter->CharacterInfo.Level);
+	RecomputeAttributes();
 
-	BaseAttributes = InitialAttributes + ProgressionAttributes;
-	UpdateCharacterAttributes();
+	OwnerCharacter->OnLevelUp();
 }
 

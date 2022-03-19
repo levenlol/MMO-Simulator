@@ -90,6 +90,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
 	void DamageTake(FMMODamage InDamage);
 
+	UFUNCTION(BlueprintNativeEvent, Category = Damage)
+	void OnLevelUp();
+
 	// Get minimum range of current equipped weapon
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	float GetWeaponRange() const;

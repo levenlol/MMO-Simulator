@@ -103,6 +103,10 @@ void AMMOBaseCharacter::InitializeCharacter(const FMMOCharacter& InCharacter)
 	OnCharacterInitialized.Broadcast(this);
 }
 
+void AMMOBaseCharacter::OnLevelUp_Implementation()
+{
+}
+
 float AMMOBaseCharacter::GetWeaponRange() const
 {
 	float WeaponRange = 0.f;

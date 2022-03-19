@@ -24,7 +24,7 @@ public:
 	void RecomputeCombatAttributesChances();
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
-	void ComputeAttributes();
+	void ComputeSecondaryAttributes();
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	void LevelUp();
@@ -65,6 +65,7 @@ protected:
 	void OnCharacterInitialized(AMMOBaseCharacter* Sender);
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnRegister() override;
 	virtual void OnUnregister() override;
 
@@ -95,6 +96,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Stats)
 	FMMOCharacterAttributes BaseAttributes;
 
+	void RecomputeAttributes();
+
+	void RecomputeBaseAttributes();
 	void RecomputeHealthAndResources();
 
 	// compute attributes and combat attributes and then set it to the character.
