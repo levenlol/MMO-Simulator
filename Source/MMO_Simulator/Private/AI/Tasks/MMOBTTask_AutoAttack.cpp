@@ -6,7 +6,7 @@
 #include "Characters/MMOBaseCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Core/MMOCommon.h"
-#include "Weapons/MMOBaseWeapon.h"
+#include "Items/MMOBaseWeapon.h"
 #include "CombatSystem/MMOCombatSystem.h"
 
 UMMOBTTask_AutoAttack::UMMOBTTask_AutoAttack()

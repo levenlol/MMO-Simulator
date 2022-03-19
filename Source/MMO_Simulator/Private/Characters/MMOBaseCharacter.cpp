@@ -2,7 +2,7 @@
 
 
 #include "Characters/MMOBaseCharacter.h"
-#include "Weapons/MMOBaseWeapon.h"
+#include "Items/MMOBaseWeapon.h"
 #include "GameplayTagsManager.h"
 #include "TimerManager.h"
 #include "CombatSystem/MMOCombatSystem.h"

@@ -3,7 +3,7 @@
 
 #include "Core/MMOCommon.h"
 #include "Data/MMODataFinder.h"
-#include "Weapons/MMOBaseWeapon.h"
+#include "Items/MMOBaseWeapon.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Characters/MMOBaseEnemy.h"
 #include "Characters/MMOBaseHero.h"

@@ -335,6 +335,9 @@ public:
 	FMMOCharacterAttributes Attributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FMMOCombatAttributes CombatAttributes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	EMMORarityType Rarity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
@@ -342,7 +345,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct MMO_SIMULATOR_API FMMOWeaponStats : public FMMOItemStats
+struct MMO_SIMULATOR_API FMMOWeaponStats
 {
 	GENERATED_BODY()
 public:

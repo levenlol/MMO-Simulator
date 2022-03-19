@@ -3,22 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Items/MMOBaseEquip.h" 
 #include "Core/MMOCommon.h"
 #include "MMOBaseWeapon.generated.h"
 
 
 UCLASS()
-class MMO_SIMULATOR_API AMMOBaseWeapon : public AActor
+class MMO_SIMULATOR_API AMMOBaseWeapon : public AMMOBaseEquip
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	AMMOBaseWeapon();
-
-	UPROPERTY(VisibleAnywhere, Category = Mesh)
-	UStaticMeshComponent* WeaponMesh;
 
 	// Weapon Type
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)

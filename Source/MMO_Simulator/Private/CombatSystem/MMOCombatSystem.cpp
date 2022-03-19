@@ -4,7 +4,7 @@
 #include "CombatSystem/MMOCombatSystem.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "GameplayTagsManager.h"
-#include "Weapons/MMOBaseWeapon.h"
+#include "Items/MMOBaseWeapon.h"
 #include "Core/MMOGameState.h"
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 

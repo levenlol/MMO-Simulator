@@ -5,7 +5,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Weapons/MMOBaseWeapon.h"
+#include "Items/MMOBaseWeapon.h"
 
 UMMOBTTask_MoveInRange::UMMOBTTask_MoveInRange()
 	: Super()
