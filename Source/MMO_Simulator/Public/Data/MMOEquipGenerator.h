@@ -103,6 +103,16 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOEquipGeneratorQualifyingNameultiplierDataTable : public FMMOEquipGeneratorDataTable
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	FString QualifyingName;
+};
+
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FEquipGeneratorData
 {
 	GENERATED_BODY()
@@ -133,6 +143,9 @@ public:
 	UPROPERTY(config)
 	FName WeaponTypeDataTableName;
 
+	UPROPERTY(config)
+	FName QualifyingNameDataTableName;
+
 private:
 	static UMMOEquipGenerator* Instance;
 
@@ -142,11 +155,13 @@ private:
 	TMap<EMMOArmorType, FEquipGeneratorData> ArmorTypeEquipMultiplier;
 	TMap<EMMOArmorSlotType, FEquipGeneratorData> ArmorSlotEquipMultiplier;
 	TMap<EMMOWeaponType, FEquipGeneratorData> WeaponTypeEquipMultiplier;
+	TArray<FMMOEquipGeneratorQualifyingNameultiplierDataTable> QualifyingNameEquipMultiplier;
 
 	void ParseEquipGenerator();
 	void ParseArmorTypeGenerator();
 	void ParseArmorSlotGenerator();
 	void ParseWeaponTypeGenerator();
+	void ParseQualifyingNameGenerator();
 
 	void Init();
 	void Uninit();

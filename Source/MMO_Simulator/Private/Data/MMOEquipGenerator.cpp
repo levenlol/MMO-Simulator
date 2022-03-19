@@ -119,12 +119,33 @@ void UMMOEquipGenerator::ParseWeaponTypeGenerator()
 	}
 }
 
+void UMMOEquipGenerator::ParseQualifyingNameGenerator()
+{
+	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());
+	UDataTable* QualifyingGenDataTable = GameInstance->RetrieveDataTable(QualifyingNameDataTableName);
+
+	if (!QualifyingGenDataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Equip Generator: cannot find %s"), *QualifyingNameDataTableName.ToString());
+		return;
+	}
+
+	TArray<FMMOEquipGeneratorQualifyingNameultiplierDataTable*> Rows;
+	QualifyingGenDataTable->GetAllRows<FMMOEquipGeneratorQualifyingNameultiplierDataTable>(TEXT("EQUIP_GENERATOR"), Rows);
+
+	Algo::Transform(Rows, QualifyingNameEquipMultiplier, [](const FMMOEquipGeneratorQualifyingNameultiplierDataTable* InData)
+		{
+			return *InData;
+		});
+}
+
 void UMMOEquipGenerator::Init()
 {
 	ParseEquipGenerator();
 	ParseArmorTypeGenerator();
 	ParseArmorSlotGenerator();
 	ParseWeaponTypeGenerator();
+	ParseQualifyingNameGenerator();
 }
 
 void UMMOEquipGenerator::Uninit()
