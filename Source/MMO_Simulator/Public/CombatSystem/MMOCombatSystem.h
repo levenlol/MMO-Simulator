@@ -16,11 +16,13 @@ class UMMOWrapperSkill;
 UENUM(BlueprintType)
 enum class EMMOSkillCastFailType : uint8
 {
+	None, // no failure
 	WrongTarget,
 	Unavailable,
 	Cooldown,
 	OutOfRange, 
-	AlreadyCasting
+	AlreadyCasting,
+	Unspecified // this is still a failure
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOSkillFailedEvent, UMMOWrapperSkill*, Skill, EMMOSkillCastFailType, FailReason);
@@ -44,6 +46,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void TryCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index);
+
+	UFUNCTION(BlueprintPure, Category = Combat)
+	EMMOSkillCastFailType CanCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index) const;
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills);

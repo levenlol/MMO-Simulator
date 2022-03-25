@@ -38,21 +38,25 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 	for (int32 i = 0; i < Character->CombatSystem->Skills.Num(); i++)
 	{
 		UMMOWrapperSkill* WrapperSkill = Character->CombatSystem->Skills[i];
-		if (Character->CombatSystem->GetRemainingCooldown(i) > 0.f || WrapperSkill->IsLocked() || AIController->IsSpellHandledByThePlayer(i))
+		if (AIController->IsSpellHandledByThePlayer(i))
 			continue;
 
 		// TODO: better pick spell logic.
 		const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
 		if (WrapperSkill->Tags.HasTag(SkillTags.TargetTag))
 		{
+			// TODO: better select target
 			TArray<FHitResult> HitResults;
 			if (GetWorld()->SweepMultiByChannel(HitResults, Character->GetActorLocation(), Character->GetActorLocation() + FVector::UpVector
 				, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(WrapperSkill->Range)))
 			{
-				// TODO: better select target
-				BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
-				BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, HitResults[0].ImpactPoint);
-				BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, HitResults[0].GetActor());
+				AMMOBaseCharacter* TargetCharacter = Cast<AMMOBaseCharacter>(HitResults[0].GetActor());
+				if (Character->CombatSystem->CanCastSkill(TargetCharacter, HitResults[0].ImpactPoint, i) == EMMOSkillCastFailType::None)
+				{
+					BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
+					BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, HitResults[0].ImpactPoint);
+					BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, HitResults[0].GetActor());
+				}
 			}
 		}
 	}

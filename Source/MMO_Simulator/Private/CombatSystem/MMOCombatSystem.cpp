@@ -79,13 +79,42 @@ bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 	if (!Target || !CanCharacterAttack())
 		return false;
 
-	const float DistanceSq = (OwnerCharacter->GetActorLocation() - Target->GetActorLocation()).SizeSquared();
+	const float DistanceSq = (OwnerCharacter->GetActorLocation() - Target->GetActorLocation()).SizeSquared2D();
+
+	float TargetRadius, TargetHalfheight;
+	Target->GetSimpleCollisionCylinder(TargetRadius, TargetHalfheight);
+
+	float OwnerRadius, OwnerHalfheight;
+	OwnerCharacter->GetSimpleCollisionCylinder(OwnerRadius, OwnerHalfheight);
 
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
-	return DistanceSq <= MainHandWeapon->Stats.WeaponRange * MainHandWeapon->Stats.WeaponRange;
+
+	const float EffectiveRange = MainHandWeapon->Stats.WeaponRange + OwnerRadius + TargetRadius;
+	return DistanceSq <= EffectiveRange * EffectiveRange;
 }
 
 void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index)
+{
+	EMMOSkillCastFailType FailCastType = CanCastSkill(Target, Location, Index);
+	if (FailCastType != EMMOSkillCastFailType::None)
+	{
+		OnSkillStartFailed.Broadcast(Skills[Index], FailCastType);
+		return;
+	}
+
+	FMMOSkillInputData InputData;
+	InputData.TargetLocation = Location;
+	InputData.TargetActor = Target;
+	InputData.SourceActor = OwnerCharacter;
+	InputData.SourceLocation = OwnerCharacter->GetActorLocation();
+
+	Skills[Index]->CastAbility(InputData);
+
+	LastSpellCastTime = GetWorld()->GetTimeSeconds();
+	LastAttackTime = LastSpellCastTime;
+}
+
+EMMOSkillCastFailType UMMOCombatSystem::CanCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index) const
 {
 	if (Skills.IsValidIndex(Index) && OwnerCharacter)
 	{
@@ -94,26 +123,22 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 
 		if (!bInRange)
 		{
-			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::OutOfRange);
-			return;
+			return EMMOSkillCastFailType::OutOfRange;
 		}
 
 		if (GetRemainingCooldown(Index) > 0.f)
 		{
-			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Cooldown);
-			return;
+			return EMMOSkillCastFailType::Cooldown;
 		}
 
 		if (IsCasting())
 		{
-			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::AlreadyCasting);
-			return;
+			return EMMOSkillCastFailType::AlreadyCasting;
 		}
 
 		if (Skills[Index]->IsLocked())
 		{
-			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::Unavailable);
-			return;
+			return EMMOSkillCastFailType::Unavailable;
 		}
 
 		const bool bOnSameSide = UMMOGameplayUtils::AreOnTheSameSide(OwnerCharacter, Target);
@@ -126,21 +151,13 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 
 		if (!bCanCastSkill)
 		{
-			OnSkillStartFailed.Broadcast(Skills[Index], EMMOSkillCastFailType::WrongTarget);
-			return;
+			return EMMOSkillCastFailType::WrongTarget;
 		}
 
-		FMMOSkillInputData InputData;
-		InputData.TargetLocation = Location;
-		InputData.TargetActor = Target;
-		InputData.SourceActor = OwnerCharacter;
-		InputData.SourceLocation = OwnerCharacter->GetActorLocation();
-
-		Skills[Index]->CastAbility(InputData);
-
-		LastSpellCastTime = GetWorld()->GetTimeSeconds();
-		LastAttackTime = LastSpellCastTime;
+		return EMMOSkillCastFailType::None;
 	}
+
+	return EMMOSkillCastFailType::Unspecified;
 }
 
 void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills)
@@ -181,7 +198,7 @@ bool UMMOCombatSystem::IsCasting() const
 
 bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
 {
-	if (!CanAttackTarget(Target) || !IsAttacking())
+	if (!IsAttacking() || !Target)
 	{
 		StopAttack();
 		return false;

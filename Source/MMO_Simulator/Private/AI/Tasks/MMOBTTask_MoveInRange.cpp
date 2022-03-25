@@ -12,8 +12,8 @@ UMMOBTTask_MoveInRange::UMMOBTTask_MoveInRange()
 {
 	NodeName = "Move in Range";
 
-	bReachTestIncludesAgentRadius = false;
-	bReachTestIncludesGoalRadius = false;
+	bReachTestIncludesAgentRadius = true;
+	bReachTestIncludesGoalRadius = true;
 	bAllowPartialPath = true;
 	bTrackMovingGoal = true;
 	bProjectGoalLocation = true;

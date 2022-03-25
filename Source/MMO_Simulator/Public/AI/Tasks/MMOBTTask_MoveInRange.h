@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(hideCategories = (Node))
+UCLASS()
 class MMO_SIMULATOR_API UMMOBTTask_MoveInRange : public UBTTask_MoveTo
 {
 	GENERATED_BODY()

@@ -28,5 +28,5 @@ public:
 #endif // WITH_EDITOR
 
 private:
-	FVector GetEndLocation(UBlackboardComponent* BlackBoard) const;
+	FVector GetEndLocation(UBlackboardComponent* BlackBoard, float& OutRadius) const;
 };

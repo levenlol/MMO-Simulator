@@ -38,6 +38,8 @@ EBTNodeResult::Type UMMOBTTask_AutoAttack::ExecuteTask(UBehaviorTreeComponent& O
 		MyMemory->TargetWeak = Target;
 		MyMemory->bDealtDamage = false;
 
+		Character->CombatSystem->StartAttack(Target);
+
 		return EBTNodeResult::InProgress;
 	}
 
@@ -74,7 +76,7 @@ void UMMOBTTask_AutoAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		}
 
 		MyMemory->bDealtDamage = true;
-		const bool bAttackPerformed = Character->CombatSystem->StartAttack(Target);
+		//const bool bAttackPerformed = Character->CombatSystem->StartAttack(Target);
 	}
 
 	if (MyMemory->AttackSpeed <= 0.f)

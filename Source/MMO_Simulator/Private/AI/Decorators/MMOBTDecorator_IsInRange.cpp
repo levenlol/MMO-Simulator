@@ -31,11 +31,18 @@ bool UMMOBTDecorator_IsInRange::CalculateRawConditionValue(UBehaviorTreeComponen
 		AcceptableRadius = BaseCharacter->GetWeaponRange();
 	}
 
-
 	const FVector Location = BaseCharacter->GetActorLocation();
-	const FVector EndLocation = GetEndLocation(BlackBoard);
 
-	return (EndLocation - Location).SizeSquared() <= AcceptableRadius * AcceptableRadius;
+	float EndLocationRadius = 0.f;
+	const FVector EndLocation = GetEndLocation(BlackBoard, EndLocationRadius);
+
+	float OwnerRadius, OwnerHalfheight;
+	BaseCharacter->GetSimpleCollisionCylinder(OwnerRadius, OwnerHalfheight);
+
+	const float Radius = OwnerRadius + AcceptableRadius + EndLocationRadius + MinAcceptableRadius;
+
+	const float DeltaRadiusSquared = (EndLocation - Location).SizeSquared2D();
+	return DeltaRadiusSquared <= Radius * Radius;
 }
 
 FString UMMOBTDecorator_IsInRange::GetStaticDescription() const
@@ -50,10 +57,12 @@ FString UMMOBTDecorator_IsInRange::GetStaticDescription() const
 	return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *KeyDesc);
 }
 
-FVector UMMOBTDecorator_IsInRange::GetEndLocation(UBlackboardComponent* BlackBoard) const
+FVector UMMOBTDecorator_IsInRange::GetEndLocation(UBlackboardComponent* BlackBoard, float& OutRadius) const
 {
 	if (AActor* Target = Cast<AActor>(BlackBoard->GetValueAsObject(GetSelectedBlackboardKey())))
 	{
+		float HalfHeight;
+		Target->GetSimpleCollisionCylinder(OutRadius, HalfHeight);
 		return Target->GetActorLocation();
 	}
 	else
