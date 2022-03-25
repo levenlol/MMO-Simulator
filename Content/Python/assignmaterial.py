@@ -1,6 +1,6 @@
 import unreal
-new_material_path = '/Game/PolygonDungeonRealms/Materials/Alternates/Mat_PolygonDungeonRealms_02_B.Mat_PolygonDungeonRealms_02_B'
-asset_folder = '/Game/PolygonDungeonRealms/Meshes/Weapons/'
+new_material_path = '/Game/Assets/PolygonFantasyKingdom/Materials/Mat_PolygonFantasyKingdom_Mat_01_A.Mat_PolygonFantasyKingdom_Mat_01_A'
+asset_folder = '/Game/Assets/PolygonFantasyKingdom/Meshes/Weapons/'
 
 load_material = unreal.EditorAssetLibrary.load_asset(new_material_path)
 
