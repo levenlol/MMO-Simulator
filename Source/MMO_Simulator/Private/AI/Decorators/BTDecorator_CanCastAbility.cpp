@@ -37,7 +37,7 @@ bool UBTDecorator_CanCastAbility::CalculateRawConditionValue(UBehaviorTreeCompon
 
 	if (BaseCharacter->CombatSystem->Skills.IsValidIndex(SpellRequest))
 	{
-		return true;
+		return BaseCharacter->CombatSystem->GetRemainingCooldown(SpellRequest) <= 0.f;
 	}
 
 	float Range = 0.f;

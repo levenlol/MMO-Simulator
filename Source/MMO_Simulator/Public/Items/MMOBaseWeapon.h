@@ -7,6 +7,7 @@
 #include "Core/MMOCommon.h"
 #include "MMOBaseWeapon.generated.h"
 
+class UAnimSequenceBase;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseWeapon : public AMMOBaseEquip
@@ -23,6 +24,10 @@ public:
 	// Stats given by the weapon
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	FMMOWeaponStats Stats;
+
+	// Custom animation. might be used for bosses or legendary weapons.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	UAnimSequenceBase* CustomWeaponAnimation = nullptr;
 
 protected:
 	// Called when the game starts or when spawned

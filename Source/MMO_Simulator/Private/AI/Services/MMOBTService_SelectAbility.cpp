@@ -45,19 +45,27 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 		const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
 		if (WrapperSkill->Tags.HasTag(SkillTags.TargetTag))
 		{
-			// TODO: better select target
 			TArray<FHitResult> HitResults;
-			if (GetWorld()->SweepMultiByChannel(HitResults, Character->GetActorLocation(), Character->GetActorLocation() + FVector::UpVector
+			if (!GetWorld()->SweepMultiByChannel(HitResults, Character->GetActorLocation(), Character->GetActorLocation() + FVector::UpVector
 				, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(WrapperSkill->Range)))
 			{
-				AMMOBaseCharacter* TargetCharacter = Cast<AMMOBaseCharacter>(HitResults[0].GetActor());
-				if (Character->CombatSystem->CanCastSkill(TargetCharacter, HitResults[0].ImpactPoint, i) == EMMOSkillCastFailType::None)
-				{
-					BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
-					BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, HitResults[0].ImpactPoint);
-					BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, HitResults[0].GetActor());
-				}
+				continue;
 			}
+
+			// TODO: better select target
+			AMMOBaseCharacter* TargetCharacter = Cast<AMMOBaseCharacter>(HitResults[0].GetActor());
+			if (Character->CombatSystem->CanCastSkill(TargetCharacter, HitResults[0].ImpactPoint, i) == EMMOSkillCastFailType::None)
+			{
+				BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
+				BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, HitResults[0].ImpactPoint);
+				BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, HitResults[0].GetActor());
+			}
+		}
+		else if (WrapperSkill->Tags.HasTag(SkillTags.SelfCastLocationTag))
+		{
+			BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
+			BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, Character->GetActorLocation());
+			BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, Character);
 		}
 	}
 }

@@ -3,13 +3,28 @@
 
 #include "CombatSystem/Skills/MMOAoeDamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+
 
 UMMOAoeDamageSkill::UMMOAoeDamageSkill()
 	: Super()
 {
 	CollisionChannel = ECollisionChannel::ECC_GameTraceChannel1;
+}
+
+void UMMOAoeDamageSkill::Setup(AMMOBaseCharacter* InOwner)
+{
+	Super::Setup(InOwner);
+
+	if (FxActorClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = OwnerCharacter;
+		FxActor = GetWorld()->SpawnActor<AMMOFXActor>(FxActorClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
+		FxActor->SetActorHiddenInGame(true);
+	}
 }
 
 void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
@@ -29,10 +44,13 @@ void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
 		}
 	}
 
-	// FX
-	if(ParticleToPlay)
+	if (FxActor)
 	{
-		const float Scale = Radius / ParticlesSize;
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleToPlay, FTransform(FRotator::ZeroRotator, Location, FVector(Scale, Scale, Scale)));
+		FxActor->SetActorLocation(Location);
+		FxActor->SetActorHiddenInGame(false);
+
+		FxActor->ParticleComponent->KillParticlesForced();
+		FxActor->ParticleComponent->ResetParticles();
+		FxActor->ParticleComponent->ActivateSystem();
 	}
 }

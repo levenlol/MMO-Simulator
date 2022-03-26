@@ -14,7 +14,6 @@ AMMOProjectile::AMMOProjectile()
 
 	SphereComponent->SetCollisionProfileName(FName("ReactToEnemy"));
 
-	ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particles"));
 	ParticleComponent->SetupAttachment(RootComponent);
 
 	PrimaryActorTick.bCanEverTick = true;

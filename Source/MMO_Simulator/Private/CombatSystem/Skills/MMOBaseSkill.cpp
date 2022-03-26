@@ -2,6 +2,8 @@
 
 
 #include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "Particles/ParticleSystemComponent.h"
+
 
 FMMOSkillTags FMMOSkillTags::SkillTags;
 
@@ -153,3 +155,10 @@ void UMMOWrapperSkill::FinishCastAbility()
 	OnSkillFinish.Broadcast(this);
 }
 
+AMMOFXActor::AMMOFXActor()
+	: Super()
+{
+
+	ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particles"));
+	ParticleComponent->SetupAttachment(RootComponent);
+}

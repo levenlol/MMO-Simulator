@@ -6,11 +6,10 @@
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "MMOProjectileSkill.generated.h"
 
-class UParticleSystemComponent;
 class USphereComponent;
 
 UCLASS()
-class MMO_SIMULATOR_API AMMOProjectile : public AActor
+class MMO_SIMULATOR_API AMMOProjectile : public AMMOFXActor
 {
 	GENERATED_BODY()
 public:
@@ -18,9 +17,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FX)
 	USphereComponent* SphereComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FX)
-	UParticleSystemComponent* ParticleComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Setup)
 	float Speed = 200.f;

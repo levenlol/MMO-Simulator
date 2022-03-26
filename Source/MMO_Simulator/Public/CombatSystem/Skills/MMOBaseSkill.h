@@ -9,10 +9,22 @@
 #include "MMOBaseSkill.generated.h"
 
 class AMMOBaseCharacter;
+class UParticleSystemComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillStart, UMMOWrapperSkill*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillFinish, UMMOWrapperSkill*, Sender);
 
+
+UCLASS()
+class MMO_SIMULATOR_API AMMOFXActor : public AActor
+{
+	GENERATED_BODY()
+public:
+	AMMOFXActor();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FX)
+	UParticleSystemComponent* ParticleComponent;
+};
 
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOSkillInputData
@@ -35,6 +47,8 @@ public:
 struct MMO_SIMULATOR_API FMMOSkillTags : public FGameplayTagNativeAdder
 {
 	FGameplayTag LocationTag;
+	FGameplayTag SelfCastLocationTag;
+	FGameplayTag TargetCastLocationTag;
 	FGameplayTag TargetTag;
 	FGameplayTag EnemyTag;
 	FGameplayTag FriendlyTag;
@@ -48,6 +62,8 @@ protected:
 		UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
 
 		LocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location"));
+		SelfCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Self"));
+		TargetCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Target"));
 		TargetTag = Manager.AddNativeGameplayTag(FName("Skill.Target"));
 		FriendlyTag = Manager.AddNativeGameplayTag(FName("Skill.Friendly"));
 		EnemyTag = Manager.AddNativeGameplayTag(FName("Skill.Enemy"));
