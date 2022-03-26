@@ -46,7 +46,7 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 		if (WrapperSkill->Tags.HasTag(SkillTags.TargetTag))
 		{
 			TArray<FHitResult> HitResults;
-			if (!GetWorld()->SweepMultiByChannel(HitResults, Character->GetActorLocation(), Character->GetActorLocation() + FVector::UpVector
+			if (WrapperSkill->Range > 0 && !GetWorld()->SweepMultiByChannel(HitResults, Character->GetActorLocation(), Character->GetActorLocation() + FVector::UpVector
 				, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(WrapperSkill->Range)))
 			{
 				continue;
@@ -59,13 +59,18 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 				BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
 				BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, HitResults[0].ImpactPoint);
 				BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, HitResults[0].GetActor());
+				break;
 			}
 		}
 		else if (WrapperSkill->Tags.HasTag(SkillTags.SelfCastLocationTag))
 		{
-			BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
-			BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, Character->GetActorLocation());
-			BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, Character);
+			if (Character->CombatSystem->CanCastSkill(Character, Character->GetActorLocation(), i) == EMMOSkillCastFailType::None)
+			{
+				BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, i + 1); // spells are 1 based
+				BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, Character->GetActorLocation());
+				BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, Character);
+				break;
+			}
 		}
 	}
 }

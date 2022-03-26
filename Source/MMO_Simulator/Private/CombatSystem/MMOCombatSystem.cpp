@@ -119,7 +119,19 @@ EMMOSkillCastFailType UMMOCombatSystem::CanCastSkill(AMMOBaseCharacter* Target, 
 	if (Skills.IsValidIndex(Index) && OwnerCharacter)
 	{
 		const FVector RangeLocation = Target ? Target->GetActorLocation() : Location;
-		const bool bInRange = (OwnerCharacter->GetActorLocation() - RangeLocation).SizeSquared() <= (Skills[Index]->Range * Skills[Index]->Range);
+
+		const float SkillRange = Skills[Index]->Range;
+
+		float TargetRadius = 0.f, OwnerRadius, UnusuedHalfHeight;
+		
+		if (Target)
+		{
+			Target->GetSimpleCollisionCylinder(TargetRadius, UnusuedHalfHeight);
+		}
+		OwnerCharacter->GetSimpleCollisionCylinder(OwnerRadius, UnusuedHalfHeight);
+
+		const float ActualRange = SkillRange + TargetRadius + OwnerRadius;
+		const bool bInRange = (OwnerCharacter->GetActorLocation() - RangeLocation).SizeSquared2D() <= (ActualRange * ActualRange);
 
 		if (!bInRange)
 		{
