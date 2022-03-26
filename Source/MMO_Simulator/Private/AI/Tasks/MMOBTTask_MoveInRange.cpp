@@ -6,6 +6,8 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Items/MMOBaseWeapon.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "CombatSystem/MMOCombatSystem.h"
 
 UMMOBTTask_MoveInRange::UMMOBTTask_MoveInRange()
 	: Super()
@@ -38,6 +40,11 @@ EBTNodeResult::Type UMMOBTTask_MoveInRange::ExecuteTask(UBehaviorTreeComponent& 
 	if (OffHandWeapon && OffHandWeapon->Stats.WeaponRange < AcceptableRadius)
 	{
 		AcceptableRadius = OffHandWeapon->Stats.WeaponRange;
+	}
+
+	for (UMMOWrapperSkill* Skill : BaseCharacter->CombatSystem->Skills)
+	{
+		AcceptableRadius = FMath::Min(AcceptableRadius, Skill->Range);
 	}
 
 	AcceptableRadius *= (1.f - MarginPercent);
