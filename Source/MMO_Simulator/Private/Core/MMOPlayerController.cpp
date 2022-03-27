@@ -236,8 +236,9 @@ void AMMOPlayerController::MoveHeroTo(AController* InController, AActor* Target)
 	{
 		if (UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent())
 		{
-			BlackBoard->SetValueAsObject(FName("TargetActor"), Target);
-			BlackBoard->ClearValue(FName("TargetLocation"));
+			BlackBoard->SetValueAsObject(FName("TargetActor"), Target); // set target actor, AI will move the Pawn to be in range with Target
+			BlackBoard->SetValueAsObject(FName("SpellActorTarget"), Target); // Spells Target.
+			BlackBoard->ClearValue(FName("TargetLocation")); // We will chase Target.
 		}
 	}
 }
@@ -248,8 +249,9 @@ void AMMOPlayerController::MoveHeroTo(AController* InController, const FVector& 
 	{
 		if (UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent())
 		{
-			BlackBoard->SetValueAsVector(FName("TargetLocation"), Location);
-			BlackBoard->ClearValue(FName("TargetActor"));
+			BlackBoard->SetValueAsVector(FName("TargetLocation"), Location); // Set Target location.
+			BlackBoard->ClearValue(FName("TargetActor")); // Clear Target actor, we will not follow him anymore
+			BlackBoard->ClearValue(FName("SpellActorTarget")); // Clear Spell target too. AI Will pick the best one.
 		}
 	}
 }
