@@ -84,6 +84,8 @@ void UMMOWrapperSkill::AbortAbility()
 	// dont cast ability.
 	CurrentCastingTime = CastTime;
 	bCasting = false;
+
+	OnSkillAborted.Broadcast(this);
 }
 
 void UMMOWrapperSkill::Tick(float DeltaSeconds)

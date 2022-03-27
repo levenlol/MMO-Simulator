@@ -47,6 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void TryCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index);
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void AbortCastSkill();
+
 	UFUNCTION(BlueprintPure, Category = Combat)
 	EMMOSkillCastFailType CanCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index) const;
 
@@ -110,6 +113,9 @@ private:
 
 	UFUNCTION()
 	void OnSkillFinish(UMMOWrapperSkill* Sender);
+
+	UFUNCTION()
+	void OnSkillAbort(UMMOWrapperSkill* Sender);
 
 	UFUNCTION()
 	void OnCharacterStunned(AMMOBaseCharacter* Sender);

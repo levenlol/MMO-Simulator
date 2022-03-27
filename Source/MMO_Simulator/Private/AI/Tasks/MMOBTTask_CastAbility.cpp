@@ -68,6 +68,12 @@ void UMMOBTTask_CastAbility::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 EBTNodeResult::Type UMMOBTTask_CastAbility::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	UBlackboardComponent* BlackBoard = OwnerComp.GetAIOwner()->GetBlackboardComponent();
+	AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+
+	if (IsValid(Character))
+	{
+		Character->CombatSystem->AbortCastSkill();
+	}
 	
 	if (BlackBoard)
 	{

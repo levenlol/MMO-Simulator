@@ -150,6 +150,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Skill)
 	FMMOOnSkillFinish OnSkillFinish;
 
+	UPROPERTY(BlueprintAssignable, Category = Skill)
+	FMMOOnSkillFinish OnSkillAborted;
+
 private:
 	float LastCastTime = 0.f; // used to track cooldown
 	float CurrentCastingTime = 0.f; // used to cast the ability (if cast time > 0)

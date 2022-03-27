@@ -114,6 +114,17 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 	LastAttackTime = LastSpellCastTime;
 }
 
+void UMMOCombatSystem::AbortCastSkill()
+{
+	for (UMMOWrapperSkill* WrapperSkill : Skills)
+	{
+		WrapperSkill->AbortAbility();
+	}
+
+	LastSpellCastTime = GetWorld()->GetTimeSeconds();
+	LastAttackTime = LastSpellCastTime;
+}
+
 EMMOSkillCastFailType UMMOCombatSystem::CanCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index) const
 {
 	if (Skills.IsValidIndex(Index) && OwnerCharacter)
@@ -178,6 +189,7 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 	{
 		Skill->OnSkillStart.RemoveDynamic(this, &UMMOCombatSystem::OnSkillStart);
 		Skill->OnSkillFinish.RemoveDynamic(this, &UMMOCombatSystem::OnSkillFinish);
+		Skill->OnSkillAborted.RemoveDynamic(this, &UMMOCombatSystem::OnSkillAbort);
 	}
 
 	Skills.Empty();
@@ -190,6 +202,7 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 
 		Skill->OnSkillStart.AddDynamic(this, &UMMOCombatSystem::OnSkillStart);
 		Skill->OnSkillFinish.AddDynamic(this, &UMMOCombatSystem::OnSkillFinish);
+		Skill->OnSkillAborted.AddDynamic(this, &UMMOCombatSystem::OnSkillAbort);
 	}
 }
 
@@ -279,6 +292,11 @@ void UMMOCombatSystem::OnSkillStart(UMMOWrapperSkill* Sender)
 }
 
 void UMMOCombatSystem::OnSkillFinish(UMMOWrapperSkill* Sender)
+{
+	OwnerCharacter->RemoveTag(CastTag);
+}
+
+void UMMOCombatSystem::OnSkillAbort(UMMOWrapperSkill* Sender)
 {
 	OwnerCharacter->RemoveTag(CastTag);
 }
