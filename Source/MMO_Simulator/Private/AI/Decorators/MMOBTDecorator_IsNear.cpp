@@ -12,7 +12,7 @@ UMMOBTDecorator_IsNear::UMMOBTDecorator_IsNear()
 	bAllowAbortLowerPri = true;
 	bAllowAbortNone = true;
 	bAllowAbortChildNodes = true;
-
+	NodeName = "Is Near";
 
 	// accept only actors and vectors
 	BlackboardKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UMMOBTDecorator_IsNear, BlackboardKey));

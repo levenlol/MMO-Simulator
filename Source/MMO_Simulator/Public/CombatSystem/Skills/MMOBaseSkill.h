@@ -50,6 +50,7 @@ struct MMO_SIMULATOR_API FMMOSkillTags : public FGameplayTagNativeAdder
 	FGameplayTag SelfCastLocationTag;
 	FGameplayTag TargetCastLocationTag;
 	FGameplayTag TargetTag;
+	FGameplayTag SelfTargetTag; // if spell is castable on self
 	FGameplayTag EnemyTag;
 	FGameplayTag FriendlyTag;
 	FGameplayTag Buff;
@@ -65,6 +66,7 @@ protected:
 		SelfCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Self"));
 		TargetCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Target"));
 		TargetTag = Manager.AddNativeGameplayTag(FName("Skill.Target"));
+		SelfTargetTag = Manager.AddNativeGameplayTag(FName("Skill.Target.Self"));
 		FriendlyTag = Manager.AddNativeGameplayTag(FName("Skill.Friendly"));
 		EnemyTag = Manager.AddNativeGameplayTag(FName("Skill.Enemy"));
 		Buff = Manager.AddNativeGameplayTag(FName("Skill.Buff"));

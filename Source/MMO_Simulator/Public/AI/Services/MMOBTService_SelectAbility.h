@@ -6,9 +6,18 @@
 #include "BehaviorTree/BTService.h"
 #include "MMOBTService_SelectAbility.generated.h"
 
-/**
- * 
- */
+class UBlackboardComponent;
+class AMMOBaseCharacter;
+
+namespace MMOAI
+{
+	enum ESelectAbilityResult : uint8
+	{
+		Failed,
+		Succeed
+	};
+}
+
 UCLASS()
 class MMO_SIMULATOR_API UMMOBTService_SelectAbility : public UBTService
 {
@@ -26,7 +35,15 @@ public:
 	FBlackboardKeySelector SpellTargetSelector;
 
 	UPROPERTY(EditAnywhere, Category = Spell)
-	TEnumAsByte<ECollisionChannel> CollisionChannel;
+	TEnumAsByte<ECollisionChannel> EnemySpellCollisionChannel;
+
+	UPROPERTY(EditAnywhere, Category = Spell)
+	TEnumAsByte<ECollisionChannel> FriendlySpellCollisionChannel;
 
 	virtual void OnSearchStart(FBehaviorTreeSearchData& SearchData) override;
+private:
+	MMOAI::ESelectAbilityResult HandleTargetSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex);
+	MMOAI::ESelectAbilityResult HandleSelfCastSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex);
+
+	TArray<FHitResult> GetHitsResults(const FVector& Location, ECollisionChannel CollisionChannel, const float Radius, const AActor* ActorToIgnore = nullptr) const;
 };
