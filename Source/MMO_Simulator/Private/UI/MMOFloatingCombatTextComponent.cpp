@@ -70,10 +70,10 @@ void UMMOFloatingCombatTextComponent::TickComponent(float DeltaTime, ELevelTick 
 
 void UMMOFloatingCombatTextComponent::AddFloatingText(const FText& Text, const FVector& WorldLocation)
 {
-	if (FloatingTextActorClass == nullptr)
+	if (!FloatingTextActorClass)
 		return;
 
-	AMMOFloatingTextActor* TextActor = TextActorPool.Num() > 0 ? TextActorPool.Pop() : nullptr;
+	AMMOFloatingTextActor* TextActor = TextActorPool.Num() > 0 ? TextActorPool.Pop(false) : nullptr;
 	if (TextActor == nullptr)
 		return;
 
