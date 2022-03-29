@@ -7,6 +7,7 @@
 #include "MMOFloatingCombatTextComponent.generated.h"
 
 class AMMOFloatingTextActor;
+class PlayerCameraManager;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MMO_SIMULATOR_API UMMOFloatingCombatTextComponent : public UActorComponent
@@ -30,6 +31,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FloatingCombatTextComponent", Meta = (AllowPrivateAccess = "True"))
 	float TextVerticalOffset = 100.0f;
 
+	// Maximum number of Floating Combat Text on screen
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FloatingCombatTextComponent", Meta = (AllowPrivateAccess = "True"))
+	int32 PoolSize = 16;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -40,14 +44,24 @@ public:
 
 	// adds the specified text at the specified location in world space
 	UFUNCTION(BlueprintCallable, Category = "FloatingCombatTextComponent")
-	void AddFloatingText(const FText& text, FVector world_Location);
+	void AddFloatingText(const FText& Text, const FVector& WorldLocation);
 
 private:
+	void SetTextActorActive(AMMOFloatingTextActor* InActor, const bool bActive);
+	void InitPool();
+
 	// fallback for when a floating text actor is destroyed
 	UFUNCTION()
-	void OnTextDestroyed(AActor* destroyed_actor);
+	void Recycle(AMMOFloatingTextActor* Sender);
 
 	// An array of all active floating text actors
 	UPROPERTY()
-	TArray<AMMOFloatingTextActor*> ActiveTextActor;
+	TArray<AMMOFloatingTextActor*> ActiveTextActors;
+
+	// Pool of all available floating text actors
+	UPROPERTY()
+	TArray<AMMOFloatingTextActor*> TextActorPool;
+
+	UPROPERTY()
+	APlayerCameraManager* PlayerCameraManager;
 };

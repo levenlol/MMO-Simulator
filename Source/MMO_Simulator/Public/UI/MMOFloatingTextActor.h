@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MMOFloatingTextActor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnAnimationFinished, AMMOFloatingTextActor*, Sender);
+
 UCLASS(ABSTRACT)
 class MMO_SIMULATOR_API AMMOFloatingTextActor : public AActor
 {
@@ -18,7 +20,11 @@ public:
 	UFUNCTION(blueprintImplementableEvent, Category = "FloatingTextActor")
 	void Initialize(const FText& text);
 
-	inline const FVector& GetAnchorLocation() const { return AnchorLocation; }
+	FORCEINLINE const FVector& GetAnchorLocation() const { return AnchorLocation; }
+	FORCEINLINE void SetAnchorLocation(const FVector& InLocation) { AnchorLocation = InLocation; }
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Anim)
+	FMMOOnAnimationFinished OnAnimationFinished;
 
 protected:
 	// Called when the game starts or when spawned

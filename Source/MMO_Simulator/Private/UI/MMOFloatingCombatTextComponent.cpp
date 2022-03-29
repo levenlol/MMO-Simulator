@@ -24,8 +24,9 @@ void UMMOFloatingCombatTextComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	InitPool();
+
+	PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
 }
 
 
@@ -38,7 +39,7 @@ void UMMOFloatingCombatTextComponent::TickComponent(float DeltaTime, ELevelTick 
 	const FVector2D viewportSize = UWidgetLayoutLibrary::GetViewportSize(this);
 
 	// check for bad viewport size
-	if (viewportSize.X <= 0.0f || viewportSize.Y >= 0.0f)
+	if (viewportSize.X <= 0.0f || viewportSize.Y <= 0.0f || !PlayerCameraManager)
 		return;
 
 	// Get viewport scale (DPI scale)
@@ -51,44 +52,81 @@ void UMMOFloatingCombatTextComponent::TickComponent(float DeltaTime, ELevelTick 
 		return;
 
 	// get the owning player's camera location
-	const FVector cameraLocation = GetOwner<APawn>()->GetController<APlayerController>()->PlayerCameraManager->GetCameraLocation();
+	const FVector cameraLocation = PlayerCameraManager->GetCameraLocation();
 
 	// adjust for the vertical location of the active text actors by the viewport size and scale so that they appear evenly stacked on the screen
-	for (int32 i = 1; i < ActiveTextActor.Num(); ++i)
+	for (int32 i = 0; i < ActiveTextActors.Num(); ++i)
 	{
 		// calculate the vertical offset based on how far we (the camera) are from the floating tect actor
-		AMMOFloatingTextActor* textActor = ActiveTextActor[i];
+		AMMOFloatingTextActor* textActor = ActiveTextActors[i];
 		const float distance = FVector::Dist(cameraLocation, textActor->GetAnchorLocation());
 		const float verticalOffset = distance / (viewportSize.X / viewportScale);
 
 		// adjust the floating tect actor's location by the calculated amount
 		textActor->SetActorLocation(textActor->GetAnchorLocation() + FVector(0.0f, 0.0f, i * verticalOffset * TextVerticalSpacing));
-
 	}
 }
 
 
-void UMMOFloatingCombatTextComponent::AddFloatingText(const FText& text, FVector world_Location)
+void UMMOFloatingCombatTextComponent::AddFloatingText(const FText& Text, const FVector& WorldLocation)
 {
 	if (FloatingTextActorClass == nullptr)
 		return;
 
-	const FTransform spawnTransform = FTransform(FRotator::ZeroRotator, world_Location + FVector(0.0f, 0.0f, TextVerticalOffset));
-	AMMOFloatingTextActor* newTextActor = GetWorld()->SpawnActorDeferred<AMMOFloatingTextActor>(FloatingTextActorClass, spawnTransform, GetOwner());
-	if (newTextActor == nullptr)
+	AMMOFloatingTextActor* TextActor = TextActorPool.Num() > 0 ? TextActorPool.Pop() : nullptr;
+	if (TextActor == nullptr)
 		return;
 
-	// initialize and finish spawning the actor
-	newTextActor->Initialize(text);
-	newTextActor->OnDestroyed.AddDynamic(this, &UMMOFloatingCombatTextComponent::OnTextDestroyed);
-	UGameplayStatics::FinishSpawningActor(newTextActor, spawnTransform);
+	SetTextActorActive(TextActor, true);
 
-	// add the new text actor to the beginning of the activeTextActor array
-	ActiveTextActor.Insert(newTextActor, 0);
+	// initialize and finish spawning the actor
+	TextActor->Initialize(Text);
+
+	const FVector AnchorLocation = WorldLocation + FVector(0.0f, 0.0f, TextVerticalOffset);
+	TextActor->SetActorLocation(AnchorLocation);
+	TextActor->SetAnchorLocation(AnchorLocation);
+
+	ActiveTextActors.Add(TextActor);
+}
+
+void UMMOFloatingCombatTextComponent::SetTextActorActive(AMMOFloatingTextActor* InActor, const bool bActive)
+{
+	if (!InActor)
+		return;
+
+	InActor->SetActorEnableCollision(false); // never allow collision with this actor.
+	InActor->SetActorHiddenInGame(!bActive);
+}
+
+void UMMOFloatingCombatTextComponent::InitPool()
+{
+	if (!FloatingTextActorClass)
+		return;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.bNoFail = true;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ActiveTextActors.Reserve(PoolSize);
+	TextActorPool.Reserve(PoolSize);
+
+	for (int32 i = 0; i < PoolSize; i++)
+	{
+		AMMOFloatingTextActor* SpawnedActor = GetWorld()->SpawnActor<AMMOFloatingTextActor>(FloatingTextActorClass, FTransform::Identity, SpawnParams);
+		SpawnedActor->OnAnimationFinished.AddDynamic(this, &UMMOFloatingCombatTextComponent::Recycle);
+		
+		SetTextActorActive(SpawnedActor, false);
+		TextActorPool.Add(SpawnedActor);
+	}
 }
 
 
-void UMMOFloatingCombatTextComponent::OnTextDestroyed(AActor* destroyed_actor)
+void UMMOFloatingCombatTextComponent::Recycle(AMMOFloatingTextActor* Sender)
 {
-	ActiveTextActor.Pop();
+	if (Sender)
+	{
+		SetTextActorActive(Sender, false);
+		TextActorPool.Add(Sender);
+		ActiveTextActors.Remove(Sender);
+	}
 }
