@@ -8,6 +8,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnAnimationFinished, AMMOFloatingTextActor*, Sender);
 
+class UWidgetComponent;
+
 UCLASS(ABSTRACT)
 class MMO_SIMULATOR_API AMMOFloatingTextActor : public AActor
 {
@@ -16,6 +18,9 @@ class MMO_SIMULATOR_API AMMOFloatingTextActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AMMOFloatingTextActor();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
+	UWidgetComponent* WidgetComponent;
 
 	UFUNCTION(blueprintImplementableEvent, Category = "FloatingTextActor")
 	void Initialize(const FText& text);

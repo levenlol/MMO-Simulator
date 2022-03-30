@@ -7,6 +7,8 @@
 #include "UI/MMOFloatingTextActor.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Components/WidgetComponent.h"
+
 
 // Sets default values for this component's properties
 UMMOFloatingCombatTextComponent::UMMOFloatingCombatTextComponent()
@@ -94,8 +96,9 @@ void UMMOFloatingCombatTextComponent::SetTextActorActive(AMMOFloatingTextActor* 
 	if (!InActor)
 		return;
 
-	InActor->SetActorEnableCollision(false); // never allow collision with this actor.
-	InActor->SetActorHiddenInGame(!bActive);
+	//InActor->SetActorEnableCollision(false); // never allow collision with this actor.
+	//InActor->SetActorHiddenInGame(!bActive);
+	InActor->WidgetComponent->GetWidget()->SetVisibility(bActive ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 }
 
 void UMMOFloatingCombatTextComponent::InitPool()
