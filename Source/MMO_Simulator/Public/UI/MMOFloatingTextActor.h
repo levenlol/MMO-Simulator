@@ -9,6 +9,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnAnimationFinished, AMMOFloatingTextActor*, Sender);
 
 class UWidgetComponent;
+struct FMMODamage;
 
 UCLASS(ABSTRACT)
 class MMO_SIMULATOR_API AMMOFloatingTextActor : public AActor
@@ -23,7 +24,7 @@ public:
 	UWidgetComponent* WidgetComponent;
 
 	UFUNCTION(blueprintImplementableEvent, Category = "FloatingTextActor")
-	void Initialize(const FText& text);
+	void Initialize(const FMMODamage& InDamage);
 
 	FORCEINLINE const FVector& GetAnchorLocation() const { return AnchorLocation; }
 	FORCEINLINE void SetAnchorLocation(const FVector& InLocation) { AnchorLocation = InLocation; }

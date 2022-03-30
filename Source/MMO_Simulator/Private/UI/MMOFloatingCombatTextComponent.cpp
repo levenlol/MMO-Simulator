@@ -6,7 +6,6 @@
 #include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 #include "UI/MMOFloatingTextActor.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "Components/WidgetComponent.h"
 
 
@@ -70,7 +69,7 @@ void UMMOFloatingCombatTextComponent::TickComponent(float DeltaTime, ELevelTick 
 }
 
 
-void UMMOFloatingCombatTextComponent::AddFloatingText(const FText& Text, const FVector& WorldLocation)
+void UMMOFloatingCombatTextComponent::AddFloatingText(const FMMODamage& InDamage, const FVector& WorldLocation)
 {
 	if (!FloatingTextActorClass)
 		return;
@@ -82,7 +81,7 @@ void UMMOFloatingCombatTextComponent::AddFloatingText(const FText& Text, const F
 	SetTextActorActive(TextActor, true);
 
 	// initialize and finish spawning the actor
-	TextActor->Initialize(Text);
+	TextActor->Initialize(InDamage);
 
 	const FVector AnchorLocation = WorldLocation + FVector(0.0f, 0.0f, TextVerticalOffset);
 	TextActor->SetActorLocation(AnchorLocation);

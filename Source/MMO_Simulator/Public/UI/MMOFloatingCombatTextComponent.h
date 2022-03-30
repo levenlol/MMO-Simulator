@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Core/MMOCommon.h"
+
 #include "MMOFloatingCombatTextComponent.generated.h"
 
 class AMMOFloatingTextActor;
 class PlayerCameraManager;
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MMO_SIMULATOR_API UMMOFloatingCombatTextComponent : public UActorComponent
@@ -44,7 +47,7 @@ public:
 
 	// adds the specified text at the specified location in world space
 	UFUNCTION(BlueprintCallable, Category = "FloatingCombatTextComponent")
-	void AddFloatingText(const FText& Text, const FVector& WorldLocation);
+	void AddFloatingText(const FMMODamage& InDamage, const FVector& WorldLocation);
 
 private:
 	void SetTextActorActive(AMMOFloatingTextActor* InActor, const bool bActive);
