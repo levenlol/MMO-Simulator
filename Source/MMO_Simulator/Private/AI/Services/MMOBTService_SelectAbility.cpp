@@ -65,6 +65,9 @@ MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTargetSpell(AMMOB
 	UMMOWrapperSkill* Skill = Character->CombatSystem->Skills[SpellIndex];
 
 	TArray<FHitResult> HitResults;
+
+
+
 	if (Skill->Tags.HasTag(SkillTags.EnemyTag))
 	{
 		HitResults = GetHitsResults(Character->GetActorLocation(), EnemySpellCollisionChannel, Skill->Range);
@@ -76,6 +79,8 @@ MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTargetSpell(AMMOB
 	}
 	else ensure(0 && "Didnt support that kind of spell yet");
 
+	if (HitResults.Num() == 0)
+		return MMOAI::ESelectAbilityResult::Failed;
 
 	// TODO: better select target
 	AMMOBaseCharacter* TargetCharacter = Cast<AMMOBaseCharacter>(HitResults[0].GetActor());
