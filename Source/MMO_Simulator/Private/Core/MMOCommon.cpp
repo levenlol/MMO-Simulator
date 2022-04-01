@@ -146,6 +146,33 @@ TArray<FName> UMMOGameplayUtils::GetKeysForAction(const UObject* WorldContextObj
 	return Names;
 }
 
+int32 UMMOGameplayUtils::GetResistanceFromType(AMMOBaseCharacter* Character, EMMODamageType DamageType)
+{
+	if(Character)
+	{
+		switch (DamageType)
+		{
+		case EMMODamageType::Physical:
+			return Character->CharacterInfo.Resistances.Armor;
+		case EMMODamageType::Fire:
+			return Character->CharacterInfo.Resistances.FireResistance;
+		case EMMODamageType::Ice:
+			return Character->CharacterInfo.Resistances.IceResistance;
+		case EMMODamageType::Shadow:
+			return Character->CharacterInfo.Resistances.ShadowResistance;
+		case EMMODamageType::Holy:
+			return Character->CharacterInfo.Resistances.HolyResistance;
+		case EMMODamageType::Nature:
+			return Character->CharacterInfo.Resistances.NatureResistance;
+		case EMMODamageType::Arcane:
+			return Character->CharacterInfo.Resistances.ArcaneResistance;
+		}
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("GetResistanceFromType failed to get a value."));
+	return 0;
+}
+
 FMMOCharacter::FMMOCharacter(const FName& InName)
 	: Name(InName)
 {}

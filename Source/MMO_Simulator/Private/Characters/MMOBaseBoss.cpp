@@ -3,3 +3,7 @@
 
 #include "Characters/MMOBaseBoss.h"
 
+void AMMOBaseBoss::Stun_Implementation(float InDuration)
+{
+	// Empty Implementation. Bosses cant be stunned... maybe... 
+}

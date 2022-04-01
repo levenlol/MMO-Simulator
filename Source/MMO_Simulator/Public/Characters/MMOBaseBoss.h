@@ -13,5 +13,6 @@ UCLASS()
 class MMO_SIMULATOR_API AMMOBaseBoss : public AMMOBaseEnemy
 {
 	GENERATED_BODY()
-	
+public:
+	virtual void Stun_Implementation(float InDuration) override;
 };

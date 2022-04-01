@@ -444,4 +444,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = UI, meta = (WorldContext = WorldContextObject))
 	static TArray<FName> GetKeysForAction(const UObject* WorldContextObject, const FName& InputName, int32 PlayerIndex = 0);
 
+	UFUNCTION(BlueprintPure, Category = Stats)
+	static int32 GetResistanceFromType(AMMOBaseCharacter* Character, EMMODamageType DamageType);
+
 };

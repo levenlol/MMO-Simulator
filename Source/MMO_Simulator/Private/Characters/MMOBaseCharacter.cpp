@@ -22,7 +22,7 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
-void AMMOBaseCharacter::Stun(float InDuration)
+void AMMOBaseCharacter::Stun_Implementation(float InDuration)
 {
 	if (InDuration <= 0.f)
 		return;
@@ -69,7 +69,20 @@ void AMMOBaseCharacter::OnRecuperate()
 
 void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
 {
-	CharacterInfo.Stats.Health = FMath::Clamp(CharacterInfo.Stats.Health - InDamage.Damage, 0, CharacterInfo.Stats.MaxHealth);
+	// handle physical damage. Physical damages can be dodged/parryed etc
+	int32 DamageToApply = InDamage.Damage;
+	
+	// Damage > 0 indicates that is a damage. Damage < 0 is a healing
+	if (DamageToApply > 0)
+	{	
+		// TODO: for now is very simple damage handling. damage is basically IncomingDamage - Resistances.
+		const int32 CharacterResistance = UMMOGameplayUtils::GetResistanceFromType(this, InDamage.DamageType);
+		DamageToApply = FMath::Max(0, DamageToApply - CharacterResistance);
+	}
+
+	// actual damage implementation.
+	CharacterInfo.Stats.Health = FMath::Clamp(CharacterInfo.Stats.Health - DamageToApply, 0, CharacterInfo.Stats.MaxHealth);
+
 	OnDamageTaken.Broadcast(this, InDamage);
 
 	if (CharacterInfo.Stats.Health <= 0 && bAlive)

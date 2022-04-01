@@ -93,6 +93,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
 	void OnLevelUp();
 
+	UFUNCTION(BlueprintNativeEvent, Category = Status)
+	void Stun(float InDuration);
+
 	// Get minimum range of current equipped weapon
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	float GetWeaponRange() const;
@@ -131,9 +134,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Status)
 	FGameplayTagContainer StatusTags;
-
-	UFUNCTION(BlueprintCallable, Category = Status)
-	void Stun(float InDuration);
 
 protected:
 
