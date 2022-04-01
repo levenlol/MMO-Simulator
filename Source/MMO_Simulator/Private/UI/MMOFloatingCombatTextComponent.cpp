@@ -65,8 +65,6 @@ void UMMOFloatingCombatTextComponent::TickComponent(float DeltaTime, ELevelTick 
 
 		// adjust the floating tect actor's location by the calculated amount
 		textActor->SetActorLocation(textActor->GetAnchorLocation() + FVector(0.0f, 0.0f, i * verticalOffset * TextVerticalSpacing));
-
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, FString::SanitizeFloat(i * verticalOffset * TextVerticalSpacing));
 	}
 }
 
