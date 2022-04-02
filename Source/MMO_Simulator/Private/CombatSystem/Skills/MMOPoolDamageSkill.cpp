@@ -29,7 +29,6 @@ void UMMOPoolDamageSkill::Setup(AMMOBaseCharacter* InOwner)
 {
 	Super::Setup(InOwner);
 
-
 	if (PoolClass)
 	{
 		FActorSpawnParameters SpawnParams;
@@ -53,14 +52,9 @@ void UMMOPoolDamageSkill::CastAbility(FMMOSkillInputData Data)
 
 	// setup positions and other stuff
 	UMMOGameplayUtils::PlayParticlesAt(Pool, Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.TargetLocation);
-	SetPoolActive(true);
-
-	// logic part
-	CurrentTick = 0;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMMOPoolDamageSkill::Tick, Duration / static_cast<float>(TickNumber), true, Duration / static_cast<float>(TickNumber));
 }
 
-void UMMOPoolDamageSkill::Tick()
+void UMMOPoolDamageSkill::Step(int32 TickCount)
 {
 	// if we are there Pool is valid.
 	TArray<AActor*> OverlappingActors;
@@ -80,12 +74,16 @@ void UMMOPoolDamageSkill::Tick()
 			Skill->CastAbility(InputData);
 		}
 	}
+}
 
-	if (++CurrentTick >= TickNumber)
-	{
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-		SetPoolActive(false);
-	}
+void UMMOPoolDamageSkill::StartTick()
+{
+	SetPoolActive(true);
+}
+
+void UMMOPoolDamageSkill::EndTick()
+{
+	SetPoolActive(false);
 }
 
 void UMMOPoolDamageSkill::SetPoolActive(const bool bActive)

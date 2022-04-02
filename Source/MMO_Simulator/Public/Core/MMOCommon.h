@@ -450,4 +450,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = FX)
 	static void PlayParticlesAt(AMMOFXActor* FxActor, const FVector& Location);
 
+	UFUNCTION(BlueprintPure, Category = FX)
+	static float GetDamageReduction(AMMOBaseCharacter* Defender, AMMOBaseCharacter* Attacker, EMMODamageType DamageType);
+		
 };

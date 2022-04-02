@@ -73,9 +73,10 @@ void AMMOBaseCharacter::DamageTake(FMMODamage InDamage)
 	// Damage > 0 indicates that is a damage. Damage < 0 is a healing
 	if (DamageToApply > 0)
 	{	
-		// TODO: for now is very simple damage handling. damage is basically IncomingDamage - Resistances.
-		const int32 CharacterResistance = UMMOGameplayUtils::GetResistanceFromType(this, InDamage.DamageType);
-		DamageToApply = FMath::Max(0, DamageToApply - CharacterResistance);
+		// Damage reduction percentage.
+		const float DamageReduction = UMMOGameplayUtils::GetDamageReduction(this, InDamage.DamageDealer, InDamage.DamageType);
+
+		DamageToApply = DamageToApply * DamageReduction;
 	}
 
 	// actual damage implementation.

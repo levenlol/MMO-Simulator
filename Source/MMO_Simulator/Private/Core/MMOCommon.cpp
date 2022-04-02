@@ -175,6 +175,24 @@ int32 UMMOGameplayUtils::GetResistanceFromType(AMMOBaseCharacter* Character, EMM
 	return 0;
 }
 
+float UMMOGameplayUtils::GetDamageReduction(AMMOBaseCharacter* Defender, AMMOBaseCharacter* Attacker, EMMODamageType DamageType)
+{
+	const float AttackerLevel = Attacker ? static_cast<float>(Attacker->CharacterInfo.Level) : 1.f;
+
+	const float ResistanceValue = static_cast<float>(GetResistanceFromType(Defender, DamageType));
+
+	if (DamageType == EMMODamageType::Physical)
+	{
+		// https://wowpedia.fandom.com/wiki/Armor
+		return ResistanceValue / (ResistanceValue + 400.f + 85.f * AttackerLevel);
+	}
+	else
+	{
+		// https://wowpedia.fandom.com/wiki/Resistance
+		return ResistanceValue / (ResistanceValue + 150.f);
+	}
+}
+
 void UMMOGameplayUtils::PlayParticlesAt(AMMOFXActor* FxActor, const FVector& Location)
 {
 	if (FxActor)

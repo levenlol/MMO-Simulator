@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "CombatSystem/Skills/MMOTimeTickSkill.h"
 #include "MMOBeamSkill.generated.h"
 
 class UParticleSystemComponent;
@@ -36,7 +36,7 @@ private:
 };
 
 UCLASS()
-class MMO_SIMULATOR_API UMMOBeamSkill : public UMMOBaseSkill
+class MMO_SIMULATOR_API UMMOBeamSkill : public UMMOTimeTickSkill
 {
 	GENERATED_BODY()
 public:
@@ -49,12 +49,6 @@ public:
 	TSubclassOf<AMMOBeam> BeamClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Damage)
-	float Duration = 5.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Damage, meta=(ClampMin="1"))
-	int32 TickNumber = 5;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Damage)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
 	AMMOBeam* GetBeam() const { return Beam; }
@@ -63,8 +57,12 @@ private:
 	UPROPERTY(VisibleInstanceOnly, Category = FX)
 	AMMOBeam* Beam;
 
-	void SetBeamActive(bool bActive);
+	UPROPERTY(VisibleInstanceOnly, Category = Data)
+	FMMOSkillInputData InputData;
 
-	FTimerHandle TimerHandle;
-	int32 CurrentTick = 0;
+	virtual void Step(int32 TickCount) override;
+	virtual void StartTick() override;
+	virtual void EndTick() override;
+
+	void SetBeamActive(bool bActive);
 };

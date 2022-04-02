@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/Skills/MMODamageSkill.h"
+#include "CombatSystem/Skills/MMOTimeTickSkill.h"
 #include "MMOPoolDamageSkill.generated.h"
 
 class USphereComponent;
@@ -20,7 +20,7 @@ public:
 };
 
 UCLASS()
-class MMO_SIMULATOR_API UMMOPoolDamageSkill : public UMMOBaseSkill
+class MMO_SIMULATOR_API UMMOPoolDamageSkill : public UMMOTimeTickSkill
 {
 	GENERATED_BODY()
 public:
@@ -33,21 +33,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
 	TSubclassOf<AMMOPoolActor> PoolClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
-	float Duration = 5.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta=(ClampMin="1"))
-	int32 TickNumber = 5;
-
 private:
 	UPROPERTY()
 	AMMOPoolActor* Pool;
 
-	UFUNCTION()
-	void Tick();
-
-	FTimerHandle TimerHandle;
-	int32 CurrentTick = 0;
+	virtual void Step(int32 TickCount) override;
+	virtual void StartTick() override;
+	virtual void EndTick() override;
 
 	void SetPoolActive(const bool bActive);
 };

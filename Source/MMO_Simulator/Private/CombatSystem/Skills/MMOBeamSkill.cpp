@@ -29,63 +29,53 @@ void UMMOBeamSkill::CastAbility(FMMOSkillInputData Data)
 {
 	Super::CastAbility(Data);
 
+	InputData = Data;
+
 	if (Beam && Data.TargetActor && OwnerCharacter)
 	{
+
 		Beam->SetBeamSourceTarget(OwnerCharacter, Data.TargetActor);
 		SetBeamActive(true);
-
-		FTimerDelegate BeamDelegate;
-
-		TWeakObjectPtr<UMMOBeamSkill> ThisWeak = this;
-
-		BeamDelegate.BindLambda([ThisWeak, Data]()
-			{
-				UMMOBeamSkill* ThisStrong = ThisWeak.Get();
-				if (!ThisStrong)
-				{
-					return;
-				}
-
-				ThisStrong->CurrentTick++;
-
-				const FVector StartLocation = ThisStrong->OwnerCharacter->GetActorLocation();
-				const FVector EndLocation = Data.TargetActor->GetActorLocation();
-
-				const FVector BoxSize((StartLocation - EndLocation).Size() * 0.5f, 5.f, 5.f);
-				const FQuat Rotation = (EndLocation - StartLocation).Rotation().Quaternion();
-
-				const FVector MiddlePoint = (EndLocation + StartLocation) * 0.5f;
-
-				//DrawDebugBox(ThisStrong->GetWorld(), MiddlePoint, BoxSize, Rotation, FColor::Magenta, false, 5.f, 0, 10.f);
-
-				TArray<FHitResult> Hits;
-				//if (ThisStrong->GetWorld()->LineTraceMultiByChannel(Hits, StartLocation, EndLocation, ThisStrong->CollisionChannel))
-				if(ThisStrong->GetWorld()->SweepMultiByChannel(Hits, MiddlePoint, MiddlePoint + FVector::UpVector, Rotation, ThisStrong->CollisionChannel, FCollisionShape::MakeBox(BoxSize)))
-				{
-					for (const FHitResult& Hit : Hits)
-					{
-						FMMOSkillInputData BeamInput = Data;
-						BeamInput.TargetLocation = Hit.ImpactPoint;
-						BeamInput.TargetActor = Cast<AMMOBaseCharacter>(Hit.GetActor());
-
-						for (UMMOBaseSkill* Skill : ThisWeak->TriggeredSkills)
-						{
-							Skill->CastAbility(BeamInput);
-						}
-					}
-				}
-
-				if (ThisStrong->CurrentTick >= ThisStrong->TickNumber)
-				{
-					ThisStrong->GetWorld()->GetTimerManager().ClearTimer(ThisStrong->TimerHandle);
-					ThisStrong->SetBeamActive(false);
-				}
-
-			});
-
-		CurrentTick = 0;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, BeamDelegate, Duration / static_cast<float>(TickNumber), true, Duration / static_cast<float>(TickNumber));
 	}
+}
+
+void UMMOBeamSkill::Step(int32 TickCount)
+{
+	const FVector StartLocation = OwnerCharacter->GetActorLocation();
+	const FVector EndLocation = InputData.TargetActor->GetActorLocation();
+
+	const FVector BoxSize((StartLocation - EndLocation).Size() * 0.5f, 5.f, 5.f);
+	const FQuat Rotation = (EndLocation - StartLocation).Rotation().Quaternion();
+
+	const FVector MiddlePoint = (EndLocation + StartLocation) * 0.5f;
+
+	//DrawDebugBox(ThisStrong->GetWorld(), MiddlePoint, BoxSize, Rotation, FColor::Magenta, false, 5.f, 0, 10.f);
+
+	TArray<FHitResult> Hits;
+	//if (ThisStrong->GetWorld()->LineTraceMultiByChannel(Hits, StartLocation, EndLocation, ThisStrong->CollisionChannel))
+	if (GetWorld()->SweepMultiByChannel(Hits, MiddlePoint, MiddlePoint + FVector::UpVector, Rotation, CollisionChannel, FCollisionShape::MakeBox(BoxSize)))
+	{
+		for (const FHitResult& Hit : Hits)
+		{
+			FMMOSkillInputData BeamInput = InputData;
+			BeamInput.TargetLocation = Hit.ImpactPoint;
+			BeamInput.TargetActor = Cast<AMMOBaseCharacter>(Hit.GetActor());
+
+			for (UMMOBaseSkill* Skill : TriggeredSkills)
+			{
+				Skill->CastAbility(BeamInput);
+			}
+		}
+	}
+}
+
+void UMMOBeamSkill::StartTick()
+{
+}
+
+void UMMOBeamSkill::EndTick()
+{
+	SetBeamActive(false);
 }
 
 void UMMOBeamSkill::SetBeamActive(bool bActive)
