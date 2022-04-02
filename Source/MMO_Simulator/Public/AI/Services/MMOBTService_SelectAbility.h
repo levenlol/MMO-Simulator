@@ -46,4 +46,7 @@ private:
 	MMOAI::ESelectAbilityResult HandleSelfCastSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex);
 
 	TArray<FHitResult> GetHitsResults(const FVector& Location, ECollisionChannel CollisionChannel, const float Radius, const AActor* ActorToIgnore = nullptr) const;
+
+	AMMOBaseCharacter* RetrieveBestEnemyTarget(const TArray<FHitResult>& HitResults) const;
+	AMMOBaseCharacter* RetrieveBestFriendlyTarget(const TArray<FHitResult>& HitResults) const;
 };

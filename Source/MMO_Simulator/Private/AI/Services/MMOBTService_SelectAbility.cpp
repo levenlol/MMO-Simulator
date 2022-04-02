@@ -62,33 +62,32 @@ MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTargetSpell(AMMOB
 {
 	const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
 
-	UMMOWrapperSkill* Skill = Character->CombatSystem->Skills[SpellIndex];
+	UMMOWrapperSkill* Skill = Character->CombatSystem->Skills[SpellIndex];	
+	AMMOBaseCharacter* TargetCharacter = nullptr;
 
 	TArray<FHitResult> HitResults;
-
-
-
 	if (Skill->Tags.HasTag(SkillTags.EnemyTag))
 	{
 		HitResults = GetHitsResults(Character->GetActorLocation(), EnemySpellCollisionChannel, Skill->Range);
+		TargetCharacter = RetrieveBestEnemyTarget(HitResults);
 	}
 	else if (Skill->Tags.HasTag(SkillTags.FriendlyTag))
 	{
 		const bool bSelfCastable = Skill->Tags.HasTag(SkillTags.SelfTargetTag); // true if the spell can be cast on self.
 		HitResults = GetHitsResults(Character->GetActorLocation(), FriendlySpellCollisionChannel, Skill->Range, bSelfCastable ? nullptr : Character);
+		TargetCharacter = RetrieveBestFriendlyTarget(HitResults);
 	}
 	else ensure(0 && "Didnt support that kind of spell yet");
 
-	if (HitResults.Num() == 0)
+	if (TargetCharacter == nullptr)
 		return MMOAI::ESelectAbilityResult::Failed;
 
-	// TODO: better select target
-	AMMOBaseCharacter* TargetCharacter = Cast<AMMOBaseCharacter>(HitResults[0].GetActor());
-	if (Character->CombatSystem->CanCastSkill(TargetCharacter, HitResults[0].ImpactPoint, SpellIndex) == EMMOSkillCastFailType::None)
+
+	if (Character->CombatSystem->CanCastSkill(TargetCharacter, TargetCharacter->GetActorLocation(), SpellIndex) == EMMOSkillCastFailType::None)
 	{
 		BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, SpellIndex + 1); // spells are 1 based
-		BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, HitResults[0].ImpactPoint);
-		BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, HitResults[0].GetActor());
+		BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, TargetCharacter->GetActorLocation());
+		BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, TargetCharacter);
 
 		return MMOAI::ESelectAbilityResult::Succeed;
 	}
@@ -119,6 +118,36 @@ TArray<FHitResult> UMMOBTService_SelectAbility::GetHitsResults(const FVector& Lo
 	GetWorld()->SweepMultiByChannel(HitResults, Location, Location + FVector::UpVector, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(Radius), Params);
 
 	return HitResults;
+}
+
+AMMOBaseCharacter* UMMOBTService_SelectAbility::RetrieveBestEnemyTarget(const TArray<FHitResult>& HitResults) const
+{
+	if (HitResults.Num() > 0)
+	{
+		// todo better select. consider player selection
+		return Cast<AMMOBaseCharacter>(HitResults[0].GetActor());
+	}
+
+	return nullptr;
+}
+
+AMMOBaseCharacter* UMMOBTService_SelectAbility::RetrieveBestFriendlyTarget(const TArray<FHitResult>& HitResults) const
+{
+	// todo consider player selection
+	float MinHealthPercent = 1.f;
+	AMMOBaseCharacter* Character = nullptr;
+
+	for (int32 i = 0; i < HitResults.Num(); i++)
+	{
+		AMMOBaseCharacter* CurrentChar = Cast<AMMOBaseCharacter>(HitResults[i].GetActor());
+		if (CurrentChar && CurrentChar->GetHealthPercent() <= MinHealthPercent)
+		{
+			MinHealthPercent = CurrentChar->GetHealthPercent();
+			Character = CurrentChar;
+		}
+	}
+
+	return Character;
 }
 
 #undef CHECK_RETURN_SPELLHANDLED
