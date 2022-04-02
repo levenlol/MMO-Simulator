@@ -15,7 +15,7 @@ class MMO_SIMULATOR_API UMMODamageSkill : public UMMOBaseSkill
 public:
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 
-	virtual void CastAbility(FMMOSkillInputData Data) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Damage)
 	FIntPoint Damage;

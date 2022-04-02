@@ -28,8 +28,6 @@ public:
 	
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 
-	virtual void CastAbility(FMMOSkillInputData Data) override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FX)
 	TSubclassOf<AMMOPoolActor> PoolClass;
 
@@ -37,9 +35,9 @@ private:
 	UPROPERTY()
 	AMMOPoolActor* Pool;
 
-	virtual void Step(int32 TickCount) override;
-	virtual void StartTick() override;
-	virtual void EndTick() override;
+	virtual void StartTick(const FMMOSkillInputData& Data);
+	virtual void EndTick(const FMMOSkillInputData& Data);
+	virtual void Step(const FMMOSkillInputData& Data, int32 TickCount);
 
 	void SetPoolActive(const bool bActive);
 };

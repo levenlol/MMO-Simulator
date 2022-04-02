@@ -40,22 +40,11 @@ void UMMOPoolDamageSkill::Setup(AMMOBaseCharacter* InOwner)
 	}
 }
 
-void UMMOPoolDamageSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOPoolDamageSkill::Step(const FMMOSkillInputData& Data, int32 TickCount)
 {
-	Super::CastAbility(Data);
-
 	if (!Pool)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Cannot spawn Pool"));
 		return;
-	}
 
-	// setup positions and other stuff
-	UMMOGameplayUtils::PlayParticlesAt(Pool, Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.TargetLocation);
-}
-
-void UMMOPoolDamageSkill::Step(int32 TickCount)
-{
 	// if we are there Pool is valid.
 	TArray<AActor*> OverlappingActors;
 	Pool->SphereComponent->GetOverlappingActors(OverlappingActors, AMMOBaseCharacter::StaticClass());
@@ -65,23 +54,31 @@ void UMMOPoolDamageSkill::Step(int32 TickCount)
 		AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(OverlappingActor);
 		for (UMMOBaseSkill* Skill : TriggeredSkills)
 		{
-			FMMOSkillInputData InputData;
-			InputData.SourceActor = OwnerCharacter;
-			InputData.SourceLocation = Pool->GetActorLocation();
-			InputData.TargetActor = Character;
-			InputData.TargetLocation = Character->GetActorLocation();
+			FMMOSkillInputData Input;
+			Input.SourceActor = OwnerCharacter;
+			Input.SourceLocation = Pool->GetActorLocation();
+			Input.TargetActor = Character;
+			Input.TargetLocation = Character->GetActorLocation();
 
-			Skill->CastAbility(InputData);
+			Skill->CastAbility(Input);
 		}
 	}
 }
 
-void UMMOPoolDamageSkill::StartTick()
+void UMMOPoolDamageSkill::StartTick(const FMMOSkillInputData& Data)
 {
+	if (!Pool)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Cannot spawn Pool"));
+		return;
+	}
+
+	// setup positions and other stuff
+	UMMOGameplayUtils::PlayParticlesAt(Pool, Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.TargetLocation);
 	SetPoolActive(true);
 }
 
-void UMMOPoolDamageSkill::EndTick()
+void UMMOPoolDamageSkill::EndTick(const FMMOSkillInputData& Data)
 {
 	SetPoolActive(false);
 }

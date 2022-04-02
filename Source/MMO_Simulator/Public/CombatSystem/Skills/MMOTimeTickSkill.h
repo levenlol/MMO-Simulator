@@ -23,16 +23,18 @@ public:
 protected:
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
-	virtual void CastAbility(FMMOSkillInputData Data) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
-	virtual void StartTick() {}
-	virtual void EndTick() {}
+	virtual void StartTick(const FMMOSkillInputData& Data) {}
+	virtual void EndTick(const FMMOSkillInputData& Data) {}
 
-	virtual void Step(int32 TickCount) {}
+	virtual void Step(const FMMOSkillInputData& Data, int32 TickCount) {}
 
 	UFUNCTION()
 	void Tick();
 private:
 	FTimerHandle TimerHandle;
 	int32 CurrentTick = 0;
+
+	FMMOSkillInputData InputData;
 };

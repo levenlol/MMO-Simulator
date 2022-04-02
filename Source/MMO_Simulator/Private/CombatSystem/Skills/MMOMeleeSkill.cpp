@@ -13,7 +13,7 @@ void UMMOMeleeSkill::Setup(AMMOBaseCharacter* InOwner)
 
 }
 
-void UMMOMeleeSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOMeleeSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	Super::CastAbility(Data);
 

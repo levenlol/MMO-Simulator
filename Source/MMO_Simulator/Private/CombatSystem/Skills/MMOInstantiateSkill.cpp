@@ -20,7 +20,7 @@ void UMMOInstantiateSkill::DrawDebug(const FVector& Location)
 }
 #endif
 
-void UMMOInstantiateSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOInstantiateSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	const FVector Location = Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.TargetLocation;
 

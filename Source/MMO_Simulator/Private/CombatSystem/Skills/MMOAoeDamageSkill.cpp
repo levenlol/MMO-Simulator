@@ -17,7 +17,7 @@ void UMMOAoeDamageSkill::Setup(AMMOBaseCharacter* InOwner)
 
 }
 
-void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOAoeDamageSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	const FVector Location = Data.TargetActor ? Data.TargetActor->GetActorLocation() : Data.TargetLocation;
 

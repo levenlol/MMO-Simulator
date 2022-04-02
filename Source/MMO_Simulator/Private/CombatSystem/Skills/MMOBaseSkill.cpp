@@ -40,7 +40,7 @@ void UMMOWrapperSkill::Setup(AMMOBaseCharacter* InOwner)
 	LastCastTime = -Cooldown;// Start with no cooldown
 }
 
-void UMMOWrapperSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOWrapperSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	if (IsInCooldown())
 	{

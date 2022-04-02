@@ -82,7 +82,7 @@ class MMO_SIMULATOR_API UMMOBaseSkill : public UObject
 public:
 	virtual void Setup(AMMOBaseCharacter* InOwner);
 
-	virtual void CastAbility(FMMOSkillInputData Data) {};
+	virtual void CastAbility(const FMMOSkillInputData& Data) {};
 	virtual void AbortAbility() {};
 
 	// Triggered Skills from this.
@@ -122,7 +122,7 @@ public:
 	FGameplayTagContainer Tags;
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
-	virtual void CastAbility(FMMOSkillInputData Data) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
 	virtual void AbortAbility() override;
 

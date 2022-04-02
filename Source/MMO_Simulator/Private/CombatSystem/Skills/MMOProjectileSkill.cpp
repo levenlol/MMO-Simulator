@@ -53,7 +53,7 @@ void UMMOProjectileSkill::Setup(AMMOBaseCharacter* InOwner)
 	}
 }
 
-void UMMOProjectileSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOProjectileSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	Super::CastAbility(Data);
 

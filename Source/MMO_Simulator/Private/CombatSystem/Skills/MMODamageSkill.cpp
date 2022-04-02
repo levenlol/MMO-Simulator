@@ -22,7 +22,7 @@ void UMMODamageSkill::Setup(AMMOBaseCharacter* InOwner)
 	}
 }
 
-void UMMODamageSkill::CastAbility(FMMOSkillInputData Data)
+void UMMODamageSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	if (AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(Data.TargetActor))
 	{

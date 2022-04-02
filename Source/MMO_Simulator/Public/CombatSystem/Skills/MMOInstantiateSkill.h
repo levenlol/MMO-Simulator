@@ -27,7 +27,7 @@ class MMO_SIMULATOR_API UMMOInstantiateSkill : public UMMOBaseSkill
 {
 	GENERATED_BODY()
 public:
-	virtual void CastAbility(FMMOSkillInputData Data) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
 	UPROPERTY(EditAnywhere, Category = Target)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;

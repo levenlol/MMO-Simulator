@@ -15,7 +15,7 @@ class MMO_SIMULATOR_API UMMOMeleeSkill : public UMMOBaseSkill
 public:
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 
-	virtual void CastAbility(FMMOSkillInputData Data) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation)
 	UAnimationAsset* AnimationAsset;

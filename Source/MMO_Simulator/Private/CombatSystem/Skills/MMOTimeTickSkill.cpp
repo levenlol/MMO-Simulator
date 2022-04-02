@@ -8,24 +8,26 @@ void UMMOTimeTickSkill::Setup(AMMOBaseCharacter* InOwner)
 	Super::Setup(InOwner);
 }
 
-void UMMOTimeTickSkill::CastAbility(FMMOSkillInputData Data)
+void UMMOTimeTickSkill::CastAbility(const FMMOSkillInputData& Data)
 {
 	Super::CastAbility(Data);
 
 	// logic part
 	CurrentTick = 0;
 
-	StartTick();
+	InputData = Data;
+
+	StartTick(InputData);
 
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMMOTimeTickSkill::Tick, Duration / static_cast<float>(TickNumber), true, Duration / static_cast<float>(TickNumber));
 }
 
 void UMMOTimeTickSkill::Tick()
 {
-	Step(CurrentTick);
+	Step(InputData, CurrentTick);
 	if (++CurrentTick >= TickNumber)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-		EndTick();
+		EndTick(InputData);
 	}
 }

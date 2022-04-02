@@ -43,7 +43,6 @@ public:
 	UMMOBeamSkill();
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
-	virtual void CastAbility(FMMOSkillInputData Data) override;
 	
 	UPROPERTY(EditDefaultsOnly, Category = FX)
 	TSubclassOf<AMMOBeam> BeamClass;
@@ -57,12 +56,9 @@ private:
 	UPROPERTY(VisibleInstanceOnly, Category = FX)
 	AMMOBeam* Beam;
 
-	UPROPERTY(VisibleInstanceOnly, Category = Data)
-	FMMOSkillInputData InputData;
-
-	virtual void Step(int32 TickCount) override;
-	virtual void StartTick() override;
-	virtual void EndTick() override;
+	virtual void StartTick(const FMMOSkillInputData& Data);
+	virtual void EndTick(const FMMOSkillInputData& Data);
+	virtual void Step(const FMMOSkillInputData& Data, int32 TickCount);
 
 	void SetBeamActive(bool bActive);
 };

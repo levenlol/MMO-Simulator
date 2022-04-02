@@ -41,7 +41,7 @@ class MMO_SIMULATOR_API UMMOProjectileSkill : public UMMOBaseSkill
 public:
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 
-	virtual void CastAbility(FMMOSkillInputData Data) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
 	TSubclassOf<AMMOProjectile> ProjectileClass;
