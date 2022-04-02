@@ -109,7 +109,7 @@ void FMMOMathExpression::Init(const UObject* InObject)
 
 	auto ansiExpression = TCHAR_TO_ANSI(*Expression);
 	compiledExpression = te_compile(ansiExpression, variablesMap.data(), variablesMap.size(), &LastError);
-	ensure(compiledExpression);
+	ensureAlways(compiledExpression);
 
 	if (!compiledExpression)
 	{

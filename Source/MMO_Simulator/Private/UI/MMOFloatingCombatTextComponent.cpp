@@ -80,7 +80,7 @@ void UMMOFloatingCombatTextComponent::AddFloatingText(const FMMODamage& InDamage
 
 	SetTextActorActive(TextActor, true);
 
-	// initialize and finish spawning the actor
+	// Initialize.
 	TextActor->Initialize(InDamage);
 
 	const FVector AnchorLocation = WorldLocation + FVector(0.0f, 0.0f, TextVerticalOffset);

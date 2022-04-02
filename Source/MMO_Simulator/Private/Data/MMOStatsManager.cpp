@@ -6,9 +6,51 @@
 #include "Data/MMODataFinder.h"
 
 UMMOStatsManager::UMMOStatsManager()
+	: Super()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-	bWantsInitializeComponent = true;
+	PrimaryComponentTick.bCanEverTick = false;
+
+	// Init parry
+	ParryExpression.VariableMap.Add(FString("Strength"), FString("OwnerCharacter.CharacterInfo.Attributes.Strength"));
+	ParryExpression.VariableMap.Add(FString("ParryRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.ParryRating"));
+	ParryExpression.Expression = FString("2 + Strength / 25 + ParryRating / 25");
+
+	// Init block
+	BlockExpression.VariableMap.Add(FString("Strength"), FString("OwnerCharacter.CharacterInfo.Attributes.Strength"));
+	BlockExpression.VariableMap.Add(FString("BlockRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.BlockRating"));
+	BlockExpression.Expression = FString("2 + Strength / 25 + BlockRating / 25");
+
+	// Init dodge
+	DodgeExpression.VariableMap.Add(FString("Dexterity"), FString("OwnerCharacter.CharacterInfo.Attributes.Dexterity"));
+	DodgeExpression.VariableMap.Add(FString("DodgeRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.DodgeRating"));
+	DodgeExpression.Expression = FString("2 + Dexterity / 25 + DodgeRating / 25");
+
+	// Init attack power
+	AttackPowerExpression.VariableMap.Add(FString("Dexterity"), FString("OwnerCharacter.CharacterInfo.Attributes.Dexterity"));
+	AttackPowerExpression.VariableMap.Add(FString("Strength"), FString("OwnerCharacter.CharacterInfo.Attributes.Strength"));
+	AttackPowerExpression.Expression = FString("2 * Dexterity + 2 * Strength");
+
+	// Init spell power
+	SpellPowerExpression.VariableMap.Add(FString("Intellect"), FString("OwnerCharacter.CharacterInfo.Attributes.Intellect"));
+	SpellPowerExpression.Expression = FString("Intellect * 0.8");
+
+	// Init attack crit 
+	AttackCritExpression.VariableMap.Add(FString("Dexterity"), FString("OwnerCharacter.CharacterInfo.Attributes.Dexterity"));
+	AttackCritExpression.VariableMap.Add(FString("AttackCritChanceRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.AttackCritChanceRating"));
+	AttackCritExpression.Expression = FString("5 + Dexterity / 25 + AttackCritChanceRating / 25");
+
+	// Init spell crit
+	SpellCritExpression.VariableMap.Add(FString("Intellect"), FString("OwnerCharacter.CharacterInfo.Attributes.Intellect"));
+	SpellCritExpression.VariableMap.Add(FString("SpellCritChanceRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.SpellCritChanceRating"));
+	SpellCritExpression.Expression = FString("5 + Intellect / 25 + SpellCritChanceRating / 25");
+
+	// Init health
+	HealthExpression.VariableMap.Add(FString("Constitution"), FString("OwnerCharacter.CharacterInfo.Attributes.Constitution"));
+	HealthExpression.Expression = FString("Constitution * 10");
+
+	// Init mana
+	ManaExpression.VariableMap.Add(FString("Intellect"), FString("OwnerCharacter.CharacterInfo.Attributes.Intellect"));
+	ManaExpression.Expression = FString("Intellect * 0.8");
 }
 
 void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
@@ -28,10 +70,10 @@ void UMMOStatsManager::BeginPlay()
 	ParryExpression.Init(this);
 	BlockExpression.Init(this);
 	DodgeExpression.Init(this);
-	AttackCritExpression.Init(this);
-	SpellCritExpression.Init(this);
 	AttackPowerExpression.Init(this);
 	SpellPowerExpression.Init(this);
+	AttackCritExpression.Init(this);
+	SpellCritExpression.Init(this);
 	HealthExpression.Init(this);
 	ManaExpression.Init(this);
 

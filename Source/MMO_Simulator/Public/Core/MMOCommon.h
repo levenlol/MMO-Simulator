@@ -367,16 +367,16 @@ public:
 	EMMODamageType DamageType = EMMODamageType::Physical;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	FIntPoint Damage;
+	int32 DamageMin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	int32 DamageMax;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float WeaponRange = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0.5"))
 	float AttackSpeed = 2.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0.0", ClampMax = "1.0"))
-	float CritChance = 0.f;
 };
 
 USTRUCT(BlueprintType)

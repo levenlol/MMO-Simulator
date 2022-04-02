@@ -18,7 +18,7 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CombatSystem = CreateDefaultSubobject<UMMOCombatSystem>(TEXT("CombatSystem"));
-	//StatsManager = CreateDefaultSubobject<UMMOStatsManager>(TEXT("StatsManager"));
+	StatsManager = CreateDefaultSubobject<UMMOStatsManager>(TEXT("StatsManager"));
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
@@ -50,8 +50,6 @@ void AMMOBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AMMOBaseCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	StatsManager = FindComponentByClass<UMMOStatsManager>();
 }
 
 void AMMOBaseCharacter::Die_Implementation()

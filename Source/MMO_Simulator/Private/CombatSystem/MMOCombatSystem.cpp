@@ -6,6 +6,7 @@
 #include "GameplayTagsManager.h"
 #include "Items/MMOBaseWeapon.h"
 #include "Core/MMOGameState.h"
+#include "Data/MMOStatsManager.h"
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 
 UMMOCombatSystem::UMMOCombatSystem()
@@ -256,8 +257,11 @@ FMMODamage UMMOCombatSystem::ComputeAutoAttackDamage()
 	if (AMMOBaseWeapon* MainHandWeapon = OwnerCharacter->GetMainHandWeapon())
 	{
 		const FMMOWeaponStats& WeaponStats = MainHandWeapon->Stats;
-		Damage.Damage = FMath::RandRange(WeaponStats.Damage.X, WeaponStats.Damage.Y);
-		Damage.bCrit = WeaponStats.CritChance >= FMath::RandRange(0.f, 1.f);
+		Damage.Damage = FMath::RandRange(WeaponStats.DamageMin, WeaponStats.DamageMax);
+		
+		const float CritChance = OwnerCharacter->StatsManager->GetAttackCritChance();
+		Damage.bCrit = CritChance >= FMath::RandRange(0.f, 1.f);
+
 		Damage.DamageType = EMMODamageType::Physical;
 		Damage.DamageDealer = OwnerCharacter;
 	}

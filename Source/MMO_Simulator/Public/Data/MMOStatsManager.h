@@ -60,6 +60,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = Initialization)
 	FMMOMathExpression ManaExpression;
 
+	FORCEINLINE float GetParryChance() const { return ParryChance; }
+	FORCEINLINE float GetBlockChance() const { return BlockChance; }
+	FORCEINLINE float GetDodgeChance() const { return DodgeChance; }
+	FORCEINLINE float GetAttackCritChance() const { return AttackCritChance; }
+	FORCEINLINE float GetSpellCritChance() const { return SpellCritChance; }
+	FORCEINLINE int32 GetSpellPowerValue() const { return SpellPowerValue; }
+	FORCEINLINE int32 GetAttackPowerValue() const { return AttackPowerValue; }
+
 protected:
 	UFUNCTION()
 	void OnCharacterInitialized(AMMOBaseCharacter* Sender);
