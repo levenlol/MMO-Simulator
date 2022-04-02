@@ -15,20 +15,20 @@ void UMMOTimeTickSkill::CastAbility(const FMMOSkillInputData& Data)
 	// logic part
 	CurrentTick = 0;
 
-	InputData = Data;
+	CachedInputData = Data;
 
-	StartTick(InputData);
+	StartTick(CachedInputData);
 
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMMOTimeTickSkill::Tick, Duration / static_cast<float>(TickNumber), true, Duration / static_cast<float>(TickNumber));
 }
 
 void UMMOTimeTickSkill::Tick()
 {
-	Step(InputData, CurrentTick);
+	Step(CachedInputData, CurrentTick);
 	if (++CurrentTick >= TickNumber)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-		EndTick(InputData);
+		EndTick(CachedInputData);
 	}
 }
 

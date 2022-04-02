@@ -34,7 +34,7 @@ private:
 	FTimerHandle TimerHandle;
 	int32 CurrentTick = 0;
 
-	FMMOSkillInputData InputData;
+	FMMOSkillInputData CachedInputData;
 };
 
 // Useful to make periodic damage tick.
