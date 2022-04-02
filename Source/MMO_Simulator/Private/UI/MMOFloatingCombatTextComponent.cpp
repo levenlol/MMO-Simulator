@@ -74,6 +74,10 @@ void UMMOFloatingCombatTextComponent::AddFloatingText(const FMMODamage& InDamage
 	if (!FloatingTextActorClass)
 		return;
 
+	// Dont display 0 damage or healing.
+	if (InDamage.Damage == 0)
+		return;
+
 	AMMOFloatingTextActor* TextActor = TextActorPool.Num() > 0 ? TextActorPool.Pop(false) : nullptr;
 	if (TextActor == nullptr)
 		return;

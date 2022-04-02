@@ -3,19 +3,34 @@
 
 #include "CombatSystem/Skills/MMODamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Core/MMOCommon.h"
+
 
 void UMMODamageSkill::Setup(AMMOBaseCharacter* InOwner)
 {
 	Super::Setup(InOwner);
 
 	DamageExpression.Init(this);
+
+	if (FxActorClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = OwnerCharacter;
+		FxActor = GetWorld()->SpawnActor<AMMOFXActor>(FxActorClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
+		FxActor->SetActorHiddenInGame(true);
+	}
 }
 
 void UMMODamageSkill::CastAbility(FMMOSkillInputData Data)
 {
 	if (AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(Data.TargetActor))
 	{
+		// Compute and apply damage
 		Target->DamageTake(ComputeDamage());
+
+		// Play FX
+		UMMOGameplayUtils::PlayParticlesAt(FxActor, Target->GetActorLocation());
 	}
 	else
 	{

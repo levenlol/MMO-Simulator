@@ -65,7 +65,7 @@ void AMMOBaseCharacter::OnRecuperate()
 	CharacterInfo.Stats.Recuperate(CharacterInfo.Stats.RecuperateEverySeconds);
 }
 
-void AMMOBaseCharacter::DamageTake_Implementation(FMMODamage InDamage)
+void AMMOBaseCharacter::DamageTake(FMMODamage InDamage)
 {
 	// handle physical damage. Physical damages can be dodged/parryed etc
 	int32 DamageToApply = InDamage.Damage;

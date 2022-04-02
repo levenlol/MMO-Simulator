@@ -447,4 +447,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = Stats)
 	static int32 GetResistanceFromType(AMMOBaseCharacter* Character, EMMODamageType DamageType);
 
+	UFUNCTION(BlueprintCallable, Category = FX)
+	static void PlayParticlesAt(AMMOFXActor* FxActor, const FVector& Location);
+
 };

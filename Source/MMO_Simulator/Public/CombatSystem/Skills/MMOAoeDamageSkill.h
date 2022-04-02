@@ -20,10 +20,4 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Damage, meta=(ClampMin="1.0"))
 	float Radius = 100.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = FX)
-	TSubclassOf<AMMOFXActor> FxActorClass;
-private:
-	UPROPERTY(VisibleAnywhere, Category = FX)
-	AMMOFXActor* FxActor;
  };

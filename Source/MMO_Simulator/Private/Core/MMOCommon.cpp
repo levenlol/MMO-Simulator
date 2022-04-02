@@ -12,6 +12,8 @@
 #include "Engine/StreamableManager.h"
 #include "Data/MMODataFinder.h"
 #include "Kismet/GameplayStatics.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
@@ -171,6 +173,19 @@ int32 UMMOGameplayUtils::GetResistanceFromType(AMMOBaseCharacter* Character, EMM
 
 	UE_LOG(LogTemp, Error, TEXT("GetResistanceFromType failed to get a value."));
 	return 0;
+}
+
+void UMMOGameplayUtils::PlayParticlesAt(AMMOFXActor* FxActor, const FVector& Location)
+{
+	if (FxActor)
+	{
+		FxActor->SetActorLocation(Location);
+		FxActor->SetActorHiddenInGame(false);
+
+		FxActor->ParticleComponent->KillParticlesForced();
+		FxActor->ParticleComponent->ResetParticles();
+		FxActor->ParticleComponent->ActivateSystem();
+	}
 }
 
 FMMOCharacter::FMMOCharacter(const FName& InName)

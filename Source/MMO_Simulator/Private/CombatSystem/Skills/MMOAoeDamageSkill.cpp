@@ -3,9 +3,7 @@
 
 #include "CombatSystem/Skills/MMOAoeDamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Particles/ParticleSystemComponent.h"
-#include "Kismet/GameplayStatics.h"
-
+#include "Core/MMOCommon.h"
 
 UMMOAoeDamageSkill::UMMOAoeDamageSkill()
 	: Super()
@@ -17,14 +15,6 @@ void UMMOAoeDamageSkill::Setup(AMMOBaseCharacter* InOwner)
 {
 	Super::Setup(InOwner);
 
-	if (FxActorClass)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = OwnerCharacter;
-		FxActor = GetWorld()->SpawnActor<AMMOFXActor>(FxActorClass, OwnerCharacter->GetActorLocation(), OwnerCharacter->GetActorRotation(), SpawnParams);
-		FxActor->SetActorHiddenInGame(true);
-	}
 }
 
 void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
@@ -44,13 +34,5 @@ void UMMOAoeDamageSkill::CastAbility(FMMOSkillInputData Data)
 		}
 	}
 
-	if (FxActor)
-	{
-		FxActor->SetActorLocation(Location);
-		FxActor->SetActorHiddenInGame(false);
-
-		FxActor->ParticleComponent->KillParticlesForced();
-		FxActor->ParticleComponent->ResetParticles();
-		FxActor->ParticleComponent->ActivateSystem();
-	}
+	UMMOGameplayUtils::PlayParticlesAt(FxActor, Location);
 }

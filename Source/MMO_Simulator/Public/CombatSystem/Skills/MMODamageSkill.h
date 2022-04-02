@@ -29,6 +29,12 @@ public:
 	FMMOMathExpression DamageExpression;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = FX)
+	TSubclassOf<AMMOFXActor> FxActorClass;
+
+	UPROPERTY(VisibleAnywhere, Category = FX)
+	AMMOFXActor* FxActor;
+
 	FMMODamage ComputeDamage();
 
 private:

@@ -87,7 +87,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Character)
 	void InitializeCharacter(const FMMOCharacter& InCharacter);
 
-	UFUNCTION(BlueprintNativeEvent, Category = Damage)
+	UFUNCTION(BlueprintCallable, Category = Damage)
 	void DamageTake(FMMODamage InDamage);
 
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)
