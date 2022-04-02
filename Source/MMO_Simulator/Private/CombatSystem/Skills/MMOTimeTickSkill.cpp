@@ -31,3 +31,11 @@ void UMMOTimeTickSkill::Tick()
 		EndTick(InputData);
 	}
 }
+
+void UMMOTickSkill::Step(const FMMOSkillInputData& Data, int32 TickCount)
+{
+	for (UMMOBaseSkill* Skill : TriggeredSkills)
+	{
+		Skill->CastAbility(Data);
+	}
+}

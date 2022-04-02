@@ -6,10 +6,8 @@
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "MMOTimeTickSkill.generated.h"
 
-/**
- * 
- */
-UCLASS()
+// Skill-helper that wrap tick mechanics.
+UCLASS(HideDropdown, NotBlueprintable)
 class MMO_SIMULATOR_API UMMOTimeTickSkill : public UMMOBaseSkill
 {
 	GENERATED_BODY()
@@ -37,4 +35,13 @@ private:
 	int32 CurrentTick = 0;
 
 	FMMOSkillInputData InputData;
+};
+
+// Useful to make periodic damage tick.
+UCLASS(Blueprintable)
+class MMO_SIMULATOR_API UMMOTickSkill : public UMMOTimeTickSkill
+{
+	GENERATED_BODY()
+public:
+	virtual void Step(const FMMOSkillInputData& Data, int32 TickCount);
 };

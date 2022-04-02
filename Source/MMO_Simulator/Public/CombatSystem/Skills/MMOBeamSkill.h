@@ -35,7 +35,7 @@ private:
 	AActor* Source;
 };
 
-UCLASS()
+UCLASS(Blueprintable)
 class MMO_SIMULATOR_API UMMOBeamSkill : public UMMOTimeTickSkill
 {
 	GENERATED_BODY()

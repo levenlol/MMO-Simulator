@@ -19,7 +19,7 @@ public:
 	USphereComponent* SphereComponent;
 };
 
-UCLASS()
+UCLASS(Blueprintable)
 class MMO_SIMULATOR_API UMMOPoolDamageSkill : public UMMOTimeTickSkill
 {
 	GENERATED_BODY()
