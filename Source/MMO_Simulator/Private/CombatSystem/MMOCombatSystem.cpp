@@ -262,6 +262,11 @@ FMMODamage UMMOCombatSystem::ComputeAutoAttackDamage()
 		const float CritChance = OwnerCharacter->StatsManager->GetAttackCritChance();
 		Damage.bCrit = CritChance >= FMath::RandRange(0.f, 1.f);
 
+		if (Damage.bCrit)
+		{
+			Damage.Damage *= 2; // todo: get crit multiplier
+		}
+
 		Damage.DamageType = EMMODamageType::Physical;
 		Damage.DamageDealer = OwnerCharacter;
 	}

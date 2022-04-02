@@ -37,12 +37,12 @@ UMMOStatsManager::UMMOStatsManager()
 	// Init attack crit 
 	AttackCritExpression.VariableMap.Add(FString("Dexterity"), FString("OwnerCharacter.CharacterInfo.Attributes.Dexterity"));
 	AttackCritExpression.VariableMap.Add(FString("AttackCritChanceRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.AttackCritChanceRating"));
-	AttackCritExpression.Expression = FString("5 + Dexterity / 25 + AttackCritChanceRating / 25");
+	AttackCritExpression.Expression = FString("0.05 + Dexterity / 25 + AttackCritChanceRating / 25");
 
 	// Init spell crit
 	SpellCritExpression.VariableMap.Add(FString("Intellect"), FString("OwnerCharacter.CharacterInfo.Attributes.Intellect"));
 	SpellCritExpression.VariableMap.Add(FString("SpellCritChanceRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.SpellCritChanceRating"));
-	SpellCritExpression.Expression = FString("5 + Intellect / 25 + SpellCritChanceRating / 25");
+	SpellCritExpression.Expression = FString("0.05 + Intellect / 25 + SpellCritChanceRating / 25");
 
 	// Init health
 	HealthExpression.VariableMap.Add(FString("Constitution"), FString("OwnerCharacter.CharacterInfo.Attributes.Constitution"));
