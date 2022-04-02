@@ -34,11 +34,11 @@ void UMMOBeamSkill::CastAbility(FMMOSkillInputData Data)
 		Beam->SetBeamSourceTarget(OwnerCharacter, Data.TargetActor);
 		SetBeamActive(true);
 
-		FTimerDelegate AttackDelegate;
+		FTimerDelegate BeamDelegate;
 
 		TWeakObjectPtr<UMMOBeamSkill> ThisWeak = this;
 
-		AttackDelegate.BindLambda([ThisWeak, Data]()
+		BeamDelegate.BindLambda([ThisWeak, Data]()
 			{
 				UMMOBeamSkill* ThisStrong = ThisWeak.Get();
 				if (!ThisStrong)
@@ -84,7 +84,7 @@ void UMMOBeamSkill::CastAbility(FMMOSkillInputData Data)
 			});
 
 		CurrentTick = 0;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, AttackDelegate, Duration / static_cast<float>(TickNumber), true, Duration / static_cast<float>(TickNumber));
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, BeamDelegate, Duration / static_cast<float>(TickNumber), true, Duration / static_cast<float>(TickNumber));
 	}
 }
 

@@ -147,7 +147,8 @@ AMMOBaseCharacter* UMMOBTService_SelectAbility::RetrieveBestFriendlyTarget(const
 		}
 	}
 
-	return Character;
+	// if min health == 1 means we have no one to heal, everyone is full health.
+	return MinHealthPercent < 1.f ? Character : nullptr; 
 }
 
 #undef CHECK_RETURN_SPELLHANDLED

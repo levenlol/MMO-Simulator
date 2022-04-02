@@ -48,13 +48,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = FX)
 	TSubclassOf<AMMOBeam> BeamClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FX)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Damage)
 	float Duration = 5.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FX, meta=(ClampMin="1"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Damage, meta=(ClampMin="1"))
 	int32 TickNumber = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FX)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Damage)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
 	AMMOBeam* GetBeam() const { return Beam; }
