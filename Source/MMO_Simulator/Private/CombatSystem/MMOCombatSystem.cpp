@@ -15,6 +15,7 @@ UMMOCombatSystem::UMMOCombatSystem()
 	AttackTag = FMMOStatusTags::Get().AttackTag;
 	StunnedTag = FMMOStatusTags::Get().StunnedTag;
 	CastTag = FMMOStatusTags::Get().CastTag;
+	ChannelingTag = FMMOStatusTags::Get().ChannelingTag;
 
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -188,8 +189,10 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 {
 	for (UMMOWrapperSkill* Skill : Skills)
 	{
-		Skill->OnSkillStart.RemoveDynamic(this, &UMMOCombatSystem::OnSkillStart);
-		Skill->OnSkillFinish.RemoveDynamic(this, &UMMOCombatSystem::OnSkillFinish);
+		Skill->OnSkillStartCast.RemoveDynamic(this, &UMMOCombatSystem::OnSkillStartCast);
+		Skill->OnSkillFinishCast.RemoveDynamic(this, &UMMOCombatSystem::OnSkillFinishCast);
+		Skill->OnSkillStartChanneling.RemoveDynamic(this, &UMMOCombatSystem::OnSkillStartChanneling);
+		Skill->OnSkillFinishChanneling.RemoveDynamic(this, &UMMOCombatSystem::OnSkillFinishChanneling);
 		Skill->OnSkillAborted.RemoveDynamic(this, &UMMOCombatSystem::OnSkillAbort);
 	}
 
@@ -201,8 +204,10 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 
 		Skills.Add(Skill);
 
-		Skill->OnSkillStart.AddDynamic(this, &UMMOCombatSystem::OnSkillStart);
-		Skill->OnSkillFinish.AddDynamic(this, &UMMOCombatSystem::OnSkillFinish);
+		Skill->OnSkillStartCast.AddDynamic(this, &UMMOCombatSystem::OnSkillStartCast);
+		Skill->OnSkillFinishCast.AddDynamic(this, &UMMOCombatSystem::OnSkillFinishCast);
+		Skill->OnSkillStartChanneling.AddDynamic(this, &UMMOCombatSystem::OnSkillStartChanneling);
+		Skill->OnSkillFinishChanneling.AddDynamic(this, &UMMOCombatSystem::OnSkillFinishChanneling);
 		Skill->OnSkillAborted.AddDynamic(this, &UMMOCombatSystem::OnSkillAbort);
 	}
 }
@@ -220,6 +225,11 @@ bool UMMOCombatSystem::IsStunned() const
 bool UMMOCombatSystem::IsCasting() const
 {
 	return OwnerCharacter ? OwnerCharacter->HasTag(CastTag) : false;
+}
+
+bool UMMOCombatSystem::IsChanneling() const
+{
+	return OwnerCharacter ? OwnerCharacter->HasTag(ChannelingTag) : false;
 }
 
 bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
@@ -295,19 +305,30 @@ void UMMOCombatSystem::OnCharacterChangeWeapon(AMMOBaseCharacter* Sender, AMMOBa
 	LastAttackTime = GetWorld()->GetTimeSeconds();
 }
 
-void UMMOCombatSystem::OnSkillStart(UMMOWrapperSkill* Sender)
+void UMMOCombatSystem::OnSkillStartCast(UMMOWrapperSkill* Sender)
 {
 	OwnerCharacter->GiveTag(CastTag);
 }
 
-void UMMOCombatSystem::OnSkillFinish(UMMOWrapperSkill* Sender)
+void UMMOCombatSystem::OnSkillFinishCast(UMMOWrapperSkill* Sender)
 {
 	OwnerCharacter->RemoveTag(CastTag);
+}
+
+void UMMOCombatSystem::OnSkillStartChanneling(UMMOWrapperSkill* Sender)
+{
+	OwnerCharacter->GiveTag(ChannelingTag);
+}
+
+void UMMOCombatSystem::OnSkillFinishChanneling(UMMOWrapperSkill* Sender)
+{
+	OwnerCharacter->RemoveTag(ChannelingTag);
 }
 
 void UMMOCombatSystem::OnSkillAbort(UMMOWrapperSkill* Sender)
 {
 	OwnerCharacter->RemoveTag(CastTag);
+	OwnerCharacter->RemoveTag(ChannelingTag);
 }
 
 void UMMOCombatSystem::OnCharacterStunned(AMMOBaseCharacter* Sender)
@@ -320,6 +341,7 @@ void UMMOCombatSystem::OnCharacterStunned(AMMOBaseCharacter* Sender)
 
 	OwnerCharacter->RemoveTag(AttackTag);
 	OwnerCharacter->RemoveTag(CastTag);
+	OwnerCharacter->RemoveTag(ChannelingTag);
 }
 
 bool UMMOCombatSystem::CanCharacterAttack() const
@@ -355,4 +377,14 @@ float UMMOCombatSystem::GetRemainingCooldown(int32 SpellIndex) const
 	}
 
 	return GetRemainingGlobalCooldown();
+}
+
+bool UMMOCombatSystem::IsSkillReady(int32 SpellIndex) const
+{
+	if (Skills.IsValidIndex(SpellIndex) )
+	{
+		return Skills[SpellIndex]->IsSkillReady();
+	}
+
+	return false;
 }

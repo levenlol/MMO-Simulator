@@ -30,5 +30,8 @@ bool UMMOBTDecorator_IsCasting::CalculateRawConditionValue(UBehaviorTreeComponen
 		return true;
 	}
 
-	return BaseCharacter->CombatSystem->IsCasting();
+	const bool bCasting = BaseCharacter->CombatSystem->IsCasting();
+	const bool bChanneling = bConsiderChanneling ? BaseCharacter->CombatSystem->IsChanneling() : false;
+
+	return bCasting || bChanneling;
 }

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatSystem/Skills/MMOTimeTickSkill.h"
+#include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "MMOBeamSkill.generated.h"
 
 class UParticleSystemComponent;
@@ -36,13 +36,17 @@ private:
 };
 
 UCLASS(Blueprintable)
-class MMO_SIMULATOR_API UMMOBeamSkill : public UMMOTimeTickSkill
+class MMO_SIMULATOR_API UMMOBeamSkill : public UMMOBaseSkill
 {
 	GENERATED_BODY()
 public:
 	UMMOBeamSkill();
 
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
+	virtual void CastAbility(const FMMOSkillInputData& Data) override;
+
+	virtual void Finish() override;
+	virtual void Abort() override;
 	
 	UPROPERTY(EditDefaultsOnly, Category = FX)
 	TSubclassOf<AMMOBeam> BeamClass;
@@ -55,10 +59,6 @@ public:
 private:
 	UPROPERTY(VisibleInstanceOnly, Category = FX)
 	AMMOBeam* Beam;
-
-	virtual void StartTick(const FMMOSkillInputData& Data);
-	virtual void EndTick(const FMMOSkillInputData& Data);
-	virtual void Step(const FMMOSkillInputData& Data, int32 TickCount);
 
 	void SetBeamActive(bool bActive);
 };

@@ -25,10 +25,15 @@ void UMMOBeamSkill::Setup(AMMOBaseCharacter* InOwner)
 	}
 }
 
-void UMMOBeamSkill::Step(const FMMOSkillInputData& Data, int32 TickCount)
+void UMMOBeamSkill::CastAbility(const FMMOSkillInputData& Data)
 {
+	Super::CastAbility(Data);
+
 	if (Beam && Data.TargetActor && OwnerCharacter)
 	{
+		Beam->SetBeamSourceTarget(OwnerCharacter, Data.TargetActor);
+		SetBeamActive(true);
+
 		const FVector StartLocation = OwnerCharacter->GetActorLocation();
 		const FVector EndLocation = Data.TargetActor->GetActorLocation();
 
@@ -55,16 +60,12 @@ void UMMOBeamSkill::Step(const FMMOSkillInputData& Data, int32 TickCount)
 	}
 }
 
-void UMMOBeamSkill::StartTick(const FMMOSkillInputData& Data)
+void UMMOBeamSkill::Finish()
 {
-	if (Beam && Data.TargetActor && OwnerCharacter)
-	{
-		Beam->SetBeamSourceTarget(OwnerCharacter, Data.TargetActor);
-		SetBeamActive(true);
-	}
+	SetBeamActive(false);
 }
 
-void UMMOBeamSkill::EndTick(const FMMOSkillInputData& Data)
+void UMMOBeamSkill::Abort()
 {
 	SetBeamActive(false);
 }

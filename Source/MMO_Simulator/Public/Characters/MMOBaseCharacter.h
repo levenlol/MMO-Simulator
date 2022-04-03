@@ -26,6 +26,7 @@ struct MMO_SIMULATOR_API FMMOStatusTags : public FGameplayTagNativeAdder
 	FGameplayTag SlowedTag;
 	FGameplayTag AttackTag;
 	FGameplayTag CastTag;
+	FGameplayTag ChannelingTag;
 
 	FORCEINLINE static const FMMOStatusTags& Get() { return StatusTags; }
 
@@ -39,6 +40,7 @@ protected:
 		SlowedTag = Manager.AddNativeGameplayTag(FName("Status.Malus.Slowed"));
 		AttackTag = Manager.AddNativeGameplayTag(FName("Status.Action.Attack"));
 		CastTag = Manager.AddNativeGameplayTag(FName("Status.Action.Cast"));
+		ChannelingTag = Manager.AddNativeGameplayTag(FName("Status.Action.Channeling"));
 	}
 private:
 	static FMMOStatusTags StatusTags;

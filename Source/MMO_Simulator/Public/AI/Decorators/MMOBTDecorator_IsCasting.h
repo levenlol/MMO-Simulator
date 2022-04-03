@@ -19,5 +19,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = Skill)
 	FBlackboardKeySelector SpellRequestedSelectorKey;
 
+	UPROPERTY(EditAnywhere, Category = Skill)
+	bool bConsiderChanneling = true;
+
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 };

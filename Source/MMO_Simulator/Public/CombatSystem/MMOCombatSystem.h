@@ -63,6 +63,9 @@ public:
 	bool IsCasting() const;
 
 	UFUNCTION(BlueprintPure, Category = Status)
+	bool IsChanneling() const;
+
+	UFUNCTION(BlueprintPure, Category = Status)
 	bool IsStunned() const;
 
 	UFUNCTION(BlueprintPure, Category = Status)
@@ -73,6 +76,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Skill)
 	float GetRemainingCooldown(int32 SpellIndex) const;
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	bool IsSkillReady(int32 SpellIndex) const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	float GlobalCooldown = 1.f;
@@ -87,6 +93,7 @@ private:
 	FGameplayTag AttackTag;
 	FGameplayTag StunnedTag;
 	FGameplayTag CastTag;
+	FGameplayTag ChannelingTag;
 
 	UPROPERTY(VisibleAnywhere, Category = Default)
 	AMMOBaseCharacter* OwnerCharacter = nullptr;
@@ -109,10 +116,16 @@ private:
 	void OnCharacterChangeWeapon(AMMOBaseCharacter* Sender, AMMOBaseWeapon* New, AMMOBaseWeapon* Old);
 
 	UFUNCTION()
-	void OnSkillStart(UMMOWrapperSkill* Sender);
+	void OnSkillStartCast(UMMOWrapperSkill* Sender);
 
 	UFUNCTION()
-	void OnSkillFinish(UMMOWrapperSkill* Sender);
+	void OnSkillFinishCast(UMMOWrapperSkill* Sender);
+
+	UFUNCTION()
+	void OnSkillStartChanneling(UMMOWrapperSkill* Sender);
+
+	UFUNCTION()
+	void OnSkillFinishChanneling(UMMOWrapperSkill* Sender);
 
 	UFUNCTION()
 	void OnSkillAbort(UMMOWrapperSkill* Sender);

@@ -35,34 +35,31 @@ const UMMOBaseSkill* UMMOBaseSkill::GetOuterSkill_Rec(const UMMOBaseSkill* InSki
 
 void UMMOWrapperSkill::Setup(AMMOBaseCharacter* InOwner)
 {
-	Super::Setup(InOwner);
+	OwnerCharacter = InOwner;
 
-	LastCastTime = -Cooldown;// Start with no cooldown
+	for (UMMOBaseSkill* Skill : TriggeredSkills)
+	{
+		Skill->Setup(InOwner);
+	}
+
+	LastCastTime = -Cooldown; // Start with no cooldown
+	CurrentCastingTime = 0.f; // not casting
+	CurrentChannelingTime = 0.f; // not channeling 
+
+	SkillState = EMMOSkillState::Ready;
 }
 
 void UMMOWrapperSkill::CastAbility(const FMMOSkillInputData& Data)
 {
-	if (IsInCooldown())
+	if (!IsSkillReady())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Requested to cast %s ability but failed because it was in cooldown."), *GetName());
-		return;
-	}
-
-	if (IsLocked())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Requested to cast %s ability but failed because it is locked."), *GetName());
-		return;
-	}
-
-	if (IsCasting())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Requested to cast %s ability but failed because it is already being casted."), *GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Requested to cast %s ability but failed because it was in status %d."), *GetName(), static_cast<int32>(SkillState));
 		return;
 	}
 
 	SavedInputData = Data;
 
-	OnSkillStart.Broadcast(this);
+	OnSkillStartCast.Broadcast(this);
 
 	if (FMath::IsNearlyZero(CastTime, KINDA_SMALL_NUMBER))
 	{
@@ -72,35 +69,21 @@ void UMMOWrapperSkill::CastAbility(const FMMOSkillInputData& Data)
 	{
 		// start cast
 		CurrentCastingTime = 0.f;
-		bCasting = true;
+		SkillState = EMMOSkillState::Casting;
 	}
-}
-
-void UMMOWrapperSkill::AbortAbility()
-{
-	if (!bCasting)
-		return;
-
-	// dont cast ability.
-	CurrentCastingTime = CastTime;
-	bCasting = false;
-
-	OnSkillAborted.Broadcast(this);
 }
 
 void UMMOWrapperSkill::Tick(float DeltaSeconds)
 {
-	if (!bCasting)
-		return;
-
-	CurrentCastingTime += DeltaSeconds;
-
-	if (CurrentCastingTime >= CastTime)
+	if (SkillState == EMMOSkillState::Casting)
 	{
-		FinishCastAbility();
+		CurrentCastingTime += DeltaSeconds;
 
-		CurrentCastingTime = CastTime;
-		bCasting = false;
+		if (CurrentCastingTime >= CastTime)
+		{
+			CurrentCastingTime = CastTime;
+			FinishCastAbility(); // side effect to change SkillState
+		}
 	}
 }
 
@@ -137,7 +120,7 @@ float UMMOWrapperSkill::GetRemainingCooldown() const
 
 float UMMOWrapperSkill::GetCastingPercent() const
 {
-	if (bCasting)
+	if (IsInCooldown())
 	{
 		return CurrentCastingTime / CastTime;
 	}
@@ -147,14 +130,84 @@ float UMMOWrapperSkill::GetCastingPercent() const
 
 void UMMOWrapperSkill::FinishCastAbility()
 {
-	LastCastTime = GetWorld()->GetTimeSeconds();
+	if (ChannelingTime <= 0.f)
+	{
+		for (UMMOBaseSkill* Skill : TriggeredSkills)
+		{
+			Skill->CastAbility(SavedInputData);
+			Skill->Finish();
+		}
 
+		SkillState = EMMOSkillState::Ready; // put it back in ready status after casting.
+		StartCooldown(); // start cooldown
+
+		OnSkillFinishCast.Broadcast(this);
+	}
+	else
+	{
+		// start channeling
+		SkillState = EMMOSkillState::Channeling;
+
+		CurrentTick = 0;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMMOWrapperSkill::TickChanneling, ChannelingTime / static_cast<float>(ChannelingTickNumber), true, 0.f);
+
+
+		OnSkillFinishCast.Broadcast(this);
+		OnSkillStartChanneling.Broadcast(this);
+	}
+}
+
+void UMMOWrapperSkill::TickChanneling()
+{
 	for (UMMOBaseSkill* Skill : TriggeredSkills)
 	{
 		Skill->CastAbility(SavedInputData);
 	}
 
-	OnSkillFinish.Broadcast(this);
+	CurrentTick++;
+	if (CurrentTick >= ChannelingTickNumber)
+	{
+		for (UMMOBaseSkill* Skill : TriggeredSkills)
+		{
+			Skill->Finish();
+		}
+
+		StartCooldown();
+
+		SkillState = EMMOSkillState::Ready;
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+
+		OnSkillFinishChanneling.Broadcast(this);
+	}
+}
+
+void UMMOWrapperSkill::AbortAbility()
+{
+	if (SkillState != EMMOSkillState::Casting && SkillState != EMMOSkillState::Channeling)
+	{
+		return;
+	}
+
+	for (UMMOBaseSkill* Skill : TriggeredSkills)
+	{
+		Skill->Abort();
+	}
+
+	if (SkillState == EMMOSkillState::Casting)
+	{
+		// dont cast ability.
+		CurrentCastingTime = CastTime;
+	}
+
+	if (SkillState == EMMOSkillState::Channeling)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+		CurrentChannelingTime = ChannelingTime;
+		StartCooldown(); // put it in cooldown
+	}
+
+	SkillState = EMMOSkillState::Ready; // back to ready
+	OnSkillAborted.Broadcast(this);
 }
 
 AMMOFXActor::AMMOFXActor()
