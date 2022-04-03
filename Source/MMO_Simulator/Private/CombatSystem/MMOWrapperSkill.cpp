@@ -20,7 +20,7 @@ void UMMOWrapperSkill::Setup(AMMOBaseCharacter* InOwner)
 	SkillState = EMMOSkillState::Ready;
 }
 
-void UMMOWrapperSkill::CastAbility(const FMMOSkillInputData& Data)
+void UMMOWrapperSkill::TryCastAbility(const FMMOSkillInputData& Data)
 {
 	if (!IsSkillReady())
 	{
@@ -34,7 +34,7 @@ void UMMOWrapperSkill::CastAbility(const FMMOSkillInputData& Data)
 
 	if (FMath::IsNearlyZero(CastTime, KINDA_SMALL_NUMBER))
 	{
-		FinishCastAbility();
+		CastAbility();
 	}
 	else
 	{
@@ -53,7 +53,7 @@ void UMMOWrapperSkill::Tick(float DeltaSeconds)
 		if (CurrentCastingTime >= CastTime)
 		{
 			CurrentCastingTime = CastTime;
-			FinishCastAbility(); // side effect to change SkillState
+			CastAbility(); // side effect to change SkillState
 		}
 	}
 }
@@ -99,7 +99,7 @@ float UMMOWrapperSkill::GetCastingPercent() const
 	return 0.0f;
 }
 
-void UMMOWrapperSkill::FinishCastAbility()
+void UMMOWrapperSkill::CastAbility()
 {
 	if (ChannelingTime <= 0.f)
 	{
@@ -109,9 +109,7 @@ void UMMOWrapperSkill::FinishCastAbility()
 			Skill->Finish();
 		}
 
-		SkillState = EMMOSkillState::Ready; // put it back in ready status after casting.
-		StartCooldown(); // start cooldown
-
+		FinishCastAbility();
 		OnSkillFinishCast.Broadcast(this);
 	}
 	else
@@ -126,6 +124,12 @@ void UMMOWrapperSkill::FinishCastAbility()
 		OnSkillFinishCast.Broadcast(this);
 		OnSkillStartChanneling.Broadcast(this);
 	}
+}
+
+void UMMOWrapperSkill::FinishCastAbility()
+{
+	SkillState = EMMOSkillState::Ready; // put it back in ready status after casting.
+	StartCooldown(); // start cooldown
 }
 
 void UMMOWrapperSkill::TickChanneling()
@@ -143,9 +147,7 @@ void UMMOWrapperSkill::TickChanneling()
 			Skill->Finish();
 		}
 
-		StartCooldown();
-
-		SkillState = EMMOSkillState::Ready;
+		FinishCastAbility();
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 
 		OnSkillFinishChanneling.Broadcast(this);

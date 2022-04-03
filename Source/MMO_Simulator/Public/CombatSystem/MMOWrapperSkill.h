@@ -40,8 +40,8 @@ public:
 	FGameplayTagContainer Tags;
 
 	void Setup(AMMOBaseCharacter* InOwner);
-	void CastAbility(const FMMOSkillInputData& Data);
-	void AbortAbility();
+	virtual void TryCastAbility(const FMMOSkillInputData& Data);
+	virtual void AbortAbility();
 
 	void Tick(float DeltaSeconds);
 
@@ -88,14 +88,22 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = Skills)
 	TArray<UMMOBaseSkill*> TriggeredSkills;
 
-private:
+protected:
+	EMMOSkillState SkillState = EMMOSkillState::Ready;
+
+	UPROPERTY()
+	AMMOBaseCharacter* OwnerCharacter;
+
+	void CastAbility();
+	virtual void FinishCastAbility();
+
 	float LastCastTime = 0.f; // used to track cooldown
 	float CurrentCastingTime = 0.f; // used to cast the ability (if cast time > 0)
 	float CurrentChannelingTime = 0.f; // used to channeling the ability (if channeling time > 0)
 
-	EMMOSkillState SkillState = EMMOSkillState::Ready;
+	FMMOSkillInputData SavedInputData; // Copy of InputData params
+private:
 
-	void FinishCastAbility();
 	FORCEINLINE void StartCooldown() { LastCastTime = GetWorld()->GetTimeSeconds(); }
 
 	FTimerHandle TimerHandle;
@@ -103,9 +111,4 @@ private:
 
 	UFUNCTION()
 	void TickChanneling();
-
-	UPROPERTY()
-	AMMOBaseCharacter* OwnerCharacter;
-
-	FMMOSkillInputData SavedInputData; // Copy of InputData params
 };

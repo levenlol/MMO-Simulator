@@ -110,7 +110,7 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 	InputData.SourceActor = OwnerCharacter;
 	InputData.SourceLocation = OwnerCharacter->GetActorLocation();
 
-	Skills[Index]->CastAbility(InputData);
+	Skills[Index]->TryCastAbility(InputData);
 
 	LastSpellCastTime = GetWorld()->GetTimeSeconds();
 	LastAttackTime = LastSpellCastTime;

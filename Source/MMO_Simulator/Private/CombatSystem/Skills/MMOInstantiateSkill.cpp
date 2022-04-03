@@ -51,7 +51,7 @@ void UMMOInstantiateSkill::CastAbility(const FMMOSkillInputData& Data)
 				InputData.SourceLocation = Data.TargetLocation;
 				InputData.SourceActor = Data.TargetActor;
 
-				SkillsToPropagate[i]->CastAbility(InputData);
+				SkillsToPropagate[i]->TryCastAbility(InputData);
 				TargetHit++;
 
 				if (TargetHit >= TargetCap)
