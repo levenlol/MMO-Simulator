@@ -76,12 +76,13 @@ void AMMOBaseCharacter::DamageTake(FMMODamage InDamage)
 		// Damage reduction percentage.
 		const float DamageReduction = UMMOGameplayUtils::GetDamageReduction(this, InDamage.DamageDealer, InDamage.DamageType);
 
-		DamageToApply = DamageToApply * DamageReduction;
+		DamageToApply = FMath::Max(0, DamageToApply - DamageToApply * DamageReduction);
 	}
 
 	// actual damage implementation.
 	CharacterInfo.Stats.Health = FMath::Clamp(CharacterInfo.Stats.Health - DamageToApply, 0, CharacterInfo.Stats.MaxHealth);
 
+	InDamage.Damage = DamageToApply;
 	OnDamageTaken.Broadcast(this, InDamage);
 
 	if (CharacterInfo.Stats.Health <= 0 && bAlive)
