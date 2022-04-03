@@ -121,7 +121,6 @@ void UMMOStatsManager::RecomputeAttributes()
 {
 	RecomputeBaseAttributes();
 	UpdateCharacterAttributes();
-	ComputeSecondaryAttributes();
 }
 
 void UMMOStatsManager::RecomputeBaseAttributes()
@@ -175,6 +174,19 @@ void UMMOStatsManager::UpdateCharacterAttributes()
 	}
 }
 
+void UMMOStatsManager::RefreshMathExpressions()
+{
+	ParryExpression.RefreshVariables();
+	BlockExpression.RefreshVariables();
+	DodgeExpression.RefreshVariables();
+	AttackPowerExpression.RefreshVariables();
+	SpellPowerExpression.RefreshVariables();
+	AttackCritExpression.RefreshVariables();
+	SpellCritExpression.RefreshVariables();
+	HealthExpression.RefreshVariables();
+	ManaExpression.RefreshVariables();
+}
+
 void UMMOStatsManager::RecomputeCombatAttributesChances()
 {
 	if (OwnerCharacter)
@@ -218,6 +230,7 @@ void UMMOStatsManager::RecomputeCombatAttributesChances()
 
 void UMMOStatsManager::ComputeSecondaryAttributes()
 {
+	RefreshMathExpressions();
 	RecomputeCombatAttributesChances();
 	RecomputeHealthAndResources();
 }

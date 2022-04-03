@@ -111,4 +111,6 @@ protected:
 
 	// compute attributes and combat attributes and then set it to the character.
 	void UpdateCharacterAttributes();
+
+	void RefreshMathExpressions();
 };
