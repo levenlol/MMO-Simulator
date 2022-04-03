@@ -5,7 +5,7 @@
 #include "Characters/MMOBaseCharacter.h"
 #include "AI/MMOAIController.h"
 #include "CombatSystem/MMOCombatSystem.h"
-#include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "CombatSystem/MMOWrapperSkill.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 #define CHECK_RETURN_SPELLHANDLED(foo) MMOAI::ESelectAbilityResult Result = foo;\

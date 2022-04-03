@@ -6,7 +6,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "CombatSystem/MMOCombatSystem.h"
-#include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "CombatSystem/MMOWrapperSkill.h"
 
 UBTDecorator_CanCastAbility::UBTDecorator_CanCastAbility()
 	: Super()
