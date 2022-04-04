@@ -67,7 +67,7 @@ void AMMOBaseCharacter::OnRecuperate()
 
 void AMMOBaseCharacter::DamageTake(FMMODamage InDamage)
 {
-	// handle physical damage. Physical damages can be dodged/parryed etc
+	// handle physical damage. Physical damages can be dodged/blocked etc
 	int32 DamageToApply = InDamage.Damage;
 	
 	// Damage > 0 indicates that is a damage. Damage < 0 is a healing

@@ -10,11 +10,6 @@ UMMOStatsManager::UMMOStatsManager()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// Init parry
-	ParryExpression.VariableMap.Add(FString("Strength"), FString("OwnerCharacter.CharacterInfo.Attributes.Strength"));
-	ParryExpression.VariableMap.Add(FString("ParryRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.ParryRating"));
-	ParryExpression.Expression = FString("2 + Strength / 25 + ParryRating / 25");
-
 	// Init block
 	BlockExpression.VariableMap.Add(FString("Strength"), FString("OwnerCharacter.CharacterInfo.Attributes.Strength"));
 	BlockExpression.VariableMap.Add(FString("BlockRating"), FString("OwnerCharacter.CharacterInfo.CombatAttributes.BlockRating"));
@@ -67,7 +62,6 @@ void UMMOStatsManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ParryExpression.Init(this);
 	BlockExpression.Init(this);
 	DodgeExpression.Init(this);
 	AttackPowerExpression.Init(this);
@@ -84,7 +78,6 @@ void UMMOStatsManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	ParryExpression.Release();
 	BlockExpression.Release();
 	DodgeExpression.Release();
 	AttackCritExpression.Release();
@@ -176,7 +169,6 @@ void UMMOStatsManager::UpdateCharacterAttributes()
 
 void UMMOStatsManager::RefreshMathExpressions()
 {
-	ParryExpression.RefreshVariables();
 	BlockExpression.RefreshVariables();
 	DodgeExpression.RefreshVariables();
 	AttackPowerExpression.RefreshVariables();
@@ -191,11 +183,6 @@ void UMMOStatsManager::RecomputeCombatAttributesChances()
 {
 	if (OwnerCharacter)
 	{
-		if (ParryExpression.IsValid())
-		{
-			ParryChance = ParryExpression.Eval<float>();
-		}
-
 		if (BlockExpression.IsValid())
 		{
 			BlockChance = BlockExpression.Eval<float>();

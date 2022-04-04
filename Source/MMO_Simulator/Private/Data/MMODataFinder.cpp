@@ -139,6 +139,24 @@ const FMMOEquipGeneratorQualifyingNameultiplierDataTable& UMMODataFinder::GetEqu
 	return ZeroData;
 }
 
+const FMMOEquipGeneratorQualifyingNameultiplierDataTable& UMMODataFinder::GetEquipGeneratorQualifyingMultipliers(const FString& Qualifier) const
+{
+	const FMMOEquipGeneratorQualifyingNameultiplierDataTable* Element = QualifyingNameEquipMultiplier.FindByPredicate([Qualifier](const FMMOEquipGeneratorQualifyingNameultiplierDataTable& Element)
+		{
+			return Element.QualifyingName.Equals(Qualifier, ESearchCase::Type::IgnoreCase);
+		});
+
+	if (Element)
+	{
+		return *Element;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("GetEquipGeneratorRandomQualifyingMultipliers didnt find: %s qualifier"), *Qualifier);
+
+	static FMMOEquipGeneratorQualifyingNameultiplierDataTable ZeroData;
+	return ZeroData;
+}
+
 void UMMODataFinder::AddEquipGeneratorData(EMMORarityType Rarity, const FName& DataTableID)
 {
 	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());

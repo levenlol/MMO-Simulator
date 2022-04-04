@@ -170,9 +170,6 @@ public:
 	int32 DodgeRating;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 ParryRating;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
 	int32 BlockRating;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
@@ -339,6 +336,9 @@ struct MMO_SIMULATOR_API FMMOItemStats
 	GENERATED_BODY()
 public:
 	FMMOItemStats() = default;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FString ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	FMMOCharacterAttributes Attributes;

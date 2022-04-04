@@ -225,6 +225,7 @@ public:
 	const FMMOEquipGeneratorDataTable& GetEquipGeneratorArmorSlotMultipliers(EMMOArmorSlotType ArmorSlot) const;
 	const FMMOEquipGeneratorDataTable& GetEquipGeneratorWeaponTypeMultipliers(EMMOWeaponType WeaponType) const;
 	const FMMOEquipGeneratorQualifyingNameultiplierDataTable& GetEquipGeneratorRandomQualifyingMultipliers() const;
+	const FMMOEquipGeneratorQualifyingNameultiplierDataTable& GetEquipGeneratorQualifyingMultipliers(const FString& Qualifier) const;
 
 
 private:

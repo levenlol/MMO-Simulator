@@ -34,9 +34,6 @@ public:
 	const FMMOCharacterAttributes& GetCharacterNakedAttributes() const { return BaseAttributes; }
 
 	UPROPERTY(EditAnywhere, Category = Attributes)
-	FMMOMathExpression ParryExpression;
-
-	UPROPERTY(EditAnywhere, Category = Attributes)
 	FMMOMathExpression BlockExpression;
 
 	UPROPERTY(EditAnywhere, Category = Attributes)
@@ -60,7 +57,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = Initialization)
 	FMMOMathExpression ManaExpression;
 
-	FORCEINLINE float GetParryChance() const { return ParryChance; }
 	FORCEINLINE float GetBlockChance() const { return BlockChance; }
 	FORCEINLINE float GetDodgeChance() const { return DodgeChance; }
 	FORCEINLINE float GetAttackCritChance() const { return AttackCritChance; }
@@ -76,9 +72,6 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnRegister() override;
 	virtual void OnUnregister() override;
-
-	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
-	float ParryChance;
 
 	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
 	float BlockChance;
