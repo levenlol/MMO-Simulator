@@ -163,22 +163,35 @@ struct MMO_SIMULATOR_API FMMOCombatAttributes
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 SpellCritChanceRating;
+	int32 SpellCritChanceRating = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 AttackCritChanceRating;
+	int32 AttackCritChanceRating = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 DodgeRating;
+	int32 DodgeRating = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 BlockRating;
+	int32 BlockRating = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 AttackPower;
+	int32 AttackPower = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attributes)
-	int32 SpellPower;
+	int32 SpellPower = 0;
+
+	FMMOCombatAttributes operator+(const FMMOCombatAttributes& Other) const
+	{
+		FMMOCombatAttributes ReturnAttributes = *this;
+		ReturnAttributes.SpellCritChanceRating += Other.SpellCritChanceRating;
+		ReturnAttributes.AttackCritChanceRating += Other.AttackCritChanceRating;
+		ReturnAttributes.DodgeRating += Other.DodgeRating;
+		ReturnAttributes.BlockRating += Other.BlockRating;
+		ReturnAttributes.AttackPower += Other.AttackPower;
+		ReturnAttributes.SpellPower += Other.SpellPower;
+
+		return ReturnAttributes;
+	}
 };
 
 USTRUCT(BlueprintType)

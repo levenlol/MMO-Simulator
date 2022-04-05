@@ -125,6 +125,17 @@ void UMMOStatsManager::RecomputeBaseAttributes()
 	BaseAttributes.Dexterity *= RaceAttributes.Dexterity / 100.f;
 }
 
+void UMMOStatsManager::RecomputeCombatAttributes()
+{
+	FMMOCombatAttributes CombatAttributes;
+	for (const TPair<EMMOArmorSlotType, FMMOItemStats>& Item : OwnerCharacter->EquippedArmor)
+	{
+		CombatAttributes = CombatAttributes + Item.Value.CombatAttributes;
+	}
+
+	OwnerCharacter->CharacterInfo.CombatAttributes = CombatAttributes;
+}
+
 void UMMOStatsManager::RecomputeHealthAndResources()
 {
 	if (!OwnerCharacter)
@@ -214,6 +225,7 @@ void UMMOStatsManager::RecomputeCombatAttributesChances()
 
 void UMMOStatsManager::ComputeSecondaryAttributes()
 {
+	RecomputeCombatAttributes();
 	RefreshMathExpressions();
 	RecomputeCombatAttributesChances();
 	RecomputeHealthAndResources();

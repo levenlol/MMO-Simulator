@@ -101,6 +101,7 @@ protected:
 	void RecomputeAttributes();
 
 	void RecomputeBaseAttributes();
+	void RecomputeCombatAttributes();
 	void RecomputeHealthAndResources();
 
 	// compute attributes and combat attributes and then set it to the character.
