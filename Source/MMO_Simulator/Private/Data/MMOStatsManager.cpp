@@ -118,7 +118,7 @@ void UMMOStatsManager::RecomputeBaseAttributes()
 	BaseAttributes = BaseAttributes + UMMODataFinder::Get()->GetCharacterProgressionAtLevel(OwnerCharacter->CharacterInfo.CharacterClass, OwnerCharacter->CharacterInfo.Level);
 
 	// add attributes for race
-	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(InRace);
+	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(OwnerCharacter->CharacterInfo.Race);
 	BaseAttributes.Strength *= RaceAttributes.Strength / 100.f;
 	BaseAttributes.Intellect *= RaceAttributes.Intellect / 100.f;
 	BaseAttributes.Constitution *= RaceAttributes.Constitution / 100.f;
