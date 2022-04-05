@@ -36,4 +36,10 @@ private:
 
 	void Init();
 	void Uninit();
+
+	UPROPERTY()
+	UEnum* ArmorSlotEnum;
+	
+	UPROPERTY()
+	UEnum* RarityEnum;
 };

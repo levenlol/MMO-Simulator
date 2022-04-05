@@ -68,10 +68,11 @@ protected:
 	UFUNCTION()
 	void OnCharacterInitialized(AMMOBaseCharacter* Sender);
 
+	UFUNCTION()
+	void OnArmorEquipped(AMMOBaseCharacter* Sender, EMMOArmorSlotType Slot, const FMMOItemStats& Item);
+
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	virtual void OnRegister() override;
-	virtual void OnUnregister() override;
 
 	UPROPERTY(VisibleAnywhere, Category = CombatAttributes)
 	float BlockChance;

@@ -25,12 +25,6 @@ void UMMOEquipGenerator::Shutdown()
 
 EMMORarityType UMMOEquipGenerator::PickRarityFromProbabilityDistribution(TArray<float> ProbabilityDistribution) const
 {
-	UEnum* RarityEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMORarityType"));
-	if (!RarityEnum)
-	{
-		UE_LOG(LogTemp, Fatal, TEXT("Cannot find enum EMMORarityType"));
-	}
-
 	const int32 RarityNum = RarityEnum->NumEnums() - 1;
 	const int32 SafeMaxNum = FMath::Min(RarityNum, ProbabilityDistribution.Num());
 
@@ -138,21 +132,27 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 
 FString UMMOEquipGenerator::GetEquipSlotName(EMMOArmorSlotType ArmorSlotType) const
 {
-	UEnum* ArmorSlotEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOArmorSlotType"));
-	if (!ArmorSlotEnum)
-	{
-		UE_LOG(LogTemp, Fatal, TEXT("Cannot find enum EMMOArmorSlotType"));
-	}
-
 	return ArmorSlotEnum->GetNameStringByValue(static_cast<int64>(ArmorSlotType));
 }
 
 void UMMOEquipGenerator::Init()
 {
+	ArmorSlotEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOArmorSlotType"));
+	if (!ArmorSlotEnum)
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("Cannot find enum EMMOArmorSlotType"));
+	}
 
+	RarityEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMORarityType"));
+	if (!RarityEnum)
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("Cannot find enum EMMORarityType"));
+	}
 }
 
 void UMMOEquipGenerator::Uninit()
 {
+	ArmorSlotEnum = nullptr;
+	RarityEnum = nullptr;
 }
 

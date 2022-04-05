@@ -227,7 +227,6 @@ public:
 	const FMMOEquipGeneratorQualifyingNameultiplierDataTable& GetEquipGeneratorRandomQualifyingMultipliers() const;
 	const FMMOEquipGeneratorQualifyingNameultiplierDataTable& GetEquipGeneratorQualifyingMultipliers(const FString& Qualifier) const;
 
-
 private:
 	static UMMODataFinder* Instance;
 

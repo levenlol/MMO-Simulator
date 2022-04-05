@@ -16,6 +16,7 @@ class UMMOStatsManager;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharacter*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FMMOOnArmorEquip, AMMOBaseCharacter*, Sender, EMMOArmorSlotType, Slot, const FMMOItemStats&, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FMMOOnEquipWeapon, AMMOBaseCharacter*, Sender, AMMOBaseWeapon*, NewWeapon, AMMOBaseWeapon*, OldWeapon);
 
 
@@ -130,11 +131,20 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOOnDamageTaken OnDamageTaken;
 
+	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOOnArmorEquip OnArmorEquipped;
+
 	UPROPERTY(BlueprintAssignable, Category = Weapon)
 	FMMOOnEquipWeapon OnEquipWeapon;
 
 	UPROPERTY(VisibleAnywhere, Category = Status)
 	FGameplayTagContainer StatusTags;
+
+	UFUNCTION(BlueprintCallable, Category = Equip)
+	void EquipArmor(EMMOArmorSlotType Slot, const FMMOItemStats& InItem);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equip)
+	TMap<EMMOArmorSlotType, FMMOItemStats> EquippedArmor;
 
 protected:
 

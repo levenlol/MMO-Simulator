@@ -31,6 +31,14 @@ void AMMOBaseCharacter::Stun_Implementation(float InDuration)
 	StunTimerRemaining = FMath::Max(StunTimerRemaining, InDuration);
 }
 
+void AMMOBaseCharacter::EquipArmor(EMMOArmorSlotType Slot, const FMMOItemStats& InItem)
+{
+	FMMOItemStats& FindSlot = EquippedArmor.FindOrAdd(Slot);
+	FindSlot = InItem;
+
+	OnArmorEquipped.Broadcast(this, Slot, InItem);
+}
+
 // Called when the game starts or when spawned
 void AMMOBaseCharacter::BeginPlay()
 {

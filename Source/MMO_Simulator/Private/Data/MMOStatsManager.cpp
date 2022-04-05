@@ -50,17 +50,27 @@ UMMOStatsManager::UMMOStatsManager()
 
 void UMMOStatsManager::OnCharacterInitialized(AMMOBaseCharacter* Sender)
 {
-	if (HasBegunPlay())
-	{
-		check(Sender == OwnerCharacter);
+	check(Sender == OwnerCharacter);
 
-		RecomputeAttributes();
-	}
+	RecomputeAttributes();
+}
+
+void UMMOStatsManager::OnArmorEquipped(AMMOBaseCharacter* Sender, EMMOArmorSlotType Slot, const FMMOItemStats& Item)
+{
+	RecomputeAttributes();
 }
 
 void UMMOStatsManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
+
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->OnCharacterInitialized.AddUniqueDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
+		OwnerCharacter->OnArmorEquipped.AddUniqueDynamic(this, &UMMOStatsManager::OnArmorEquipped);
+	}
 
 	BlockExpression.Init(this);
 	DodgeExpression.Init(this);
@@ -86,27 +96,11 @@ void UMMOStatsManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	SpellPowerExpression.Release();
 	HealthExpression.Release();
 	ManaExpression.Release();
-}
-
-void UMMOStatsManager::OnRegister()
-{
-	Super::OnRegister();
-
-	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
-
-	if (OwnerCharacter)
-	{
-		OwnerCharacter->OnCharacterInitialized.AddUniqueDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
-	}
-}
-
-void UMMOStatsManager::OnUnregister()
-{
-	Super::OnUnregister();
 
 	if (OwnerCharacter)
 	{
 		OwnerCharacter->OnCharacterInitialized.RemoveDynamic(this, &UMMOStatsManager::OnCharacterInitialized);
+		OwnerCharacter->OnArmorEquipped.RemoveDynamic(this, &UMMOStatsManager::OnArmorEquipped);
 	}
 }
 
@@ -124,11 +118,11 @@ void UMMOStatsManager::RecomputeBaseAttributes()
 	BaseAttributes = BaseAttributes + UMMODataFinder::Get()->GetCharacterProgressionAtLevel(OwnerCharacter->CharacterInfo.CharacterClass, OwnerCharacter->CharacterInfo.Level);
 
 	// add attributes for race
-	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(OwnerCharacter->CharacterInfo.Race);
-	BaseAttributes.Strength += FMath::RoundToInt(RaceAttributes.Strength * BaseAttributes.Strength / 100.f);
-	BaseAttributes.Intellect += FMath::RoundToInt(RaceAttributes.Intellect * BaseAttributes.Intellect / 100.f);
-	BaseAttributes.Constitution += FMath::RoundToInt(RaceAttributes.Constitution * BaseAttributes.Constitution / 100.f);
-	BaseAttributes.Dexterity += FMath::RoundToInt(RaceAttributes.Dexterity * BaseAttributes.Dexterity / 100.f);
+	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(InRace);
+	BaseAttributes.Strength *= RaceAttributes.Strength / 100.f;
+	BaseAttributes.Intellect *= RaceAttributes.Intellect / 100.f;
+	BaseAttributes.Constitution *= RaceAttributes.Constitution / 100.f;
+	BaseAttributes.Dexterity *= RaceAttributes.Dexterity / 100.f;
 }
 
 void UMMOStatsManager::RecomputeHealthAndResources()
@@ -156,9 +150,12 @@ void UMMOStatsManager::UpdateCharacterAttributes()
 {
 	if (OwnerCharacter)
 	{
-		// TODO: sum equip stats.
+		// Sum equip stats.
 		FMMOCharacterAttributes FullAttributes = BaseAttributes;
-		// ... sum equip attributes...
+		for (const TPair<EMMOArmorSlotType, FMMOItemStats>& Item : OwnerCharacter->EquippedArmor)
+		{
+			FullAttributes = FullAttributes + Item.Value.Attributes;
+		}
 
 		OwnerCharacter->CharacterInfo.Attributes = FullAttributes;
 

@@ -56,10 +56,10 @@ FMMOCharacter UMMOCharacterGenerator::GenerateCharacter(EMMOCharacterClass InCla
 	Character.Attributes.Dexterity += AttributesProgress.Dexterity;
  
 	FMMOCharacterAttributes RaceAttributes = UMMODataFinder::Get()->GetRaceAttributes(InRace);
-	Character.Attributes.Strength += FMath::RoundToInt(RaceAttributes.Strength * Character.Attributes.Strength / 100.f);
-	Character.Attributes.Intellect += FMath::RoundToInt(RaceAttributes.Intellect * Character.Attributes.Intellect / 100.f);
-	Character.Attributes.Constitution += FMath::RoundToInt(RaceAttributes.Constitution * Character.Attributes.Constitution / 100.f);
-	Character.Attributes.Dexterity += FMath::RoundToInt(RaceAttributes.Dexterity * Character.Attributes.Dexterity / 100.f);
+	Character.Attributes.Strength *= RaceAttributes.Strength / 100.f;
+	Character.Attributes.Intellect *= RaceAttributes.Intellect / 100.f;
+	Character.Attributes.Constitution *= RaceAttributes.Constitution / 100.f;
+	Character.Attributes.Dexterity *= RaceAttributes.Dexterity / 100.f;
 
 	return Character;
 }
