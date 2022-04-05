@@ -97,9 +97,11 @@ enum class EMMOArmorSlotType : uint8
 {
 	Head,
 	Shoulder,
+	Arms,
 	Chest,
 	Legs,
-	Feet,
+	Feets,
+	Ring,
 	Trinket
 };
 
