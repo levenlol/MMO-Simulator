@@ -78,7 +78,7 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 	EquipStats.ItemName = GetEquipSlotName(ArmorSlotType) + TEXT(" ") + EquipQualifyGenerator.QualifyingName;
 	EquipStats.ItemLevel = ItemLevel;
 
-	// base stats
+	// Base stats
 	EquipStats.Attributes.Strength = EquipGenerator.Strength;
 	EquipStats.Attributes.Intellect = EquipGenerator.Intellect;
 	EquipStats.Attributes.Constitution = EquipGenerator.Constitution;
@@ -92,17 +92,20 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 
 	// Apply multipliers
 	// Armor type multipliers
-	EquipStats.Attributes.Strength *= EquipArmorTypeGenerator.Strength / 100.f;
-	EquipStats.Attributes.Intellect *= EquipArmorTypeGenerator.Intellect / 100.f;
-	EquipStats.Attributes.Constitution *= EquipArmorTypeGenerator.Constitution / 100.f;
-	EquipStats.Attributes.Dexterity *= EquipArmorTypeGenerator.Dexterity / 100.f;
-	EquipStats.CombatAttributes.AttackCritChanceRating *= EquipArmorTypeGenerator.MeleeCritRating / 100.f;
-	EquipStats.CombatAttributes.AttackPower *= EquipArmorTypeGenerator.AttackPower / 100.f;
-	EquipStats.CombatAttributes.BlockRating *= EquipArmorTypeGenerator.BlockRating / 100.f;
-	EquipStats.CombatAttributes.DodgeRating *= EquipArmorTypeGenerator.DodgeRating / 100.f;
-	EquipStats.CombatAttributes.SpellPower *= EquipArmorTypeGenerator.SpellPower / 100.f;
-	EquipStats.CombatAttributes.SpellCritChanceRating *= EquipArmorTypeGenerator.SpellCritRating / 100.f;
-
+	if (ArmorSlotType != EMMOArmorSlotType::Ring && ArmorSlotType != EMMOArmorSlotType::Trinket)
+	{
+		EquipStats.Attributes.Strength *= EquipArmorTypeGenerator.Strength / 100.f;
+		EquipStats.Attributes.Intellect *= EquipArmorTypeGenerator.Intellect / 100.f;
+		EquipStats.Attributes.Constitution *= EquipArmorTypeGenerator.Constitution / 100.f;
+		EquipStats.Attributes.Dexterity *= EquipArmorTypeGenerator.Dexterity / 100.f;
+		EquipStats.CombatAttributes.AttackCritChanceRating *= EquipArmorTypeGenerator.MeleeCritRating / 100.f;
+		EquipStats.CombatAttributes.AttackPower *= EquipArmorTypeGenerator.AttackPower / 100.f;
+		EquipStats.CombatAttributes.BlockRating *= EquipArmorTypeGenerator.BlockRating / 100.f;
+		EquipStats.CombatAttributes.DodgeRating *= EquipArmorTypeGenerator.DodgeRating / 100.f;
+		EquipStats.CombatAttributes.SpellPower *= EquipArmorTypeGenerator.SpellPower / 100.f;
+		EquipStats.CombatAttributes.SpellCritChanceRating *= EquipArmorTypeGenerator.SpellCritRating / 100.f;
+	}
+	
 	// Armor slot multipliers
 	EquipStats.Attributes.Strength *= EquipArmorSlotGenerator.Strength / 100.f;
 	EquipStats.Attributes.Intellect *= EquipArmorSlotGenerator.Intellect / 100.f;
