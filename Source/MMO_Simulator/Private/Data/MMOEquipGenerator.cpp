@@ -77,6 +77,10 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 	FMMOItemStats EquipStats;
 	EquipStats.ItemName = GetEquipSlotName(ArmorSlotType) + TEXT(" ") + EquipQualifyGenerator.QualifyingName;
 	EquipStats.ItemLevel = ItemLevel;
+	EquipStats.Rarity = Rarity;
+	EquipStats.Durability = 100;
+	EquipStats.ArmorSlot = ArmorSlotType;
+	EquipStats.ArmorType = ArmorType;
 
 	// Base stats
 	EquipStats.Attributes.Strength = EquipGenerator.Strength;
@@ -89,6 +93,14 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 	EquipStats.CombatAttributes.DodgeRating = EquipGenerator.DodgeRating;
 	EquipStats.CombatAttributes.SpellPower = EquipGenerator.SpellPower;
 	EquipStats.CombatAttributes.SpellCritChanceRating = EquipGenerator.SpellCritRating;
+	EquipStats.Resistances.Armor = EquipGenerator.Armor;
+	EquipStats.Resistances.ArcaneResistance = EquipGenerator.ArcaneResistance;
+	EquipStats.Resistances.FireResistance = EquipGenerator.FireResistance;
+	EquipStats.Resistances.HolyResistance = EquipGenerator.HolyResistance;
+	EquipStats.Resistances.IceResistance = EquipGenerator.IceResistance;
+	EquipStats.Resistances.NatureResistance = EquipGenerator.NatureResistance;
+	EquipStats.Resistances.ShadowResistance = EquipGenerator.ShadowResistance;
+	
 
 	// Apply multipliers
 	// Armor type multipliers
@@ -104,6 +116,13 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 		EquipStats.CombatAttributes.DodgeRating *= EquipArmorTypeGenerator.DodgeRating / 100.f;
 		EquipStats.CombatAttributes.SpellPower *= EquipArmorTypeGenerator.SpellPower / 100.f;
 		EquipStats.CombatAttributes.SpellCritChanceRating *= EquipArmorTypeGenerator.SpellCritRating / 100.f;
+		EquipStats.Resistances.Armor *= EquipArmorTypeGenerator.Armor / 100.f;
+		EquipStats.Resistances.ArcaneResistance *= EquipArmorTypeGenerator.ArcaneResistance / 100.f;
+		EquipStats.Resistances.FireResistance *= EquipArmorTypeGenerator.FireResistance / 100.f;
+		EquipStats.Resistances.HolyResistance *= EquipArmorTypeGenerator.HolyResistance / 100.f;
+		EquipStats.Resistances.IceResistance *= EquipArmorTypeGenerator.IceResistance / 100.f;
+		EquipStats.Resistances.NatureResistance *= EquipArmorTypeGenerator.NatureResistance / 100.f;
+		EquipStats.Resistances.ShadowResistance *= EquipArmorTypeGenerator.ShadowResistance / 100.f;
 	}
 	
 	// Armor slot multipliers
@@ -117,6 +136,13 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 	EquipStats.CombatAttributes.DodgeRating *= EquipArmorSlotGenerator.DodgeRating / 100.f;
 	EquipStats.CombatAttributes.SpellPower *= EquipArmorSlotGenerator.SpellPower / 100.f;
 	EquipStats.CombatAttributes.SpellCritChanceRating *= EquipArmorSlotGenerator.SpellCritRating / 100.f;
+	EquipStats.Resistances.Armor *= EquipArmorSlotGenerator.Armor / 100.f;
+	EquipStats.Resistances.ArcaneResistance *= EquipArmorSlotGenerator.ArcaneResistance / 100.f;
+	EquipStats.Resistances.FireResistance *= EquipArmorSlotGenerator.FireResistance / 100.f;
+	EquipStats.Resistances.HolyResistance *= EquipArmorSlotGenerator.HolyResistance / 100.f;
+	EquipStats.Resistances.IceResistance *= EquipArmorSlotGenerator.IceResistance / 100.f;
+	EquipStats.Resistances.NatureResistance *= EquipArmorSlotGenerator.NatureResistance / 100.f;
+	EquipStats.Resistances.ShadowResistance *= EquipArmorSlotGenerator.ShadowResistance / 100.f;
 
 	// Qualifier
 	EquipStats.Attributes.Strength *= EquipQualifyGenerator.Strength / 100.f;
@@ -129,6 +155,13 @@ FMMOItemStats UMMOEquipGenerator::GenerateEquipOfKind(int32 ItemLevel, EMMORarit
 	EquipStats.CombatAttributes.DodgeRating *= EquipQualifyGenerator.DodgeRating / 100.f;
 	EquipStats.CombatAttributes.SpellPower *= EquipQualifyGenerator.SpellPower / 100.f;
 	EquipStats.CombatAttributes.SpellCritChanceRating *= EquipQualifyGenerator.SpellCritRating / 100.f;
+	EquipStats.Resistances.Armor *= EquipQualifyGenerator.Armor / 100.f;
+	EquipStats.Resistances.ArcaneResistance *= EquipQualifyGenerator.ArcaneResistance / 100.f;
+	EquipStats.Resistances.FireResistance *= EquipQualifyGenerator.FireResistance / 100.f;
+	EquipStats.Resistances.HolyResistance *= EquipQualifyGenerator.HolyResistance / 100.f;
+	EquipStats.Resistances.IceResistance *= EquipQualifyGenerator.IceResistance / 100.f;
+	EquipStats.Resistances.NatureResistance *= EquipQualifyGenerator.NatureResistance / 100.f;
+	EquipStats.Resistances.ShadowResistance *= EquipQualifyGenerator.ShadowResistance / 100.f;
 	
 	return EquipStats;
 }

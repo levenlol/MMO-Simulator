@@ -217,11 +217,11 @@ public:
 
 	// Health per seconds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 HPS;
+	int32 HPS = 0;
 
 	// Resources per seconds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
-	int32 RPS;
+	int32 RPS = 0;
 
 	// Recuperate Health and Resource every X seconds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "0"))
@@ -362,7 +362,16 @@ public:
 	FMMOCombatAttributes CombatAttributes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FMMOResistances Resistances;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	EMMORarityType Rarity = EMMORarityType::Common;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	EMMOArmorSlotType ArmorSlot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	EMMOArmorType ArmorType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	int32 ItemLevel = 1;
