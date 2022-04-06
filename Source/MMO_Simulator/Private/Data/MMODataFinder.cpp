@@ -66,7 +66,7 @@ const FMMOEquipGeneratorDataTable& UMMODataFinder::GetEquipGeneratorData(EMMORar
 	{
 		const int32 ItemLevelIdx = FMath::Max(0, ItemLevel - 1); // 0 based index
 
-		if (EquipGeneratorItemLevel[RarityType].Data.IsValidIndex(ItemLevel))
+		if (EquipGeneratorItemLevel[RarityType].Data.IsValidIndex(ItemLevelIdx))
 		{
 			return EquipGeneratorItemLevel[RarityType].Data[ItemLevelIdx];
 		}
