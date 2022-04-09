@@ -29,7 +29,7 @@ void UMMOAoeDamageSkill::CastAbility(const FMMOSkillInputData& Data)
 			if (AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(Hit.GetActor()))
 			{
 				FMMODamage MMODamage = ComputeDamage();
-				Character->DamageTake(MMODamage);
+				OwnerCharacter->DoDamage(MMODamage, Character);
 			}
 		}
 	}

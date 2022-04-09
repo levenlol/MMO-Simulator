@@ -94,6 +94,9 @@ public:
 	void InitializeCharacter(const FMMOCharacter& InCharacter);
 
 	UFUNCTION(BlueprintCallable, Category = Damage)
+	void DoDamage(FMMODamage InDamage, AMMOBaseCharacter* Target);
+
+	UFUNCTION(BlueprintCallable, Category = Damage)
 	void DamageTake(FMMODamage InDamage);
 
 	UFUNCTION(BlueprintNativeEvent, Category = Damage)

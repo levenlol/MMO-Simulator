@@ -27,14 +27,14 @@ void UMMODamageSkill::CastAbility(const FMMOSkillInputData& Data)
 	if (AMMOBaseCharacter* Target = Cast<AMMOBaseCharacter>(Data.TargetActor))
 	{
 		// Compute and apply damage
-		Target->DamageTake(ComputeDamage());
+		OwnerCharacter->DoDamage(ComputeDamage(), Target);
 
 		// Play FX
 		UMMOGameplayUtils::PlayParticlesAt(FxActor, Target->GetActorLocation());
 	}
 	else
 	{
-		const FString SkillName = *GetOuterSkill()->GetName();
+		const FString SkillName = GetOuterSkill()->GetName();
 		UE_LOG(LogTemp, Warning, TEXT("Skill: %s cannot do damage to location, expected a target."), *SkillName);
 	}
 }

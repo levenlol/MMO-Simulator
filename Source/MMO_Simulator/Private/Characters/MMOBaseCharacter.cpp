@@ -128,6 +128,14 @@ void AMMOBaseCharacter::InitializeCharacter(const FMMOCharacter& InCharacter)
 	OnCharacterInitialized.Broadcast(this);
 }
 
+void AMMOBaseCharacter::DoDamage(FMMODamage InDamage, AMMOBaseCharacter* Target)
+{
+	if (Target)
+	{
+		Target->DamageTake(InDamage);
+	}
+}
+
 void AMMOBaseCharacter::OnLevelUp_Implementation()
 {
 }

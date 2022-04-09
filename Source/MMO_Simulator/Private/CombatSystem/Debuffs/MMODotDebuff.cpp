@@ -34,9 +34,9 @@ void UMMODotDebuff::ReceiveExecute()
 {
 	Super::ReceiveExecute();
 
-	if (TargetCharacter)
+	if (TargetCharacter && OwnerCharacter)
 	{
-		TargetCharacter->DamageTake(DamagePerTick);
+		OwnerCharacter->DoDamage(DamagePerTick, TargetCharacter);
 	}
 }
 

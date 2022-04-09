@@ -258,7 +258,7 @@ bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
 	}
 
 	FMMODamage Damage = ComputeAutoAttackDamage();
-	Target->DamageTake(MoveTemp(Damage));
+	OwnerCharacter->DoDamage(MoveTemp(Damage), Target);
 
 	if (AMMOGameState* GameState = AMMOGameState::GetMMOGameState(this))
 	{
