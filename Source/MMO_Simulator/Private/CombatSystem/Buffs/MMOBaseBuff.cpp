@@ -7,3 +7,24 @@ UMMOBaseBuff::UMMOBaseBuff()
 	: Super()
 {
 }
+
+void UMMOBaseBuff::Init(AMMOBaseCharacter* Owner)
+{
+	OwnerCharacter = Owner;
+	AccDeltaTime = 0.f;
+}
+
+void UMMOBaseBuff::Activate()
+{
+	AccDeltaTime = 0.f;
+}
+
+void UMMOBaseBuff::Tick(float DeltaTime)
+{
+	AccDeltaTime += DeltaTime;
+	if (AccDeltaTime >= TickTime)
+	{
+		ReceiveExecute();
+		AccDeltaTime -= TickTime;
+	}
+}

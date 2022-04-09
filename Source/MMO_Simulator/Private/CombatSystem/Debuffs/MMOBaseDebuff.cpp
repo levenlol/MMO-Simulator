@@ -17,6 +17,7 @@ void UMMOBaseDebuff::Init(AMMOBaseCharacter* InOwner)
 void UMMOBaseDebuff::Activate(AMMOBaseCharacter* InTarget)
 {
 	TargetCharacter = InTarget;
+	AccDeltaTime = 0.f;
 }
 
 void UMMOBaseDebuff::ReceiveExecute()

@@ -14,6 +14,7 @@ class AMMOBaseWeapon;
 class UMMOCombatSystem;
 class UMMOStatsManager;
 class UMMODebuffManager;
+class UMMOBuffManager;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharacter*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
@@ -65,6 +66,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	UMMODebuffManager* DebuffManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
+	UMMOBuffManager* BuffManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Info)
 	FMMOCharacter CharacterInfo;
