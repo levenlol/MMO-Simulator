@@ -3,6 +3,8 @@
 
 #include "CombatSystem/MMODebuffManager.h"
 #include "CombatSystem/Debuffs/MMOBaseDebuff.h"
+#include "CombatSystem/Debuffs/MMOVulnerabilityDebuff.h"
+
 
 UMMODebuffManager::UMMODebuffManager()
 {
@@ -56,5 +58,18 @@ void UMMODebuffManager::AddDebuff(UMMOBaseDebuff* Debuff, float Duration)
 
 		Debuff->Activate(GetOwnerCharacter());
 	}
+}
+
+FMMODamage UMMODebuffManager::ProcessDamageTaken(FMMODamage Damage)
+{
+	for (UMMOBaseDebuff* Debuff : Debuffs)
+	{
+		if (UMMOVulnerabilityDebuff* VulnerabilityDebuff = Cast<UMMOVulnerabilityDebuff>(Debuff))
+		{
+			VulnerabilityDebuff->ProcessDamageTaken(Damage);
+		}
+	}
+
+	return Damage;
 }
 

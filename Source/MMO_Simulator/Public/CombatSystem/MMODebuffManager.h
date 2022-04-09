@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Core/MMOCommon.h"
 #include "MMODebuffManager.generated.h"
 
 class UMMOBaseDebuff;
@@ -22,6 +23,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Debuff)
 	void AddDebuff(UMMOBaseDebuff* Debuff, float Duration);
+
+	UFUNCTION(BlueprintCallable, Category = Debuff)
+	FMMODamage ProcessDamageTaken(FMMODamage Damage);
 
 protected:
 	// Called when the game starts
