@@ -30,6 +30,23 @@ void UMMOCombatSystem::BeginPlay()
 	OwnerCharacter->OnCharacterStunned.AddDynamic(this, &UMMOCombatSystem::OnCharacterStunned);
 }
 
+void UMMOCombatSystem::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->OnEquipWeapon.RemoveDynamic(this, &UMMOCombatSystem::OnCharacterChangeWeapon);
+		OwnerCharacter->OnCharacterStunned.RemoveDynamic(this, &UMMOCombatSystem::OnCharacterStunned);
+		OwnerCharacter = nullptr;
+	}
+
+	for (UMMOWrapperSkill* Skill : Skills)
+	{
+		Skill->End();
+	}
+}
+
 void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

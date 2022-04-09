@@ -8,6 +8,7 @@
 #include "CombatSystem/MMOCombatSystem.h"
 #include "Core/MMOGameState.h"
 #include "Data/MMOStatsManager.h"
+#include "CombatSystem/MMODebuffManager.h"
 
 FMMOStatusTags FMMOStatusTags::StatusTags;
 
@@ -19,6 +20,7 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 
 	CombatSystem = CreateDefaultSubobject<UMMOCombatSystem>(TEXT("CombatSystem"));
 	StatsManager = CreateDefaultSubobject<UMMOStatsManager>(TEXT("StatsManager"));
+	DebuffManager = CreateDefaultSubobject<UMMODebuffManager>(TEXT("DebuffManager"));
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 

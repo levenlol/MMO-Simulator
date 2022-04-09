@@ -13,6 +13,7 @@
 class AMMOBaseWeapon;
 class UMMOCombatSystem;
 class UMMOStatsManager;
+class UMMODebuffManager;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharacter*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
@@ -56,11 +57,14 @@ public:
 	// Sets default values for this character's properties
 	AMMOBaseCharacter();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 	UMMOCombatSystem* CombatSystem;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Stats)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	UMMOStatsManager* StatsManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
+	UMMODebuffManager* DebuffManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Info)
 	FMMOCharacter CharacterInfo;

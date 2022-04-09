@@ -43,6 +43,9 @@ public:
 	virtual void TryCastAbility(const FMMOSkillInputData& Data);
 	virtual void AbortAbility();
 
+	// todo: implement and broadcast to triggered skills.
+	virtual void End() {};
+
 	void Tick(float DeltaSeconds);
 
 	UFUNCTION(BlueprintPure, Category = Skill)

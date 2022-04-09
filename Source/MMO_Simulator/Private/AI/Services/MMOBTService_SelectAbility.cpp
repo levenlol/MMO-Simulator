@@ -17,6 +17,10 @@ UMMOBTService_SelectAbility::UMMOBTService_SelectAbility()
 	NodeName = "Select Ability";
 	EnemySpellCollisionChannel = ECollisionChannel::ECC_GameTraceChannel1; // Enemy
 	FriendlySpellCollisionChannel = ECollisionChannel::ECC_GameTraceChannel3; // Hero
+
+	SpellTargetSelector.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UMMOBTService_SelectAbility, SpellTargetSelector), AActor::StaticClass());
+	SpellLocationSelector.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UMMOBTService_SelectAbility, SpellLocationSelector));
+
 	INIT_SERVICE_NODE_NOTIFY_FLAGS();
 }
 
