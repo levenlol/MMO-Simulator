@@ -206,6 +206,18 @@ void UMMOGameplayUtils::PlayParticlesAt(AMMOFXActor* FxActor, const FVector& Loc
 	}
 }
 
+FString UMMOGameplayUtils::GetClassName(EMMOCharacterClass InClass)
+{
+	static UEnum* ClassEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterClass"));
+	if (!ClassEnum)
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("Cannot find EMMOCharacterClass"));
+		return "";
+	}
+
+	return ClassEnum->GetNameStringByValue(static_cast<int64>(InClass));
+}
+
 FMMOCharacter::FMMOCharacter(const FName& InName)
 	: Name(InName)
 {}

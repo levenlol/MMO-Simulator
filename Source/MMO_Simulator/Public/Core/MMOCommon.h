@@ -477,4 +477,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = FX)
 	static float GetDamageReduction(AMMOBaseCharacter* Defender, AMMOBaseCharacter* Attacker, EMMODamageType DamageType);
 		
+	UFUNCTION(BlueprintPure, Category = Utility)
+	static FString GetClassName(EMMOCharacterClass InClass);
 };

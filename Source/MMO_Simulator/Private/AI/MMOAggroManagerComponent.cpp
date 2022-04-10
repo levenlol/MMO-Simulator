@@ -3,6 +3,7 @@
 
 #include "AI/MMOAggroManagerComponent.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Core/MMOCommon.h"
 
 
 UMMOAggroManagerComponent::UMMOAggroManagerComponent()
@@ -95,4 +96,16 @@ void UMMOAggroManagerComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+#if WITH_EDITORONLY_DATA
+	if (bDebug)
+	{
+		for (int32 i = 0; i < AggroList.Num(); i++)
+		{
+			const FMMOAggroData& Aggro = AggroList[i];
+
+			const auto& Info = Aggro.Character->CharacterInfo;
+			GEngine->AddOnScreenDebugMessage(1000 + i, 0.1f, FColor::Blue, FString::Printf(TEXT("%d - %s - %s - Aggro: %f"), i, *UMMOGameplayUtils::GetClassName(Info.CharacterClass), *Info.Name.ToString(), Aggro.Aggro));
+		}
+	}
+#endif
 }

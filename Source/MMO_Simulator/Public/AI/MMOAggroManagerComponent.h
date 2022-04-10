@@ -76,4 +76,10 @@ private:
 	// sorted array.highest aggro first
 	UPROPERTY(VisibleAnywhere, Category = Aggro)
 	TArray<FMMOAggroData> AggroList;
+	
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Category = Aggro, meta=(AllowPrivateAccess))
+	bool bDebug = false;
+#endif
+
 };
