@@ -3,6 +3,7 @@
 
 #include "CombatSystem/MMOBuffManager.h"
 #include "CombatSystem/Buffs/MMOBaseBuff.h"
+#include "CombatSystem/Buffs/MMOResistanceBuff.h"
 
 UMMOBuffManager::UMMOBuffManager()
 {
@@ -47,8 +48,17 @@ void UMMOBuffManager::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	PurgeBuffs();
 }
 
-FMMODamage UMMOBuffManager::ProcessDamageDone(FMMODamage Damage)
+FMMODamage UMMOBuffManager::ProcessDamageTaken(FMMODamage Damage)
 {
+	for (UMMOBaseBuff* Buff : Buffs)
+	{
+		UMMOResistanceBuff* ResBuff = Cast<UMMOResistanceBuff>(Buff);
+		if (ResBuff)
+		{
+			ResBuff->ProcessDamageTaken(Damage);
+		}
+	}
+
 	return Damage;
 }
 

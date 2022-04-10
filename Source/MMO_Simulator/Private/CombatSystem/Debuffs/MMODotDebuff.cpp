@@ -8,13 +8,13 @@ void UMMODotDebuff::Init(AMMOBaseCharacter* InOwner)
 {
 	Super::Init(InOwner);
 
-	DamageExpression.Init(this);
 }
 
 void UMMODotDebuff::Activate(AMMOBaseCharacter* InTarget)
 {
 	Super::Activate(InTarget);
 
+	DamageExpression.Init(this);
 	DamageExpression.RefreshVariables();
 
 	if (DamageExpression.IsValid())

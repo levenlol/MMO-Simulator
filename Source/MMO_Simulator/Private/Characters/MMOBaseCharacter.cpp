@@ -80,7 +80,8 @@ void AMMOBaseCharacter::OnRecuperate()
 
 void AMMOBaseCharacter::DamageTake(FMMODamage InDamage)
 {
-	InDamage = DebuffManager->ProcessDamageTaken(InDamage);
+	InDamage = BuffManager->ProcessDamageTaken(InDamage); // much likely it means resistances
+	InDamage = DebuffManager->ProcessDamageTaken(InDamage); // much likely means vulnerabilities
 
 	// handle physical damage. Physical damages can be dodged/blocked etc
 	int32 DamageToApply = InDamage.Damage;

@@ -22,7 +22,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = Debuff)
-	FMMODamage ProcessDamageDone(FMMODamage Damage);
+	FMMODamage ProcessDamageTaken(FMMODamage Damage);
 
 	UFUNCTION(BlueprintCallable, Category = Debuff)
 	void AddBuff(UMMOBaseBuff* Buff, float Duration);

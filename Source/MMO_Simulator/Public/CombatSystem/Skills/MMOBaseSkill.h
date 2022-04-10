@@ -62,6 +62,7 @@ struct MMO_SIMULATOR_API FMMOSkillTags : public FGameplayTagNativeAdder
 	FGameplayTag EnemyTag;
 	FGameplayTag FriendlyTag;
 	FGameplayTag Buff;
+	FGameplayTag Debuff;
 
 	FORCEINLINE static const FMMOSkillTags& Get() { return SkillTags; }
 
@@ -73,12 +74,14 @@ protected:
 		LocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location"));
 		SelfCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Self"));
 		TargetCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Target"));
-		TargetTag = Manager.AddNativeGameplayTag(FName("Skill.Target"));
-		SelfTargetTag = Manager.AddNativeGameplayTag(FName("Skill.Target.Self"));
+		TargetTag = Manager.AddNativeGameplayTag(FName("Skill.Actor.Target"));
+		SelfTargetTag = Manager.AddNativeGameplayTag(FName("Skill.Actor.Self"));
 		FriendlyTag = Manager.AddNativeGameplayTag(FName("Skill.Friendly"));
 		EnemyTag = Manager.AddNativeGameplayTag(FName("Skill.Enemy"));
 		Buff = Manager.AddNativeGameplayTag(FName("Skill.Buff"));
+		Debuff = Manager.AddNativeGameplayTag(FName("Skill.Debuff"));
 	}
+
 private:
 	static FMMOSkillTags SkillTags;
 };
