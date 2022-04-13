@@ -16,6 +16,7 @@ FMMOStatusTags FMMOStatusTags::StatusTags;
 
 // Sets default values
 AMMOBaseCharacter::AMMOBaseCharacter()
+	: Super()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,6 +26,8 @@ AMMOBaseCharacter::AMMOBaseCharacter()
 	DebuffManager = CreateDefaultSubobject<UMMODebuffManager>(TEXT("DebuffManager"));
 	BuffManager = CreateDefaultSubobject<UMMOBuffManager>(TEXT("BuffManager"));
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 void AMMOBaseCharacter::Stun_Implementation(float InDuration)

@@ -14,6 +14,7 @@ AMMOBaseEnemy::AMMOBaseEnemy()
 	AggroManager = CreateDefaultSubobject<UMMOAggroManagerComponent>(TEXT("AggroManager"));
 	
 	AggroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AggroSphere"));
+	AggroSphere->SetCollisionProfileName(TEXT("OverlapAll"));
 	AggroSphere->SetupAttachment(RootComponent);
 }
 

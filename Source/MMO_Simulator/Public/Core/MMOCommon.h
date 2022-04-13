@@ -381,7 +381,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct MMO_SIMULATOR_API FMMOWeaponStats
+struct MMO_SIMULATOR_API FMMOWeaponStats : public FMMOItemStats
 {
 	GENERATED_BODY()
 public:
