@@ -2,12 +2,11 @@
 
 
 #include "AI/MMOAIController.h"
-#include "Navigation/CrowdFollowingComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 
 AMMOAIController::AMMOAIController(const FObjectInitializer& ObjInit)
-	: Super(ObjInit.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
+	: Super(ObjInit)
 {
 	SpellRequestKey = FName("SpellRequest");
 	SpellActorTargetKey = FName("SpellActorTarget");
