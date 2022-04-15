@@ -129,6 +129,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Status)
 	bool HasTag(const FGameplayTag& InTag) const;
 
+	UFUNCTION(BlueprintPure, Category = Status)
+	bool IsAlive() const { return bAlive; }
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
