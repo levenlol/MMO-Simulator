@@ -61,4 +61,5 @@ private:
 	int32 CurrentPreviewIndex = -1;
 
 	void AddPrecachePreviewActors(const int32 PreviewNumbersToAdd);
+	FVector ProjectPointToNavMesh(const FVector& InLocation) const;
 };

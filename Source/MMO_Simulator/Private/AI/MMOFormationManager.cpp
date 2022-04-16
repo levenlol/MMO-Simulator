@@ -3,10 +3,10 @@
 
 #include "AI/MMOFormationManager.h"
 #include "Characters/MMOBaseHero.h"
-
-#pragma optimize("", off)
+#include "NavigationSystem.h"
 
 UMMOFormationManager::UMMOFormationManager()
+	: Super()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -43,6 +43,31 @@ void UMMOFormationManager::AddPrecachePreviewActors(const int32 PreviewNumbersTo
 	}
 
 	ensure(UIFormationPreviews.Num() < 60);
+}
+
+FVector UMMOFormationManager::ProjectPointToNavMesh(const FVector& InLocation) const
+{
+	UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if (!NavigationSystem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("FormationManager: cannot find UNavigationSystemV1"));
+		return InLocation;
+	}
+
+	ANavigationData* NavData = NavigationSystem->GetDefaultNavDataInstance(FNavigationSystem::DontCreate);
+	if (!NavData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("FormationManager: cannot find ANavigationData"));
+		return InLocation;
+	}
+
+	FNavLocation EndLocation;
+	if (NavigationSystem->ProjectPointToNavigation(InLocation, EndLocation, FVector(500.f)))
+	{
+		return EndLocation.Location;
+	}
+
+	return InLocation;
 }
 
 void UMMOFormationManager::ShowPreview(const TArray<FVector>& Points)
@@ -104,8 +129,8 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const int32 CharactersNum
 		const int32 ColumnNum = j % MaxHeroesPerRow;
 		const int32 RowNum = j / MaxHeroesPerRow;
 
-
-		const FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) + (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
+		FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) + (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
+		Point = ProjectPointToNavMesh(Point);
 		Points.Add(Point);
 
 		if (bShowPreview)
