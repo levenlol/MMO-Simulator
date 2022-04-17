@@ -95,7 +95,6 @@ bool UMMOCombatSystem::StartAttack(AMMOBaseCharacter* Target)
 	OwnerCharacter->GiveTag(AttackTag);
 
 	AutoAttackTarget = Target;
-
 	return true;
 }
 

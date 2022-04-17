@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
 
+	UFUNCTION(BlueprintPure, Category = Combat)
+	AMMOBaseCharacter* GetAutoAttackTarget() const { return AutoAttackTarget; }
+
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void TryCastSkill(AMMOBaseCharacter* Target, const FVector& Location, const int32 Index);
 
