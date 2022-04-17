@@ -52,31 +52,38 @@ void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (AMMOBaseWeapon* Weapon = GetEquippedMainHandWeapon())
+	if (IsAttacking())
 	{
-		const float CurrentGameTime = GetWorld()->GetTimeSeconds();
-
-		if (CurrentGameTime - LastAttackTime >= Weapon->Stats.AttackSpeed)
+		if (AMMOBaseWeapon* Weapon = GetEquippedMainHandWeapon())
 		{
-			if (AutoAttackTarget && CanAttackTarget(AutoAttackTarget) && IsAttacking() && !IsCasting() && !IsChanneling())
+			const float CurrentGameTime = GetWorld()->GetTimeSeconds();
+
+			if (CurrentGameTime - LastAttackTime >= Weapon->Stats.AttackSpeed)
 			{
-				if (IsStunned() || TryAttack(AutoAttackTarget))
+				if (AutoAttackTarget && CanAttackTarget(AutoAttackTarget) && IsAttacking())
 				{
-					LastAttackTime = CurrentGameTime;
+					if (IsCasting() || IsChanneling())
+					{
+						StopAttack();
+					}
+					else if (IsStunned() || TryAttack(AutoAttackTarget))
+					{
+						LastAttackTime = CurrentGameTime;
+					}
+				}
+			}
+			else if (DelayAADamage.HasPendingDamage())
+			{
+				DelayAADamage.TimeToDamage -= DeltaTime;
+				if (DelayAADamage.TimeToDamage <= 0.f)
+				{
+					DoAutoAttackDamage(DelayAADamage.Target);
+					DelayAADamage.Clear();
 				}
 			}
 		}
-		else if (DelayAADamage.HasPendingDamage())
-		{
-			DelayAADamage.TimeToDamage -= DeltaTime;
-			if (DelayAADamage.TimeToDamage <= 0.f)
-			{
-				DoAutoAttackDamage(DelayAADamage.Target);
-				DelayAADamage.Clear();
-			}
-		}
 	}
-
+	
 	for (UMMOWrapperSkill* Skill : Skills)
 	{
 		Skill->Tick(DeltaTime);
@@ -85,7 +92,7 @@ void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 bool UMMOCombatSystem::StartAttack(AMMOBaseCharacter* Target)
 {
-	if (!IsValid(OwnerCharacter) || !OwnerCharacter->HasEquippedAnyWeapons())
+	if (!IsValid(OwnerCharacter) || !CanCharacterAttack())
 	{
 		return false;
 	}
@@ -292,6 +299,8 @@ void UMMOCombatSystem::StopAttack()
 
 	OwnerCharacter->RemoveTag(AttackTag);
 
+	const float CurrentGameTime = GetWorld()->GetTimeSeconds();
+	LastAttackTime = CurrentGameTime;
 	AutoAttackTarget = nullptr;
 }
 
@@ -387,8 +396,9 @@ bool UMMOCombatSystem::CanCharacterAttack() const
 
 	const bool bIsStunned = IsStunned();
 	const bool bIsAttacking = IsAttacking();
+	const bool bIsCasting = IsCasting();
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
-	return MainHandWeapon && !bIsAttacking && !bIsStunned;
+	return MainHandWeapon && !bIsAttacking && !bIsCasting && !bIsStunned;
 }
 
 float UMMOCombatSystem::GetRemainingGlobalCooldown() const
