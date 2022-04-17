@@ -42,6 +42,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	bool StartAttack(AMMOBaseCharacter* Target);
 
+	void StopAttack();
+
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
 
@@ -99,6 +101,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Default)
 	AMMOBaseCharacter* OwnerCharacter = nullptr;
 
+	UPROPERTY(VisibleAnywhere, Category = Default)
+	AMMOBaseCharacter* AutoAttackTarget = nullptr;
+
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	float LastAttackTime = 0.f;
 
@@ -106,7 +111,7 @@ private:
 	float LastSpellCastTime = 0.f;
 
 	bool TryAttack(AMMOBaseCharacter* Target);
-	void StopAttack();
+
 
 	FMMODamage ComputeAutoAttackDamage();
 
