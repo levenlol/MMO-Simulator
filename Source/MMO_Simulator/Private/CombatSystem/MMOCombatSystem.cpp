@@ -294,7 +294,6 @@ FMMODamage UMMOCombatSystem::ComputeAutoAttackDamage()
 
 		Damage.DamageType = EMMODamageType::Physical;
 		Damage.DamageDealer = OwnerCharacter;
-		Damage.bIsAutoAttack = true;
 	}
 
 	return Damage;
