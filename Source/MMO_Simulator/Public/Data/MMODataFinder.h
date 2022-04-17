@@ -9,6 +9,7 @@
 #include "MMODataFinder.generated.h"
 
 class UAnimSequenceBase;
+class UAnimMontage;
 
 enum class EMMORarityType : uint8;
 enum class EMMOArmorType : uint8;
@@ -172,7 +173,10 @@ public:
 	FMMOWeaponTypeCouple WeaponsType;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimSequenceBase* WeaponAnimation;
+	UAnimSequenceBase* WeaponAnimation = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AnimMontage = nullptr;
 };
 
 UCLASS(config = game, defaultconfig)
