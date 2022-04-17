@@ -66,6 +66,15 @@ void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				}
 			}
 		}
+		else if (DelayAADamage.HasPendingDamage())
+		{
+			DelayAADamage.TimeToDamage -= DeltaTime;
+			if (DelayAADamage.TimeToDamage <= 0.f)
+			{
+				DoAutoAttackDamage(DelayAADamage.Target);
+				DelayAADamage.Clear();
+			}
+		}
 	}
 
 	for (UMMOWrapperSkill* Skill : Skills)
@@ -253,8 +262,7 @@ bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
 		return false;
 	}
 
-	FMMODamage Damage = ComputeAutoAttackDamage();
-	OwnerCharacter->DoDamage(MoveTemp(Damage), Target);
+	DelayAADamage.DelayDamage(Target, GetEquippedMainHandWeapon()->Stats.AttackSpeed / 2.f);
 
 	if (AMMOGameState* GameState = AMMOGameState::GetMMOGameState(this))
 	{
@@ -262,6 +270,18 @@ bool UMMOCombatSystem::TryAttack(AMMOBaseCharacter* Target)
 	}
 
 	return true;
+}
+
+void UMMOCombatSystem::DoAutoAttackDamage(AMMOBaseCharacter* Target)
+{
+	if (!Target)
+		return;
+
+	if (Target->IsAlive())
+	{
+		FMMODamage Damage = ComputeAutoAttackDamage();
+		OwnerCharacter->DoDamage(MoveTemp(Damage), Target);
+	}
 }
 
 void UMMOCombatSystem::StopAttack()
@@ -402,4 +422,24 @@ bool UMMOCombatSystem::IsSkillReady(int32 SpellIndex) const
 	}
 
 	return false;
+}
+
+void FMMODelayAADamage::DelayDamage(AMMOBaseCharacter* InTarget, float Delay)
+{
+	Target = InTarget;
+	if (!Target)
+	{
+		Clear();
+		return;
+	}
+
+	TimeToDamage = Delay;
+	bPending = true;
+}
+
+void FMMODelayAADamage::Clear()
+{
+	Target = nullptr;
+	TimeToDamage = 0.f;
+	bPending = false;
 }

@@ -25,6 +25,26 @@ enum class EMMOSkillCastFailType : uint8
 	Unspecified // this is still a failure
 };
 
+USTRUCT()
+struct MMO_SIMULATOR_API FMMODelayAADamage
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	AMMOBaseCharacter* Target = nullptr;
+
+	UPROPERTY()
+	float TimeToDamage = 0.f;
+
+	UPROPERTY()
+	bool bPending = false;
+
+	bool HasPendingDamage() const { return TimeToDamage > 0.f && Target; }
+
+	void DelayDamage(AMMOBaseCharacter* InTarget, float Delay);
+	void Clear();
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOSkillFailedEvent, UMMOWrapperSkill*, Skill, EMMOSkillCastFailType, FailReason);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOSkillStartEvent, UMMOWrapperSkill*, Skill);
 
@@ -111,7 +131,9 @@ private:
 	float LastSpellCastTime = 0.f;
 
 	bool TryAttack(AMMOBaseCharacter* Target);
-
+	
+	void DoAutoAttackDamage(AMMOBaseCharacter* Target);
+	FMMODelayAADamage DelayAADamage;
 
 	FMMODamage ComputeAutoAttackDamage();
 
