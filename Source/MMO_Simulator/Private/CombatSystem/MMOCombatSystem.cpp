@@ -8,6 +8,7 @@
 #include "Core/MMOGameState.h"
 #include "Data/MMOStatsManager.h"
 #include "CombatSystem/Skills/MMOBaseSkill.h"
+#include "CombatSystem/MMOWrapperSkill.h"
 
 UMMOCombatSystem::UMMOCombatSystem()
 	: Super()
@@ -51,6 +52,22 @@ void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (AMMOBaseWeapon* Weapon = GetEquippedMainHandWeapon())
+	{
+		const float CurrentGameTime = GetWorld()->GetTimeSeconds();
+
+		if (CurrentGameTime - LastAttackTime >= Weapon->Stats.AttackSpeed)
+		{
+			if (AutoAttackTarget && CanAttackTarget(AutoAttackTarget) && IsAttacking() && !IsCasting() && !IsChanneling())
+			{
+				if (IsStunned() || TryAttack(AutoAttackTarget))
+				{
+					LastAttackTime = CurrentGameTime;
+				}
+			}
+		}
+	}
+
 	for (UMMOWrapperSkill* Skill : Skills)
 	{
 		Skill->Tick(DeltaTime);
@@ -59,44 +76,23 @@ void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 bool UMMOCombatSystem::StartAttack(AMMOBaseCharacter* Target)
 {
-	if (!CanAttackTarget(Target) || !IsValid(OwnerCharacter) || !OwnerCharacter->HasEquippedAnyWeapons())
+	if (!IsValid(OwnerCharacter) || !OwnerCharacter->HasEquippedAnyWeapons())
 	{
 		return false;
 	}
 
+	if (Target == AutoAttackTarget) return true;
+
 	OwnerCharacter->GiveTag(AttackTag);
 
-	// Damage Delegate
-	FTimerHandle UnusuedHandle;
-	FTimerDelegate AttackDelegate;
-
-	TWeakObjectPtr<AMMOBaseCharacter> TargetWeak = Target;
-	TWeakObjectPtr<UMMOCombatSystem> ThisWeak = this;
-
-	AttackDelegate.BindLambda([ThisWeak, TargetWeak]()
-	{
-		if (!ThisWeak.IsValid())
-		{
-			return;
-		}
-
-		ThisWeak->TryAttack(TargetWeak.Get());
-	});
-
-	// Stop autoattack delegate
-	FTimerHandle UnusuedHandle2;
-
-	AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
-	GetWorld()->GetTimerManager().SetTimer(UnusuedHandle, AttackDelegate, MainHandWeapon->Stats.AttackSpeed * 0.5f, false, MainHandWeapon->Stats.AttackSpeed * 0.5f);
-	GetWorld()->GetTimerManager().SetTimer(UnusuedHandle2, this, &UMMOCombatSystem::StopAttack, MainHandWeapon->Stats.AttackSpeed, false, MainHandWeapon->Stats.AttackSpeed);
+	AutoAttackTarget = Target;
 
 	return true;
 }
 
 bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 {
-	if (!Target || !CanCharacterAttack())
-		return false;
+	if (!Target) return false;
 
 	const float DistanceSq = (OwnerCharacter->GetActorLocation() - Target->GetActorLocation()).SizeSquared2D();
 
@@ -276,6 +272,8 @@ void UMMOCombatSystem::StopAttack()
 	}
 
 	OwnerCharacter->RemoveTag(AttackTag);
+
+	AutoAttackTarget = nullptr;
 }
 
 FMMODamage UMMOCombatSystem::ComputeAutoAttackDamage()
@@ -296,6 +294,7 @@ FMMODamage UMMOCombatSystem::ComputeAutoAttackDamage()
 
 		Damage.DamageType = EMMODamageType::Physical;
 		Damage.DamageDealer = OwnerCharacter;
+		Damage.bIsAutoAttack = true;
 	}
 
 	return Damage;
@@ -371,7 +370,7 @@ bool UMMOCombatSystem::CanCharacterAttack() const
 	const bool bIsStunned = IsStunned();
 	const bool bIsAttacking = IsAttacking();
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
-	return MainHandWeapon && !bIsAttacking && !bIsStunned && (GetWorld()->GetTimeSeconds() - LastAttackTime) > MainHandWeapon->Stats.AttackSpeed;
+	return MainHandWeapon && !bIsAttacking && !bIsStunned;
 }
 
 float UMMOCombatSystem::GetRemainingGlobalCooldown() const
