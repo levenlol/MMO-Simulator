@@ -114,9 +114,10 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const int32 CharactersNum
 	TArray<FVector> Points;
 	Points.Reserve(CharactersNum);
 	
-	const float InitialLateralOffset = CharactersNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
-	const int32 InitialLateralNum = (CharactersNum - 1)/ 2;
-	const int32 ColumnsNum = (CharactersNum / MaxHeroesPerRow) + 1;
+	const int32 SafeCharacterRowNum = FMath::Min(MaxHeroesPerRow, CharactersNum);
+	const float InitialLateralOffset = SafeCharacterRowNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
+	const int32 InitialLateralNum = (SafeCharacterRowNum - 1)/ 2;
+	const int32 ColumnsNum = (SafeCharacterRowNum / MaxHeroesPerRow) + 1;
 
 	FVector Tangent = FMath::IsNearlyZero((LastPoint - AnchorPoint).SizeSquared()) ? FVector::ForwardVector : (LastPoint - AnchorPoint);
 	Tangent.Z = 0.f;
@@ -129,7 +130,7 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const int32 CharactersNum
 		const int32 ColumnNum = j % MaxHeroesPerRow;
 		const int32 RowNum = j / MaxHeroesPerRow;
 
-		FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) + (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
+		FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) - (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
 		Point = ProjectPointToNavMesh(Point);
 		Points.Add(Point);
 
