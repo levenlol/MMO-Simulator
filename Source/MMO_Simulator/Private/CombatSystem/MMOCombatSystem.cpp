@@ -92,7 +92,7 @@ void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 bool UMMOCombatSystem::StartAttack(AMMOBaseCharacter* Target)
 {
-	if (!IsValid(OwnerCharacter) || !CanCharacterAttack())
+	if (!IsValid(OwnerCharacter) || !OwnerCharacter->GetMainHandWeapon())
 	{
 		return false;
 	}
