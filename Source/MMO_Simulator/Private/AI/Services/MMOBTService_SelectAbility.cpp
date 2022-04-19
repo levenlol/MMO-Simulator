@@ -72,8 +72,15 @@ MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTargetSpell(AMMOB
 	TArray<FHitResult> HitResults;
 	if (Skill->Tags.HasTag(SkillTags.EnemyTag))
 	{
-		HitResults = GetHitsResults(Character->GetActorLocation(), EnemySpellCollisionChannel, Skill->Range);
-		TargetCharacter = RetrieveBestEnemyTarget(HitResults);
+		if (AMMOBaseCharacter* AATarget = Character->CombatSystem->GetAutoAttackTarget())
+		{
+			TargetCharacter = AATarget;
+		}
+		else
+		{
+			HitResults = GetHitsResults(Character->GetActorLocation(), EnemySpellCollisionChannel, Skill->Range);
+			TargetCharacter = RetrieveBestEnemyTarget(HitResults);
+		}
 	}
 	else if (Skill->Tags.HasTag(SkillTags.FriendlyTag))
 	{
