@@ -242,7 +242,13 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 
 bool UMMOCombatSystem::IsAttacking() const
 {
-	return OwnerCharacter ? OwnerCharacter->HasTag(AttackTag) : false;
+	if (OwnerCharacter)
+	{
+		const bool bAttackTag = OwnerCharacter->HasTag(AttackTag);
+
+		return bAttackTag && !IsStunned() && !IsCasting() && !IsChanneling();
+	}
+	return false;
 }
 
 bool UMMOCombatSystem::IsStunned() const

@@ -91,7 +91,7 @@ float UMMOWrapperSkill::GetRemainingCooldown() const
 
 float UMMOWrapperSkill::GetCastingPercent() const
 {
-	if (IsInCooldown())
+	if (IsCasting())
 	{
 		return CurrentCastingTime / CastTime;
 	}
