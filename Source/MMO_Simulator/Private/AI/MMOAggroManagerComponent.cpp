@@ -7,18 +7,22 @@
 
 
 UMMOAggroManagerComponent::UMMOAggroManagerComponent()
+	: Super()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UMMOAggroManagerComponent::AddDanger(AMMOBaseCharacter* InCharacter, float AggroBoost /*= 0.f*/)
 {
-	if (!InCharacter)
+	if (!InCharacter || !InCharacter->IsAlive())
 		return;
 	
 	if (!AggroList.FindByPredicate([InCharacter](const FMMOAggroData& Data) { return Data.Character == InCharacter; }))
 	{
 		AggroList.Emplace(InCharacter, AggroList.Num() <= 0 ? AggroOnPull : 0.f);
+
+		if (AggroList.Num() == 1)
+			EnterCombatDelegate.Broadcast(this, InCharacter);
 	}
 
 	SortAggroList();

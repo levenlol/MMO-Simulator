@@ -3,6 +3,7 @@
 
 #include "AI/MMOAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
 
 
 AMMOAIController::AMMOAIController(const FObjectInitializer& ObjInit)
@@ -11,6 +12,20 @@ AMMOAIController::AMMOAIController(const FObjectInitializer& ObjInit)
 	SpellRequestKey = FName("SpellRequest");
 	SpellActorTargetKey = FName("SpellActorTarget");
 	SpellLocationTargetKey = FName("SpellLocationTarget");
+}
+
+void AMMOAIController::StopBehaviorTree(const FString& Reason)
+{
+	if (BrainComponent)
+	{
+		BrainComponent->StopLogic(Reason);
+	}
+}
+
+void AMMOAIController::StartBehaviorTree(UBehaviorTree* NewBT)
+{
+	StopBehaviorTree(FString("Start New BT"));
+	RunBehaviorTree(NewBT);
 }
 
 void AMMOAIController::RequestCastSpell(AActor* Target, const FVector& Location, int32 SpellIndex)

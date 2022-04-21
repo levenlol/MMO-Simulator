@@ -18,6 +18,12 @@ public:
 	AMMOAIController(const FObjectInitializer& ObjInit);
 
 	UFUNCTION(BlueprintCallable, Category = Spell)
+	void StopBehaviorTree(const FString& Reason);
+
+	UFUNCTION(BlueprintCallable, Category = Spell)
+	void StartBehaviorTree(UBehaviorTree* NewBT);
+
+	UFUNCTION(BlueprintCallable, Category = Spell)
 	void RequestCastSpell(AActor* Target, const FVector& Location, int32 SpellIndex);
 
 	UFUNCTION(BlueprintCallable, Category = Spell)

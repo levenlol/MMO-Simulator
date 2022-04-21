@@ -9,6 +9,8 @@
 
 class AMMOBaseCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAggroEnterCombatDelegate, UMMOAggroManagerComponent*, Sender, AMMOBaseCharacter*, Danger);
+
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOAggroData
 {
@@ -62,6 +64,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Aggro)
 	const TArray<FMMOAggroData>& GetSortedAggroList() const { return AggroList; }
+
+	UPROPERTY(BlueprintAssignable, Category = Events)
+	FAggroEnterCombatDelegate EnterCombatDelegate;
 
 protected:
 	virtual void BeginPlay() override;
