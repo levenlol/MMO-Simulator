@@ -15,9 +15,15 @@ public:
 	virtual void Setup(AMMOBaseCharacter* InOwner) override;
 	virtual void CastAbility(const FMMOSkillInputData& Data) override;
 
+	// Collision Channel to query for enemies.
 	UPROPERTY(EditAnywhere, Category = Damage)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
+	// Perform Line of Sight check.
+	UPROPERTY(EditAnywhere, Category = Damage)
+	bool bDoLOSCheck = false;
+
+	// Do damage in Radius
 	UPROPERTY(EditAnywhere, Category = Damage, meta=(ClampMin="1.0"))
 	float Radius = 100.f;
  };

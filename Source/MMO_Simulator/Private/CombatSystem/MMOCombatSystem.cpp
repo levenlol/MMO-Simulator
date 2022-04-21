@@ -240,6 +240,22 @@ void UMMOCombatSystem::SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& In
 	}
 }
 
+int32 UMMOCombatSystem::AddSkill(TSubclassOf<UMMOWrapperSkill> InSkill)
+{
+	UMMOWrapperSkill* Skill = NewObject<UMMOWrapperSkill>(this, InSkill);
+	Skill->Setup(OwnerCharacter);
+
+	Skills.Add(Skill);
+
+	Skill->OnSkillStartCast.AddDynamic(this, &UMMOCombatSystem::OnSkillStartCast);
+	Skill->OnSkillFinishCast.AddDynamic(this, &UMMOCombatSystem::OnSkillFinishCast);
+	Skill->OnSkillStartChanneling.AddDynamic(this, &UMMOCombatSystem::OnSkillStartChanneling);
+	Skill->OnSkillFinishChanneling.AddDynamic(this, &UMMOCombatSystem::OnSkillFinishChanneling);
+	Skill->OnSkillAborted.AddDynamic(this, &UMMOCombatSystem::OnSkillAbort);
+
+	return Skills.Num() - 1;
+}
+
 bool UMMOCombatSystem::IsAttacking() const
 {
 	if (OwnerCharacter)

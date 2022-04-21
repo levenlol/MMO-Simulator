@@ -61,12 +61,9 @@ void UMMOBossManagerComponent::CheckPhase()
 	const int32 BossPercent = GetBossHealthPercent();
 
 	int32 Phase = -1;
-	for (int32 i = 0; i < DropHealthPercentEvents.Num() - 1; i++)
+	for (int32 i = DropHealthPercentEvents.Num() - 1; i >= 0; i--)
 	{
-		const bool bOverMin = BossPercent <= DropHealthPercentEvents[i].HealthPercent;
-		const bool bUnderMax = BossPercent >= DropHealthPercentEvents[i].HealthPercent;
-
-		if (bOverMin && bUnderMax)
+		if (BossPercent <= DropHealthPercentEvents[i].HealthPercent)
 		{
 			Phase = i;
 			break;

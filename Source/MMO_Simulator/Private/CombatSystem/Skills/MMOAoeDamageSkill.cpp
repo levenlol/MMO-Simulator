@@ -28,6 +28,20 @@ void UMMOAoeDamageSkill::CastAbility(const FMMOSkillInputData& Data)
 		{
 			if (AMMOBaseCharacter* Character = Cast<AMMOBaseCharacter>(Hit.GetActor()))
 			{
+				if (bDoLOSCheck)
+				{
+					FHitResult LosHit;
+					FCollisionQueryParams Params;
+					Params.AddIgnoredActor(OwnerCharacter);
+
+					const bool bHit = GetWorld()->LineTraceSingleByChannel(LosHit, Location, Character->GetActorLocation(), ECollisionChannel::ECC_Visibility, Params);
+
+					if(!bHit || LosHit.GetActor() != Character)
+					{
+						continue;
+					}
+				}
+
 				FMMODamage MMODamage = ComputeDamage();
 				OwnerCharacter->DoDamage(MMODamage, Character);
 			}

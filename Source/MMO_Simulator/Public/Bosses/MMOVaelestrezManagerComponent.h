@@ -6,6 +6,7 @@
 #include "Bosses/MMOBossManagerComponent.h"
 #include "MMOVaelestrezManagerComponent.generated.h"
 
+class UMMOWrapperSkill;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MMO_SIMULATOR_API UMMOVaelestrezManagerComponent : public UMMOBossManagerComponent
@@ -15,6 +16,10 @@ class MMO_SIMULATOR_API UMMOVaelestrezManagerComponent : public UMMOBossManagerC
 public:	
 	UMMOVaelestrezManagerComponent();
 
+	UPROPERTY(EditDefaultsOnly, Category = Skill)
+	TSubclassOf<UMMOWrapperSkill> DeathNovaSkill;
+
+	virtual void OnDropHealthEvent_Implementation(const FMMOHealthPercentEventData& HealthPercentData) override;
 
 protected:
 	virtual void BeginPlay() override;

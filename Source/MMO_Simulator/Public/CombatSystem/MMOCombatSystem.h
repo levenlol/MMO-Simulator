@@ -82,6 +82,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	void SetSkills(const TArray<TSubclassOf<UMMOWrapperSkill>>& InSkills);
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	int32 AddSkill(TSubclassOf<UMMOWrapperSkill> InSkill);
+
 	UFUNCTION(BlueprintPure, Category = Status)
 	bool IsAttacking() const;
 
