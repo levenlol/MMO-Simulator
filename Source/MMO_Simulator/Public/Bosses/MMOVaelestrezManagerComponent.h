@@ -15,7 +15,7 @@ class MMO_SIMULATOR_API UMMOVaelestrezManagerComponent : public UMMOBossManagerC
 
 public:	
 	UMMOVaelestrezManagerComponent();
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = Skill)
 	TSubclassOf<UMMOWrapperSkill> DeathNovaSkill;
 
@@ -34,8 +34,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = Environment)
 	TEnumAsByte<ECollisionChannel> TerrainCollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
 
-	virtual void OnDropHealthEvent_Implementation(const FMMOHealthPercentEventData& HealthPercentData) override;
-
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
@@ -46,4 +44,14 @@ private:
 
 	UPROPERTY()
 	TArray<AActor*> SpawnedPillars;
+
+	template<int32 HealthPercent>
+	inline bool DeathNova_Condition(AMMOBaseBoss* Boss)
+	{
+		return DeathNova_Condition(Boss, HealthPercent);
+	}
+
+	bool DeathNova_Condition(AMMOBaseBoss* Boss, int32 HealthPercent);
+	void DeathNova_Callback(AMMOBaseBoss* Boss);
+
 };

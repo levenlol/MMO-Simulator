@@ -13,16 +13,40 @@ class UMMOAggroManagerComponent;
 class AMMOBaseCharacter;
 class UBehaviorTree;
 
-USTRUCT(BlueprintType)
-struct MMO_SIMULATOR_API FMMOHealthPercentEventData
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere, Category = Data, meta=(ClampMin ="0.0", ClampMax = "100.0"))
-	int32 HealthPercent = 0;
+DECLARE_DELEGATE_RetVal_OneParam(bool, FBossConditionEventDelegate, AMMOBaseBoss*);
+DECLARE_DELEGATE_OneParam(FBossCallbackEventDelegate, AMMOBaseBoss*)
 
-	UPROPERTY(EditAnywhere, Category = Data)
-	UBehaviorTree* NewBT = nullptr;
+struct MMO_SIMULATOR_API FMMOEventDelegateHelper
+{
+	/** Holds the delegate to call. */
+	FBossConditionEventDelegate ConditionFuncDelegate;
+	FBossCallbackEventDelegate CallbackFuncDelegate;
+
+	FMMOEventDelegateHelper() {};
+	FMMOEventDelegateHelper(FBossConditionEventDelegate const& Condition, FBossCallbackEventDelegate const& Callback)
+		: ConditionFuncDelegate(Condition)
+		, CallbackFuncDelegate(Callback)
+	{};
+
+	inline bool Execute_Condition(AMMOBaseBoss* Boss)
+	{
+		check(Boss);
+		if (ConditionFuncDelegate.IsBound())
+		{
+			return ConditionFuncDelegate.Execute(Boss);
+		}
+
+		return false;
+	}
+
+	inline void Execute_Callback(AMMOBaseBoss* Boss)
+	{
+		check(Boss);
+		if (CallbackFuncDelegate.IsBound())
+		{
+			CallbackFuncDelegate.Execute(Boss);
+		}
+	}
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -33,17 +57,20 @@ class MMO_SIMULATOR_API UMMOBossManagerComponent : public UActorComponent
 public:	
 	UMMOBossManagerComponent();
 
-	// Events fired when boss reach a pre-determined health percent value.
-	UPROPERTY(EditDefaultsOnly, Category = Setup)
-	TArray<FMMOHealthPercentEventData> DropHealthPercentEvents;
-
-	UFUNCTION(BlueprintNativeEvent, Category = Phase)
-	void OnDropHealthEvent(const FMMOHealthPercentEventData& HealthPercentData);
-
 	UFUNCTION(BlueprintPure, Category = Phase)
 	FORCEINLINE int32 GetCurrentPhase() const { return CurrentPhase; }
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	template<class UserClass>
+	void AddCustomBossEvent(UserClass* InObj, typename FBossConditionEventDelegate::TMethodPtr<UserClass> InCondition, typename FBossCallbackEventDelegate::TMethodPtr<UserClass> InCallback)
+	{
+		FMMOEventDelegateHelper DelegateHelper(
+			FBossConditionEventDelegate::CreateUObject(InObj, InCondition),
+			FBossCallbackEventDelegate::CreateUObject(InObj, InCallback));
+
+		PendingEvents.Add(MoveTemp(DelegateHelper));
+	}
 
 protected:
 	virtual void BeginPlay() override;
@@ -61,5 +88,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Phase)
 	int32 CurrentPhase = 0;
 
-	void CheckPhase();
+	TArray<FMMOEventDelegateHelper> PendingEvents;
+
+	void CheckEvents();
 };

@@ -1,5 +1,4 @@
 #include "Bosses/MMOBossManagerComponent.h"
-#include "BehaviorTree/BehaviorTree.h"
 #include "AI/MMOAggroManagerComponent.h"
 
 UMMOBossManagerComponent::UMMOBossManagerComponent()
@@ -9,30 +8,9 @@ UMMOBossManagerComponent::UMMOBossManagerComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
-
-void UMMOBossManagerComponent::OnDropHealthEvent_Implementation(const FMMOHealthPercentEventData& HealthPercentData)
-{
-	if (HealthPercentData.NewBT)
-	{
-		GetAIController()->StopBehaviorTree(FString("New Phase."));
-		GetAIController()->StartBehaviorTree(HealthPercentData.NewBT);
-	}
-}
-
 void UMMOBossManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (DropHealthPercentEvents.Num() == 0)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Boss: %s doesn't have any phases"), *GetOwner()->GetName());
-		return;
-	}
-
-	if (DropHealthPercentEvents[0].HealthPercent != 100)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Boss: %s first phase isn't set to start at 100% HP"), *GetOwner()->GetName());
-	}
 
 	CurrentPhase = 0;
 
@@ -47,33 +25,25 @@ int32 UMMOBossManagerComponent::GetBossHealthPercent() const
 
 void UMMOBossManagerComponent::OnEnterCombat(UMMOAggroManagerComponent* Sender, AMMOBaseCharacter* Danger)
 {
-	if (DropHealthPercentEvents.Num() > 0)
-	{
-		CurrentPhase = 0;
-		OnDropHealthEvent(DropHealthPercentEvents[0]);
-	
-		SetComponentTickEnabled(true);
-	}
+	CheckEvents();
+
+	SetComponentTickEnabled(true);
 }
 
-void UMMOBossManagerComponent::CheckPhase()
+void UMMOBossManagerComponent::CheckEvents()
 {
-	const int32 BossPercent = GetBossHealthPercent();
-
-	int32 Phase = -1;
-	for (int32 i = DropHealthPercentEvents.Num() - 1; i >= 0; i--)
+	AMMOBaseBoss* Boss = GetBossPawn();
+	
+	// Custom Events
+	for (int32 i = PendingEvents.Num() - 1; i >= 0; i--)
 	{
-		if (BossPercent <= DropHealthPercentEvents[i].HealthPercent)
+		FMMOEventDelegateHelper& PendingEvent = PendingEvents[i];
+
+		if (PendingEvent.Execute_Condition(Boss))
 		{
-			Phase = i;
-			break;
+			PendingEvent.Execute_Callback(Boss);
+			PendingEvents.RemoveAt(i);
 		}
-	}
-
-	if (Phase >= 0 && Phase != CurrentPhase)
-	{
-		CurrentPhase = Phase;
-		OnDropHealthEvent(DropHealthPercentEvents[CurrentPhase]);
 	}
 }
 
@@ -81,6 +51,6 @@ void UMMOBossManagerComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	CheckPhase();
+	CheckEvents();
 }
 

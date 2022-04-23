@@ -1,36 +1,21 @@
 #include "Bosses/MMOVaelestrezManagerComponent.h"
 #include "CombatSystem/MMOCombatSystem.h"
 #include "Core/MMOCommon.h"
+#include "Characters/MMOBaseBoss.h"
 
 UMMOVaelestrezManagerComponent::UMMOVaelestrezManagerComponent()
 	: Super()
 {
 }
 
-
-void UMMOVaelestrezManagerComponent::OnDropHealthEvent_Implementation(const FMMOHealthPercentEventData& HealthPercentData)
-{
-	Super::OnDropHealthEvent_Implementation(HealthPercentData);
-
-	if (HealthPercentData.HealthPercent == 80)
-	{
-		SpawnSafetyPillars();
-
-		AMMOBaseBoss* Boss = GetBossPawn();
-
-		const int32 SpellIndex = Boss->CombatSystem->AddSkill(DeathNovaSkill);
-		if (AMMOAIController* AIController = GetAIController())
-		{
-			AIController->AddPlayerHandledAbility(SpellIndex);
-		}
-
-		GetBossPawn()->CombatSystem->TryCastSkill(Boss, Boss->GetActorLocation(), SpellIndex);
-	}
-}
-
 void UMMOVaelestrezManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AddCustomBossEvent(this, &UMMOVaelestrezManagerComponent::DeathNova_Condition<80>, &UMMOVaelestrezManagerComponent::DeathNova_Callback);
+	AddCustomBossEvent(this, &UMMOVaelestrezManagerComponent::DeathNova_Condition<60>, &UMMOVaelestrezManagerComponent::DeathNova_Callback);
+	AddCustomBossEvent(this, &UMMOVaelestrezManagerComponent::DeathNova_Condition<40>, &UMMOVaelestrezManagerComponent::DeathNova_Callback);
+	AddCustomBossEvent(this, &UMMOVaelestrezManagerComponent::DeathNova_Condition<20>, &UMMOVaelestrezManagerComponent::DeathNova_Callback);
 }
 
 void UMMOVaelestrezManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -83,5 +68,23 @@ void UMMOVaelestrezManagerComponent::SpawnSafetyPillars()
 				}
 			}, PillarsDuration, false, PillarsDuration);
 	}
+}
+
+bool UMMOVaelestrezManagerComponent::DeathNova_Condition(AMMOBaseBoss* Boss, int32 HealthPercent)
+{
+	return Boss && FMath::RoundToInt(Boss->GetHealthPercent() * 100.f) <= HealthPercent;
+}
+
+void UMMOVaelestrezManagerComponent::DeathNova_Callback(AMMOBaseBoss* Boss)
+{
+	SpawnSafetyPillars();
+
+	const int32 SpellIndex = Boss->CombatSystem->AddSkill(DeathNovaSkill);
+	if (AMMOAIController* AIController = GetAIController())
+	{
+		AIController->AddPlayerHandledAbility(SpellIndex);
+	}
+
+	GetBossPawn()->CombatSystem->TryCastSkill(Boss, Boss->GetActorLocation(), SpellIndex);
 }
 
