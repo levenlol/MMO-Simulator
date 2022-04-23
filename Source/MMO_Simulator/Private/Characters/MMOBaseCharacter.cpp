@@ -10,7 +10,8 @@
 #include "Data/MMOStatsManager.h"
 #include "CombatSystem/MMODebuffManager.h"
 #include "CombatSystem/MMOBuffManager.h"
-
+#include "Animation/AnimationAsset.h"
+#include "Components/CapsuleComponent.h"
 
 FMMOStatusTags FMMOStatusTags::StatusTags;
 
@@ -72,6 +73,19 @@ void AMMOBaseCharacter::Die_Implementation()
 {
 	if (AMMOGameState* GameState = AMMOGameState::GetMMOGameState(this))
 	{
+		if (AController* CurrentController = GetController())
+		{
+			CurrentController->UnPossess();
+		}
+
+		if (DeathAnimationAsset)
+		{
+			GetMesh()->PlayAnimation(DeathAnimationAsset, false);
+		}
+
+		GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+
+		bAlive = false;
 		GameState->NotifyDeath(this);
 	}
 }
@@ -106,7 +120,6 @@ void AMMOBaseCharacter::DamageTake(FMMODamage InDamage)
 
 	if (CharacterInfo.Stats.Health <= 0 && bAlive)
 	{
-		bAlive = false;
 		Die();
 	}
 }

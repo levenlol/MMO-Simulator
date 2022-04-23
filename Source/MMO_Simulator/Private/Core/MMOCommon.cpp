@@ -218,7 +218,7 @@ FString UMMOGameplayUtils::GetClassName(EMMOCharacterClass InClass)
 	return ClassEnum->GetNameStringByValue(static_cast<int64>(InClass));
 }
 
-FVector UMMOGameplayUtils::ProjectPointToTerrain(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset)
+FVector UMMOGameplayUtils::VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset)
 {
 	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
 	{

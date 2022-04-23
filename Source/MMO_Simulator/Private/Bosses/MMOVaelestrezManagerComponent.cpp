@@ -42,7 +42,7 @@ void UMMOVaelestrezManagerComponent::SpawnSafetyPillars()
 			const FVector Direction(CosVal, SinVal, 0.f);
 
 			FVector Location = GetBossPawn()->GetActorLocation() + Direction * RockDisplacementLength;
-			Location = UMMOGameplayUtils::ProjectPointToTerrain(this, Location, 400.f, TerrainCollisionChannel);
+			Location = UMMOGameplayUtils::VerticalRaycast(this, Location, 400.f, TerrainCollisionChannel);
 
 			AActor* SpawnedPillar = GetWorld()->SpawnActor<AActor>(PillarsClass, Location, FRotator::ZeroRotator, SpawnParams);
 			check(SpawnedPillar);

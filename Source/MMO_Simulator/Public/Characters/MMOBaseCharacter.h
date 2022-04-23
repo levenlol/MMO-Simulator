@@ -15,6 +15,7 @@ class UMMOCombatSystem;
 class UMMOStatsManager;
 class UMMODebuffManager;
 class UMMOBuffManager;
+class UAnimationAsset;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharacter*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
@@ -60,6 +61,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat)
 	UMMOCombatSystem* CombatSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat)
+	UAnimationAsset* DeathAnimationAsset;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	UMMOStatsManager* StatsManager;
