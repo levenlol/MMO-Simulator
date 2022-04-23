@@ -9,6 +9,7 @@ UMMOAoeDamageSkill::UMMOAoeDamageSkill()
 	: Super()
 {
 	CollisionChannel = ECollisionChannel::ECC_GameTraceChannel1;
+	LosCollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
 }
 
 void UMMOAoeDamageSkill::Setup(AMMOBaseCharacter* InOwner)
@@ -34,9 +35,9 @@ void UMMOAoeDamageSkill::CastAbility(const FMMOSkillInputData& Data)
 					FCollisionQueryParams Params;
 					Params.AddIgnoredActor(OwnerCharacter);
 
-					const bool bHit = GetWorld()->LineTraceSingleByChannel(LosHit, Location, Character->GetActorLocation(), ECollisionChannel::ECC_Visibility, Params);
+					const bool bHit = GetWorld()->LineTraceSingleByChannel(LosHit, Location, Character->GetActorLocation(), LosCollisionChannel, Params);
 
-					if(!bHit || LosHit.GetActor() != Character)
+					if(bHit)
 					{
 						continue;
 					}

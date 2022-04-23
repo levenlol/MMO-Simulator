@@ -19,6 +19,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Damage)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
+	UPROPERTY(EditAnywhere, Category = Damage, meta=(EditCondition="bDoLOSCheck"))
+	TEnumAsByte<ECollisionChannel> LosCollisionChannel;
+
 	// Perform Line of Sight check.
 	UPROPERTY(EditAnywhere, Category = Damage)
 	bool bDoLOSCheck = false;

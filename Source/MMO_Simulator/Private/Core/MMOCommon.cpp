@@ -218,6 +218,23 @@ FString UMMOGameplayUtils::GetClassName(EMMOCharacterClass InClass)
 	return ClassEnum->GetNameStringByValue(static_cast<int64>(InClass));
 }
 
+FVector UMMOGameplayUtils::ProjectPointToTerrain(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset)
+{
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		FHitResult HitResult;
+
+		const FVector StartLocation = InLocation + FVector(0.f, 0.f, UpRayOffset);
+		const FVector EndLocation = StartLocation + FVector(0.f, 0.f, -RayLength);
+		if (World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, CollisionChannel))
+		{
+			return HitResult.ImpactPoint;
+		}
+	}
+
+	return InLocation;
+}
+
 FMMOCharacter::FMMOCharacter(const FName& InName)
 	: Name(InName)
 {}
