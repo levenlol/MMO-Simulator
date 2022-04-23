@@ -61,9 +61,27 @@ void UMMOVaelestrezManagerComponent::SpawnSafetyPillars()
 
 			AActor* SpawnedPillar = GetWorld()->SpawnActor<AActor>(PillarsClass, Location, FRotator::ZeroRotator, SpawnParams);
 			check(SpawnedPillar);
+			SpawnedPillars.Add(SpawnedPillar);
 
 			CurrentAngle += Step;
 		}
+
+		FTimerHandle Unusued;
+		TWeakObjectPtr<UMMOVaelestrezManagerComponent> ThisWeak = this;
+		GetWorld()->GetTimerManager().SetTimer(Unusued, [ThisWeak]() 
+			{
+				if (ThisWeak.IsValid())
+				{
+					TArray<AActor*>& Pillars = ThisWeak->SpawnedPillars;
+					for (AActor* Pillar : Pillars)
+					{
+						if (Pillar)
+							Pillar->Destroy();
+					}
+
+					Pillars.Empty();
+				}
+			}, PillarsDuration, false, PillarsDuration);
 	}
 }
 

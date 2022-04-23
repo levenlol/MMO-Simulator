@@ -26,7 +26,10 @@ public:
 	TSubclassOf<AActor> PillarsClass;
 
 	UPROPERTY(EditAnywhere, Category = Environment, meta = (ClampMin = "100.0"))
-	float RockDisplacementLength = 800.f;
+	float RockDisplacementLength = 1600.f;
+
+	UPROPERTY(EditAnywhere, Category = Environment, meta = (ClampMin = "1.0", ClampMax = "20.0"))
+	float PillarsDuration = 12.f;
 
 	UPROPERTY(EditAnywhere, Category = Environment)
 	TEnumAsByte<ECollisionChannel> TerrainCollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
@@ -40,5 +43,7 @@ protected:
 
 private:
 	void SpawnSafetyPillars();
-		
+
+	UPROPERTY()
+	TArray<AActor*> SpawnedPillars;
 };
