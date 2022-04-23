@@ -481,5 +481,5 @@ public:
 	static FString GetClassName(EMMOCharacterClass InClass);
 
 	UFUNCTION(BlueprintPure, Category = Utility, meta = (WorldContext = WorldContextObject))
-	static FVector ProjectPointToTerrain(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset= 0.f);
+	static FVector ProjectPointToTerrain(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset = 0.f);
 };
