@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta = (ClampMin = "2", EditCondition="ChannelingTime > 0.0"))
 	int32 ChannelingTickNumber = 2;
 
+	UPROPERTY(EditAnywhere, AdvancedDisplay, Category = Skill)
+	TEnumAsByte<ECollisionChannel> LOSCollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	FGameplayTagContainer Tags;
 

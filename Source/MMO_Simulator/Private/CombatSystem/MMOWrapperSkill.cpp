@@ -3,6 +3,8 @@
 
 #include "CombatSystem/MMOWrapperSkill.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Utils/MMOGameplayUtils.h"
+
 
 void UMMOWrapperSkill::Setup(AMMOBaseCharacter* InOwner)
 {
@@ -101,6 +103,9 @@ float UMMOWrapperSkill::GetCastingPercent() const
 
 void UMMOWrapperSkill::CastAbility()
 {
+	if (SavedInputData.TargetActor && (!SavedInputData.TargetActor->IsAlive() || UMMOGameplayUtils::IsInLOS(OwnerCharacter, SavedInputData.TargetActor, LOSCollisionChannel)))
+		return;
+
 	if (ChannelingTime <= 0.f)
 	{
 		for (UMMOBaseSkill* Skill : TriggeredSkills)
