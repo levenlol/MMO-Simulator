@@ -15,7 +15,7 @@ class MMO_SIMULATOR_API UMMOGameplayUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable, Category = Weapon)
+	UFUNCTION(BlueprintPure, Category = Weapon)
 	static bool Is2HWeapon(EMMOWeaponType WeaponType);
 
 	UFUNCTION(BlueprintPure, Category = Animation, meta = (BlueprintThreadSafe))
@@ -51,9 +51,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Utility)
 	static FString GetClassName(EMMOCharacterClass InClass);
 
-	UFUNCTION(BlueprintPure, Category = Utility, meta = (WorldContext = WorldContextObject)) 
+	UFUNCTION(BlueprintCallable, Category = Utility, meta = (WorldContext = WorldContextObject))
 	static FVector VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset = 0.f);
 
-	UFUNCTION(BlueprintPure, Category = Utility)
+	UFUNCTION(BlueprintCallable, Category = Utility)
 	static bool IsInLOS(AMMOBaseCharacter* First, AMMOBaseCharacter* Second, ECollisionChannel CollisionChannel);
 };
