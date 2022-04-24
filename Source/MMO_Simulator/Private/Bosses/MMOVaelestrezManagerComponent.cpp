@@ -1,6 +1,6 @@
 #include "Bosses/MMOVaelestrezManagerComponent.h"
 #include "CombatSystem/MMOCombatSystem.h"
-#include "Core/MMOCommon.h"
+#include "Utils/MMOGameplayUtils.h"
 #include "Characters/MMOBaseBoss.h"
 
 UMMOVaelestrezManagerComponent::UMMOVaelestrezManagerComponent()

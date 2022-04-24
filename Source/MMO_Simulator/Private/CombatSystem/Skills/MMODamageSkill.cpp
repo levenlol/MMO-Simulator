@@ -3,7 +3,8 @@
 
 #include "CombatSystem/Skills/MMODamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Core/MMOCommon.h"
+#include "Utils/MMOGameplayUtils.h"
+#include "CombatSystem/MMOWrapperSkill.h"
 
 
 void UMMODamageSkill::Setup(AMMOBaseCharacter* InOwner)

@@ -9,6 +9,8 @@
 #include "Data/MMOStatsManager.h"
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "CombatSystem/MMOWrapperSkill.h"
+#include "Utils/MMOGameplayUtils.h"
+
 
 UMMOCombatSystem::UMMOCombatSystem()
 	: Super()

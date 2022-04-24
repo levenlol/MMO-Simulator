@@ -2,7 +2,7 @@
 #include "CombatSystem/Skills/MMOBeamSkill.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Core/MMOCommon.h"
+#include "Utils/MMOGameplayUtils.h"
 
 UMMOBeamSkill::UMMOBeamSkill()
 	: Super()

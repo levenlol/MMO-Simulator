@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Utils/MMOGameplayUtils.h"
+
 
 AMMOPoolActor::AMMOPoolActor()
 	: Super()

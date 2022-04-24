@@ -3,7 +3,7 @@
 
 #include "AI/MMOAggroManagerComponent.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Core/MMOCommon.h"
+#include "Utils/MMOGameplayUtils.h"
 
 
 UMMOAggroManagerComponent::UMMOAggroManagerComponent()

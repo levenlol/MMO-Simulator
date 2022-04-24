@@ -3,7 +3,7 @@
 
 #include "CombatSystem/Skills/MMOAoeDamageSkill.h"
 #include "Characters/MMOBaseCharacter.h"
-#include "Core/MMOCommon.h"
+#include "Utils/MMOGameplayUtils.h"
 
 UMMOAoeDamageSkill::UMMOAoeDamageSkill()
 	: Super()

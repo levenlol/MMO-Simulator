@@ -12,6 +12,8 @@
 #include "CombatSystem/MMOBuffManager.h"
 #include "Animation/AnimationAsset.h"
 #include "Components/CapsuleComponent.h"
+#include "Utils/MMOGameplayUtils.h"
+
 
 FMMOStatusTags FMMOStatusTags::StatusTags;
 
