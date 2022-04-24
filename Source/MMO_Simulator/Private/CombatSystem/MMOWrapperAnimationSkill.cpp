@@ -18,6 +18,7 @@ void UMMOWrapperAnimationSkill::TryCastAbility(const FMMOSkillInputData& Data)
 			Mesh->PlayAnimation(AnimationAsset, false);
 
 			const float AnimLength = AnimationAsset->GetPlayLength();
+			SkillState = EMMOSkillState::Casting;
 
 			GetWorld()->GetTimerManager().SetTimer(AnimationHandle, this, &UMMOWrapperAnimationSkill::OnAnimationEnd, AnimLength, false, AnimLength);
 		}
@@ -62,4 +63,6 @@ void UMMOWrapperAnimationSkill::StopAnimation()
 		Mesh->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 		Mesh->Stop();
 	}
+
+	SkillState = EMMOSkillState::Ready;
 }

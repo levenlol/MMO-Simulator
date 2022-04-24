@@ -235,6 +235,20 @@ FVector UMMOGameplayUtils::VerticalRaycast(const UObject* WorldContextObject, co
 	return InLocation;
 }
 
+bool UMMOGameplayUtils::IsInLOS(AMMOBaseCharacter* First, AMMOBaseCharacter* Second, ECollisionChannel CollisionChannel)
+{
+	if (!First || !Second)
+	{
+		return false;
+	}
+
+	FHitResult LosHit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(First);
+
+	return First->GetWorld()->LineTraceSingleByChannel(LosHit, First->GetActorLocation(), Second->GetActorLocation(), CollisionChannel, Params);
+}
+
 FMMOCharacter::FMMOCharacter(const FName& InName)
 	: Name(InName)
 {}

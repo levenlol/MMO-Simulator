@@ -42,10 +42,13 @@ public:
 
 	virtual void OnSearchStart(FBehaviorTreeSearchData& SearchData) override;
 private:
+	MMOAI::ESelectAbilityResult HandleTauntSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex);
 	MMOAI::ESelectAbilityResult HandleTargetSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex);
 	MMOAI::ESelectAbilityResult HandleSelfCastSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex);
 
 	TArray<FHitResult> GetHitsResults(const FVector& Location, ECollisionChannel CollisionChannel, const float Radius, const AActor* ActorToIgnore = nullptr) const;
+
+	AMMOBaseCharacter* GetBestEnemyTarget(AMMOBaseCharacter* Character, float Range) const;
 
 	AMMOBaseCharacter* RetrieveBestEnemyTarget(const TArray<FHitResult>& HitResults) const;
 	AMMOBaseCharacter* RetrieveBestFriendlyTarget(const TArray<FHitResult>& HitResults) const;

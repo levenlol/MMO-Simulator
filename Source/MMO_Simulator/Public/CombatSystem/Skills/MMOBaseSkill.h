@@ -10,9 +10,7 @@
 
 class AMMOBaseCharacter;
 class UParticleSystemComponent;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillStart, UMMOWrapperSkill*, Sender);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillFinish, UMMOWrapperSkill*, Sender);
+class UMMOWrapperSkill;
 
 UENUM()
 enum class EMMOSkillState : uint8
@@ -59,6 +57,7 @@ struct MMO_SIMULATOR_API FMMOSkillTags : public FGameplayTagNativeAdder
 	FGameplayTag TargetCastLocationTag;
 	FGameplayTag TargetTag;
 	FGameplayTag SelfTargetTag; // if spell is castable on self
+	FGameplayTag TauntTag;
 	FGameplayTag EnemyTag;
 	FGameplayTag FriendlyTag;
 	FGameplayTag Buff;
@@ -75,6 +74,7 @@ protected:
 		SelfCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Self"));
 		TargetCastLocationTag = Manager.AddNativeGameplayTag(FName("Skill.Location.Target"));
 		TargetTag = Manager.AddNativeGameplayTag(FName("Skill.Actor.Target"));
+		TauntTag = Manager.AddNativeGameplayTag(FName("Skill.Taunt"));
 		SelfTargetTag = Manager.AddNativeGameplayTag(FName("Skill.Actor.Self"));
 		FriendlyTag = Manager.AddNativeGameplayTag(FName("Skill.Friendly"));
 		EnemyTag = Manager.AddNativeGameplayTag(FName("Skill.Enemy"));

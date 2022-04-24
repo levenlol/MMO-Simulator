@@ -7,6 +7,8 @@
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "MMOWrapperSkill.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillStart, UMMOWrapperSkill*, Sender);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnSkillFinish, UMMOWrapperSkill*, Sender);
 
 // Container for MMOBaseSkills
 UCLASS(DefaultToInstanced, EditInlineNew, Blueprintable, BlueprintType)

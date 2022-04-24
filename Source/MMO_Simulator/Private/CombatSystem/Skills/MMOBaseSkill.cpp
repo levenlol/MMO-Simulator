@@ -3,6 +3,7 @@
 
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "CombatSystem/MMOWrapperSkill.h"
 
 
 FMMOSkillTags FMMOSkillTags::SkillTags;

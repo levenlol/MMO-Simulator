@@ -14,7 +14,7 @@ UMMOAggroManagerComponent::UMMOAggroManagerComponent()
 
 void UMMOAggroManagerComponent::AddDanger(AMMOBaseCharacter* InCharacter, float AggroBoost /*= 0.f*/)
 {
-	if (!InCharacter || !InCharacter->IsAlive())
+	if (!InCharacter || !InCharacter->IsAlive() || InCharacter == GetOwner())
 		return;
 	
 	if (!AggroList.FindByPredicate([InCharacter](const FMMOAggroData& Data) { return Data.Character == InCharacter; }))
@@ -36,6 +36,36 @@ AMMOBaseCharacter* UMMOAggroManagerComponent::GetMostDangerousCharacter() const
 	}
 
 	return nullptr;
+}
+
+void UMMOAggroManagerComponent::Taunt(AMMOBaseCharacter* Attacker)
+{
+	if (!Attacker)
+		return;
+
+	if (AggroList.Num() == 0)
+	{
+		// nothing to do, just add it to the aggro list.
+		AddDanger(Attacker, 0.f);
+	}
+	else
+	{
+		FMMOAggroData& TopDanger = AggroList.Last();
+		if (TopDanger.Character == Attacker)
+			return; // already on top aggro, nothing to do.
+
+		// check if taunter is already on aggro list.
+		float AggroToAdd = TopDanger.Aggro * 1.1f;
+		FMMOAggroData* AggroData = AggroList.FindByPredicate([Attacker](const FMMOAggroData& AggroData) { return AggroData.Character == Attacker; });
+		if (AggroData)
+		{
+			AggroToAdd -= AggroData->Aggro;
+		}
+
+		AddAggro(Attacker, AggroToAdd);
+
+		SortAggroList();
+	}
 }
 
 void UMMOAggroManagerComponent::BeginPlay()
@@ -67,19 +97,27 @@ void UMMOAggroManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason
 
 void UMMOAggroManagerComponent::OnTakeDamage(AMMOBaseCharacter* Sender, FMMODamage Damage)
 {
-	FMMOAggroData* AggroData = AggroList.FindByPredicate([DamageDealer = Damage.DamageDealer](const FMMOAggroData& AggroData) { return AggroData.Character == DamageDealer; });
-
 	const float Aggro = FMath::Max(static_cast<float>(Damage.Damage), 0.f) * DamageAggroPercent + FMath::Max(static_cast<float>(-Damage.Damage), 0.f) * HealAggroPercent;
+	AddAggro(Sender, Aggro);
+
+	SortAggroList();
+}
+
+void UMMOAggroManagerComponent::AddAggro(AMMOBaseCharacter* Danger, const float Aggro)
+{
+	if (Danger == GetOwner())
+		return;
+
+	FMMOAggroData* AggroData = AggroList.FindByPredicate([Danger](const FMMOAggroData& AggroData) { return AggroData.Character == Danger; });
+
 	if (AggroData)
 	{
 		AggroData->Aggro += Aggro;
 	}
 	else
 	{
-		AggroList.Add(FMMOAggroData(Damage.DamageDealer, Aggro));
+		AggroList.Add(FMMOAggroData(Danger, Aggro));
 	}
-
-	SortAggroList();
 }
 
 void UMMOAggroManagerComponent::SortAggroList()

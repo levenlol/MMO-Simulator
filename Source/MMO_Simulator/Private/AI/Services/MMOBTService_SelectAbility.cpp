@@ -3,6 +3,8 @@
 
 #include "AI/Services/MMOBTService_SelectAbility.h"
 #include "Characters/MMOBaseCharacter.h"
+#include "Characters/MMOBaseEnemy.h"
+#include "AI/MMOAggroManagerComponent.h"
 #include "AI/MMOAIController.h"
 #include "CombatSystem/MMOCombatSystem.h"
 #include "CombatSystem/MMOWrapperSkill.h"
@@ -51,7 +53,12 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 
 		// TODO: better pick spell logic.
 		const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
-		if (WrapperSkill->Tags.HasTag(SkillTags.TargetTag))
+
+		if(WrapperSkill->Tags.HasTag(SkillTags.TauntTag))
+		{
+			CHECK_RETURN_SPELLHANDLED(HandleTauntSpell(Character, BlackBoard, i));
+		}
+		else if (WrapperSkill->Tags.HasTag(SkillTags.TargetTag))
 		{
 			CHECK_RETURN_SPELLHANDLED(HandleTargetSpell(Character, BlackBoard, i));
 		}
@@ -62,6 +69,35 @@ void UMMOBTService_SelectAbility::OnSearchStart(FBehaviorTreeSearchData& SearchD
 	}
 }
 
+MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTauntSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex)
+{
+	const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
+
+	UMMOWrapperSkill* Skill = Character->CombatSystem->Skills[SpellIndex];
+
+	if (Skill->Tags.HasTag(SkillTags.TargetTag))
+	{
+		if (AMMOBaseEnemy* Enemy = Cast<AMMOBaseEnemy>(GetBestEnemyTarget(Character, Skill->Range)))
+		{
+			// Check if enemy is attacking us.
+			if (Enemy->AggroManager->GetMostDangerousCharacter() != Character)
+			{
+				if (Character->CombatSystem->CanCastSkill(Enemy, Enemy->GetActorLocation(), SpellIndex) == EMMOSkillCastFailType::None)
+				{
+					BlackBoard->SetValueAsInt(SpellSelector.SelectedKeyName, SpellIndex + 1); // spells are 1 based
+					BlackBoard->SetValueAsVector(SpellLocationSelector.SelectedKeyName, Enemy->GetActorLocation());
+					BlackBoard->SetValueAsObject(SpellTargetSelector.SelectedKeyName, Enemy);
+
+					return MMOAI::ESelectAbilityResult::Succeed;
+				}
+			}
+		}
+	}
+	else ensure(0 && "Unsupported");
+
+	return MMOAI::ESelectAbilityResult::Failed;
+}
+
 MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTargetSpell(AMMOBaseCharacter* Character, UBlackboardComponent* BlackBoard, int32 SpellIndex)
 {
 	const FMMOSkillTags& SkillTags = FMMOSkillTags::Get();
@@ -69,23 +105,14 @@ MMOAI::ESelectAbilityResult UMMOBTService_SelectAbility::HandleTargetSpell(AMMOB
 	UMMOWrapperSkill* Skill = Character->CombatSystem->Skills[SpellIndex];	
 	AMMOBaseCharacter* TargetCharacter = nullptr;
 
-	TArray<FHitResult> HitResults;
 	if (Skill->Tags.HasTag(SkillTags.EnemyTag))
 	{
-		if (AMMOBaseCharacter* AATarget = Character->CombatSystem->GetAutoAttackTarget())
-		{
-			TargetCharacter = AATarget;
-		}
-		else
-		{
-			HitResults = GetHitsResults(Character->GetActorLocation(), EnemySpellCollisionChannel, Skill->Range);
-			TargetCharacter = RetrieveBestEnemyTarget(HitResults);
-		}
+		TargetCharacter = GetBestEnemyTarget(Character, Skill->Range);
 	}
 	else if (Skill->Tags.HasTag(SkillTags.FriendlyTag))
 	{
 		const bool bSelfCastable = Skill->Tags.HasTag(SkillTags.SelfTargetTag); // true if the spell can be cast on self.
-		HitResults = GetHitsResults(Character->GetActorLocation(), FriendlySpellCollisionChannel, Skill->Range, bSelfCastable ? nullptr : Character);
+		TArray<FHitResult> HitResults = GetHitsResults(Character->GetActorLocation(), FriendlySpellCollisionChannel, Skill->Range, bSelfCastable ? nullptr : Character);
 		TargetCharacter = RetrieveBestFriendlyTarget(HitResults);
 	}
 	else ensure(0 && "Didnt support that kind of spell yet");
@@ -129,6 +156,21 @@ TArray<FHitResult> UMMOBTService_SelectAbility::GetHitsResults(const FVector& Lo
 	GetWorld()->SweepMultiByChannel(HitResults, Location, Location + FVector::UpVector, FQuat::Identity, CollisionChannel, FCollisionShape::MakeSphere(Radius), Params);
 
 	return HitResults;
+}
+
+AMMOBaseCharacter* UMMOBTService_SelectAbility::GetBestEnemyTarget(AMMOBaseCharacter* Character, float Range) const
+{
+	AMMOBaseCharacter* Target = nullptr;
+	if (AMMOBaseCharacter* AATarget = Character->CombatSystem->GetAutoAttackTarget())
+	{
+		Target = AATarget;
+	}
+	else
+	{
+		TArray<FHitResult> HitResults = GetHitsResults(Character->GetActorLocation(), EnemySpellCollisionChannel, Range);
+		Target = RetrieveBestEnemyTarget(HitResults);
+	}
+	return Target;
 }
 
 AMMOBaseCharacter* UMMOBTService_SelectAbility::RetrieveBestEnemyTarget(const TArray<FHitResult>& HitResults) const

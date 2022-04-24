@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Object.h"
 #include "MMOCommon.generated.h"
 
 class UAnimSequenceBase;
@@ -482,4 +483,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Utility, meta = (WorldContext = WorldContextObject)) 
 	static FVector VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset = 0.f);
+
+	UFUNCTION(BlueprintPure, Category = Utility)
+	static bool IsInLOS(AMMOBaseCharacter* First, AMMOBaseCharacter* Second, ECollisionChannel CollisionChannel);
 };

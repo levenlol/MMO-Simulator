@@ -68,6 +68,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = Events)
 	FAggroEnterCombatDelegate EnterCombatDelegate;
 
+	UFUNCTION(BlueprintCallable, Category = Combat)
+	void Taunt(AMMOBaseCharacter* Attacker);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -75,6 +78,8 @@ protected:
 private:
 	UFUNCTION()
 	void OnTakeDamage(AMMOBaseCharacter* Sender, FMMODamage Damage);
+
+	void AddAggro(AMMOBaseCharacter* Danger, const float Aggro);
 
 	void SortAggroList();
 
