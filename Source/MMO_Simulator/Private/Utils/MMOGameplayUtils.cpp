@@ -1,7 +1,6 @@
 #include "Utils/MMOGameplayUtils.h"
 #include "Data/MMODataFinder.h"
 #include "Items/MMOBaseWeapon.h"
-#include "Characters/MMOBaseCharacter.h"
 #include "Characters/MMOBaseEnemy.h"
 #include "Characters/MMOBaseHero.h"
 #include "Core/MMOGameState.h"
@@ -207,35 +206,4 @@ FString UMMOGameplayUtils::GetClassName(EMMOCharacterClass InClass)
 	}
 
 	return ClassEnum->GetNameStringByValue(static_cast<int64>(InClass));
-}
-
-FVector UMMOGameplayUtils::VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset)
-{
-	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
-	{
-		FHitResult HitResult;
-
-		const FVector StartLocation = InLocation + FVector(0.f, 0.f, UpRayOffset);
-		const FVector EndLocation = StartLocation + FVector(0.f, 0.f, -RayLength);
-		if (World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, CollisionChannel))
-		{
-			return HitResult.ImpactPoint;
-		}
-	}
-
-	return InLocation;
-}
-
-bool UMMOGameplayUtils::IsInLOS(AMMOBaseCharacter* First, AMMOBaseCharacter* Second, ECollisionChannel CollisionChannel)
-{
-	if (!First || !Second)
-	{
-		return false;
-	}
-
-	FHitResult LosHit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(First);
-
-	return First->GetWorld()->LineTraceSingleByChannel(LosHit, First->GetActorLocation(), Second->GetActorLocation(), CollisionChannel, Params);
 }
