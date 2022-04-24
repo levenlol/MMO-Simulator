@@ -98,7 +98,7 @@ void UMMOAggroManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason
 void UMMOAggroManagerComponent::OnTakeDamage(AMMOBaseCharacter* Sender, FMMODamage Damage)
 {
 	const float Aggro = FMath::Max(static_cast<float>(Damage.Damage), 0.f) * DamageAggroPercent + FMath::Max(static_cast<float>(-Damage.Damage), 0.f) * HealAggroPercent;
-	AddAggro(Sender, Aggro);
+	AddAggro(Damage.DamageDealer, Aggro);
 
 	SortAggroList();
 }
