@@ -147,6 +147,9 @@ public:
 	FMMOOnCharacterEvent OnCharacterStunned;
 
 	UPROPERTY(BlueprintAssignable, Category = Combat)
+	FMMOOnCharacterEvent OnCharacterDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOOnDamageTaken OnDamageTaken;
 
 	UPROPERTY(BlueprintAssignable, Category = Combat)

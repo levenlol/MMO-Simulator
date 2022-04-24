@@ -63,6 +63,7 @@ public:
 	bool StartAttack(AMMOBaseCharacter* Target);
 
 	void StopAttack();
+	void StopCast();
 
 	UFUNCTION(BlueprintCallable, Category = Combat)
 	bool CanAttackTarget(AMMOBaseCharacter* Target) const;
@@ -166,4 +167,7 @@ private:
 
 	UFUNCTION()
 	void OnCharacterStunned(AMMOBaseCharacter* Sender);
+
+	UFUNCTION()
+	void OnCharacterDeath(AMMOBaseCharacter* Sender);
 };

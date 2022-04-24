@@ -31,6 +31,7 @@ void UMMOCombatSystem::BeginPlay()
 	OwnerCharacter = Cast<AMMOBaseCharacter>(GetOwner());
 	OwnerCharacter->OnEquipWeapon.AddDynamic(this, &UMMOCombatSystem::OnCharacterChangeWeapon);
 	OwnerCharacter->OnCharacterStunned.AddDynamic(this, &UMMOCombatSystem::OnCharacterStunned);
+	OwnerCharacter->OnCharacterDeath.AddDynamic(this, &UMMOCombatSystem::OnCharacterDeath);
 }
 
 void UMMOCombatSystem::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -41,6 +42,7 @@ void UMMOCombatSystem::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		OwnerCharacter->OnEquipWeapon.RemoveDynamic(this, &UMMOCombatSystem::OnCharacterChangeWeapon);
 		OwnerCharacter->OnCharacterStunned.RemoveDynamic(this, &UMMOCombatSystem::OnCharacterStunned);
+		OwnerCharacter->OnCharacterDeath.RemoveDynamic(this, &UMMOCombatSystem::OnCharacterDeath);
 		OwnerCharacter = nullptr;
 	}
 
@@ -53,6 +55,16 @@ void UMMOCombatSystem::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void UMMOCombatSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!OwnerCharacter || !OwnerCharacter->IsAlive())
+	{
+		return;
+	}
+
+	if (AutoAttackTarget && !AutoAttackTarget->IsAlive())
+	{
+		StopAttack();
+	}
 
 	if (IsAttacking())
 	{
@@ -109,7 +121,7 @@ bool UMMOCombatSystem::StartAttack(AMMOBaseCharacter* Target)
 
 bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 {
-	if (!Target) return false;
+	if (!Target || !Target->IsAlive()) return false;
 
 	const float DistanceSq = (OwnerCharacter->GetActorLocation() - Target->GetActorLocation()).SizeSquared2D();
 
@@ -120,6 +132,8 @@ bool UMMOCombatSystem::CanAttackTarget(AMMOBaseCharacter* Target) const
 	OwnerCharacter->GetSimpleCollisionCylinder(OwnerRadius, OwnerHalfheight);
 
 	const AMMOBaseWeapon* MainHandWeapon = GetEquippedMainHandWeapon();
+
+	if (!MainHandWeapon) return false;
 
 	const float EffectiveRange = MainHandWeapon->Stats.WeaponRange + OwnerRadius + TargetRadius;
 	return DistanceSq <= EffectiveRange * EffectiveRange;
@@ -260,7 +274,7 @@ int32 UMMOCombatSystem::AddSkill(TSubclassOf<UMMOWrapperSkill> InSkill)
 
 bool UMMOCombatSystem::IsAttacking() const
 {
-	if (OwnerCharacter)
+	if (OwnerCharacter && OwnerCharacter->IsAlive())
 	{
 		const bool bAttackTag = OwnerCharacter->HasTag(AttackTag);
 
@@ -326,6 +340,17 @@ void UMMOCombatSystem::StopAttack()
 	const float CurrentGameTime = GetWorld()->GetTimeSeconds();
 	LastAttackTime = CurrentGameTime;
 	AutoAttackTarget = nullptr;
+}
+
+void UMMOCombatSystem::StopCast()
+{
+	for (UMMOWrapperSkill* Skill : Skills)
+	{
+		Skill->AbortAbility();
+	}
+
+	OwnerCharacter->RemoveTag(CastTag);
+	OwnerCharacter->RemoveTag(ChannelingTag);
 }
 
 FMMODamage UMMOCombatSystem::ComputeAutoAttackDamage()
@@ -401,14 +426,14 @@ void UMMOCombatSystem::OnSkillAbort(UMMOWrapperSkill* Sender)
 void UMMOCombatSystem::OnCharacterStunned(AMMOBaseCharacter* Sender)
 {
 	// we clearly have to stop everything we are doing.
-	for (UMMOWrapperSkill* Skill : Skills)
-	{
-		Skill->AbortAbility();
-	}
+	StopCast();
+	StopAttack();
+}
 
-	OwnerCharacter->RemoveTag(AttackTag);
-	OwnerCharacter->RemoveTag(CastTag);
-	OwnerCharacter->RemoveTag(ChannelingTag);
+void UMMOCombatSystem::OnCharacterDeath(AMMOBaseCharacter* Sender)
+{
+	StopCast();
+	StopAttack();
 }
 
 bool UMMOCombatSystem::CanCharacterAttack() const
