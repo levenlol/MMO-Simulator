@@ -12,6 +12,7 @@
 class UMMOAggroManagerComponent;
 class AMMOBaseCharacter;
 class UBehaviorTree;
+class UMMOBossUI;
 
 DECLARE_DELEGATE_RetVal_OneParam(bool, FBossConditionEventDelegate, AMMOBaseBoss*);
 DECLARE_DELEGATE_OneParam(FBossCallbackEventDelegate, AMMOBaseBoss*)
@@ -72,6 +73,12 @@ public:
 		PendingEvents.Add(MoveTemp(DelegateHelper));
 	}
 
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UMMOBossUI> BossWidgetClass;
+
+	void ShowBossWidget();
+	void HideBossWidget();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -91,4 +98,7 @@ private:
 	TArray<FMMOEventDelegateHelper> PendingEvents;
 
 	void CheckEvents();
+
+	UPROPERTY(VisibleInstanceOnly, Category = UI)
+	UMMOBossUI* BossWidget = nullptr;
 };

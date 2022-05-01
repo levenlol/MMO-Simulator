@@ -1,11 +1,40 @@
 #include "Bosses/MMOBossManagerComponent.h"
 #include "AI/MMOAggroManagerComponent.h"
+#include "UI/MMOBossUI.h"
 
 UMMOBossManagerComponent::UMMOBossManagerComponent()
 	: Super()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
+}
+
+void UMMOBossManagerComponent::ShowBossWidget()
+{
+	if (!BossWidgetClass)
+	{
+		return;
+	}
+
+	if (!BossWidget)
+	{
+		BossWidget = CreateWidget<UMMOBossUI>(GetWorld(), BossWidgetClass);
+		BossWidget->SetCharacter(GetBossPawn());
+		BossWidget->AddToViewport();
+	}
+
+	if (!BossWidget->IsVisible())
+	{
+		BossWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+}
+
+void UMMOBossManagerComponent::HideBossWidget()
+{
+	if (BossWidget && BossWidget->IsVisible())
+	{
+		BossWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UMMOBossManagerComponent::BeginPlay()
@@ -28,6 +57,7 @@ void UMMOBossManagerComponent::OnEnterCombat(UMMOAggroManagerComponent* Sender, 
 	CheckEvents();
 
 	SetComponentTickEnabled(true);
+	ShowBossWidget();
 }
 
 void UMMOBossManagerComponent::CheckEvents()
