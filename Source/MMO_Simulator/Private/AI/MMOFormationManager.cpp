@@ -54,13 +54,6 @@ FVector UMMOFormationManager::ProjectPointToNavMesh(const FVector& InLocation) c
 		return InLocation;
 	}
 
-	ANavigationData* NavData = NavigationSystem->GetDefaultNavDataInstance(FNavigationSystem::DontCreate);
-	if (!NavData)
-	{
-		UE_LOG(LogTemp, Error, TEXT("FormationManager: cannot find ANavigationData"));
-		return InLocation;
-	}
-
 	FNavLocation EndLocation;
 	if (NavigationSystem->ProjectPointToNavigation(InLocation, EndLocation, FVector(500.f)))
 	{

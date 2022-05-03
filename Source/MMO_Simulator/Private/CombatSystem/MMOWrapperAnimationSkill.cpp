@@ -50,8 +50,6 @@ void UMMOWrapperAnimationSkill::FinishCastAbility()
 
 void UMMOWrapperAnimationSkill::OnAnimationEnd()
 {
-	Super::TryCastAbility(SavedInputData); // do damage.
-
 	StopAnimation();
 }
 
