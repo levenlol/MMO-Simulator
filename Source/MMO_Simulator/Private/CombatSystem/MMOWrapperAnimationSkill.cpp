@@ -50,6 +50,8 @@ void UMMOWrapperAnimationSkill::FinishCastAbility()
 
 void UMMOWrapperAnimationSkill::OnAnimationEnd()
 {
+	CastAbility();
+
 	StopAnimation();
 }
 
