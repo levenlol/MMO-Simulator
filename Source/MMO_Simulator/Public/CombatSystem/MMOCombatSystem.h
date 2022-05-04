@@ -110,6 +110,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = Skill)
 	bool IsSkillReady(int32 SpellIndex) const;
 	
+	UFUNCTION(BlueprintPure, Category = Skill)
+	float GetCastingPercentage() const;
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	UMMOWrapperSkill* GetCurrentCastingSkill() const;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill)
 	float GlobalCooldown = 1.f;
 

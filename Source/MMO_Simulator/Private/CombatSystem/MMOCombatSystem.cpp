@@ -482,6 +482,33 @@ bool UMMOCombatSystem::IsSkillReady(int32 SpellIndex) const
 	return false;
 }
 
+float UMMOCombatSystem::GetCastingPercentage() const
+{
+	UMMOWrapperSkill* CurrentCastedSkill = GetCurrentCastingSkill();
+	if (CurrentCastedSkill)
+	{
+		return CurrentCastedSkill->GetCastingPercent();
+	}
+
+	return 0.f;
+}
+
+UMMOWrapperSkill* UMMOCombatSystem::GetCurrentCastingSkill() const
+{
+	if (IsCasting())
+	{
+		for (UMMOWrapperSkill* Skill : Skills)
+		{
+			if (Skill && Skill->IsCasting())
+			{
+				return Skill;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void FMMODelayAADamage::DelayDamage(AMMOBaseCharacter* InTarget, float Delay)
 {
 	Target = InTarget;

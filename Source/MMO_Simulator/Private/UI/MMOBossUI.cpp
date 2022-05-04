@@ -5,6 +5,8 @@
 #include "Components/Image.h"
 #include "Characters/MMOBaseCharacter.h"
 #include "Components/TextBlock.h"
+#include "CombatSystem/MMOCombatSystem.h"
+#include "CombatSystem/MMOWrapperSkill.h"
 
 
 UMMOBossUI::UMMOBossUI(const FObjectInitializer& ObjectInitializer)
@@ -12,6 +14,7 @@ UMMOBossUI::UMMOBossUI(const FObjectInitializer& ObjectInitializer)
 {
 	HealthParameterName = FName("Progress");
 	ManaParameterName = FName("Progress");
+	CastParameterName = FName("Progress");
 
 	CharacterReference = nullptr;
 }
@@ -57,6 +60,16 @@ void UMMOBossUI::NativeConstruct()
 	Super::NativeConstruct();
 
 	AccumulatedTickTime = 0.f;
+
+	if (CastBar)
+	{
+		CastBar->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (AbilityNameTextBlock)
+	{
+		AbilityNameTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UMMOBossUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -81,5 +94,48 @@ void UMMOBossUI::TickBossUI(const FGeometry& MyGeometry, float InElapsedTime)
 	{
 		SetHealth(CharacterReference->GetHealthPercent());
 		SetMana(CharacterReference->GetResourcePercent());
+
+		HandleCastBar();
+	}
+}
+
+void UMMOBossUI::HandleCastBar()
+{
+	if (!CastBar)
+		return;
+
+	const float CastPercent = CharacterReference->CombatSystem->GetCastingPercentage();
+
+	const bool bIsCasting = CastPercent > 0.f && CharacterReference->CombatSystem->IsCasting();
+	if (bIsCasting)
+	{
+		if (!CastBar->IsVisible())
+		{
+			CastBar->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+			if (AbilityNameTextBlock)
+			{
+				UMMOWrapperSkill* Skill = CharacterReference->CombatSystem->GetCurrentCastingSkill();
+				check(Skill);
+
+				if (Skill)
+				{
+					AbilityNameTextBlock->SetText(FText::FromName(Skill->AbilityName));
+					AbilityNameTextBlock->SetVisibility(ESlateVisibility::HitTestInvisible);
+				}
+			}
+		}
+
+		CastBar->GetDynamicMaterial()->SetScalarParameterValue(CastParameterName, CastPercent);
+	}
+	else
+	{
+		if (CastBar->IsVisible())
+		{
+			CastBar->SetVisibility(ESlateVisibility::Collapsed);
+			AbilityNameTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+		}
+
+		CastBar->GetDynamicMaterial()->SetScalarParameterValue(CastParameterName, 0.f);
 	}
 }

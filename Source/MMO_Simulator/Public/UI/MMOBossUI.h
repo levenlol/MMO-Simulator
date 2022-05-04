@@ -24,6 +24,9 @@ public:
 	FName ManaParameterName;
 
 	UPROPERTY(EditDefaultsOnly, AdvancedDisplay, Category = Setup)
+	FName CastParameterName;
+
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay, Category = Setup)
 	float TickTime = 0.f;
 
 	UPROPERTY(meta = (BindWidget))
@@ -34,6 +37,12 @@ public:
 	
 	UPROPERTY(meta = (BindWidget, OptionalWidget = true))
 	UTextBlock* BossNameTextBlock;
+
+	UPROPERTY(meta = (BindWidget, OptionalWidget = true))
+	UImage* CastBar;
+
+	UPROPERTY(meta = (BindWidget, OptionalWidget = true))
+	UTextBlock* AbilityNameTextBlock;
 
 	UFUNCTION(BlueprintCallable, Category = Resources)
 	void SetHealth(float InPercent);
@@ -55,6 +64,8 @@ public:
 private:
 	UPROPERTY()
 	AMMOBaseCharacter* CharacterReference;
+
+	void HandleCastBar();
 
 	float AccumulatedTickTime = 0.f;
 };
