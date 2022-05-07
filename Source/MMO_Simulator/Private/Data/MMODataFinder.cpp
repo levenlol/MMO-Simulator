@@ -50,6 +50,16 @@ FMMOCharacterAttributes UMMODataFinder::GetRaceAttributes(const EMMOCharacterRac
 	return FMMOCharacterAttributes();
 }
 
+FLinearColor UMMODataFinder::GetColorFromClass(const EMMOCharacterClass Class) const
+{
+	if (ClassColors.Contains(Class))
+	{
+		return ClassColors[Class];
+	}
+
+	return FColor::Magenta.ReinterpretAsLinear();
+}
+
 UAnimSequenceBase* UMMODataFinder::GetAnimSequence(const FMMOWeaponTypeCouple& WeaponCouple) const
 {
 	if (AnimationsMap.Contains(WeaponCouple))
@@ -177,6 +187,26 @@ void UMMODataFinder::AddEquipGeneratorData(EMMORarityType Rarity, const FName& D
 	}
 }
 
+void UMMODataFinder::ParseClassColor()
+{
+	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());
+	UDataTable* ClassColorDataTable = GameInstance->RetrieveDataTable(ColorClassTableName);
+
+	if (!ClassColorDataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UMMODataFinder: cannot find %s"), *ColorClassTableName.ToString());
+		return;
+	}
+
+	TArray<FMMOClassColorDataTable*> Data;
+	ClassColorDataTable->GetAllRows<FMMOClassColorDataTable>(TEXT("CLASS_COLOR"), Data);
+
+	for (FMMOClassColorDataTable* ClassColorData : Data)
+	{
+		ClassColors.FindOrAdd(ClassColorData->Class, ClassColorData->ClassColor);
+	}
+}
+
 void UMMODataFinder::ParseEquipGenerator()
 {
 	UEnum* RarityEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMORarityType"));
@@ -281,6 +311,7 @@ void UMMODataFinder::Init()
 	ParseRaceCharacterDataTable();
 	ParseCharacterProgressionDataTable();
 
+	ParseClassColor();
 	ParseEquipGenerator();
 	ParseArmorTypeGenerator();
 	ParseArmorSlotGenerator();

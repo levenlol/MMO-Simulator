@@ -17,6 +17,18 @@ enum class EMMOArmorSlotType : uint8;
 enum class EMMOWeaponType : uint8;
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOClassColorDataTable : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	EMMOCharacterClass Class;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
+	FLinearColor ClassColor;
+};
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOEquipGeneratorDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
@@ -114,7 +126,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data)
 	FString QualifyingName;
 };
-
 
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FEquipGeneratorData
@@ -214,11 +225,20 @@ public:
 	UPROPERTY(config)
 	FString CharacterProgressionTableName;
 
+	UPROPERTY(config)
+	FName ColorClassTableName;
+
 	UFUNCTION(BlueprintPure, Category = CharacterProgression)
 	FMMOCharacterAttributes GetCharacterProgressionAtLevel(const EMMOCharacterClass CharacterClass, int32 Level) const;
 
 	UFUNCTION(BlueprintPure, Category = CharacterProgression)
 	FMMOCharacterAttributes GetRaceAttributes(const EMMOCharacterRace InRace) const;
+
+	UFUNCTION(BlueprintPure, Category = CharacterProgression)
+	FLinearColor GetColorFromClass(const EMMOCharacterClass Class) const;
+
+	UFUNCTION(BlueprintPure, Category = DataFinder)
+	static UMMODataFinder* GetDataFinder() { return Get(); }
 
 	static UMMODataFinder* Get() { check(Instance); return Instance; }
 
@@ -234,14 +254,17 @@ public:
 private:
 	static UMMODataFinder* Instance;
 
-	UPROPERTY(VisibleAnywhere, Category = Animation)
+	UPROPERTY(VisibleAnywhere, Category = Data)
 	TMap<FMMOWeaponTypeCouple, UAnimSequenceBase*> AnimationsMap;
 
-	UPROPERTY(VisibleAnywhere, Category = Animation)
+	UPROPERTY(VisibleAnywhere, Category = Data)
 	TMap<EMMOCharacterClass, FMMOCharacterProgressionContainer> AttributesIncreasePerLevel;
 
-	UPROPERTY(VisibleAnywhere, Category = Animation)
+	UPROPERTY(VisibleAnywhere, Category = Data)
 	TMap<EMMOCharacterRace, FMMOCharacterAttributes> RaceAttributes;
+
+	UPROPERTY(VisibleAnywhere, Category = Data)
+	TMap<EMMOCharacterClass, FLinearColor> ClassColors;
 
 	void AddEquipGeneratorData(EMMORarityType Rarity, const FName& DataTableID);
 
@@ -251,6 +274,7 @@ private:
 	TMap<EMMOWeaponType, FEquipGeneratorData> WeaponTypeEquipMultiplier;
 	TArray<FMMOEquipGeneratorQualifyingNameultiplierDataTable> QualifyingNameEquipMultiplier;
 
+	void ParseClassColor();
 	void ParseEquipGenerator();
 	void ParseArmorTypeGenerator();
 	void ParseArmorSlotGenerator();
