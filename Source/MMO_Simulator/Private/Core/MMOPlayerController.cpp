@@ -10,6 +10,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "AI/MMOAIController.h"
+#include "Components/MMOGroupsManagerComponent.h"
+
 
 AMMOPlayerController::AMMOPlayerController()
 {
@@ -17,6 +19,7 @@ AMMOPlayerController::AMMOPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 	FormationManager = CreateDefaultSubobject<UMMOFormationManager>(TEXT("FormationManager"));
+	GroupsManager = CreateDefaultSubobject<UMMOGroupsManagerComponent>(TEXT("GroupManager"));
 	EnemyCollionChannel = ECollisionChannel::ECC_GameTraceChannel1; // Enemy Channel.
 	CharacterCollionChannel = ECollisionChannel::ECC_GameTraceChannel2; // Character Channel
 	HeroCollisionChannel = ECollisionChannel::ECC_GameTraceChannel3; // Hero Channel
@@ -124,6 +127,13 @@ void AMMOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill_1", IE_Released, this, &AMMOPlayerController::TryCastSkill<0>);
 	InputComponent->BindAction("Skill_2", IE_Released, this, &AMMOPlayerController::TryCastSkill<1>);
 	InputComponent->BindAction("Skill_3", IE_Released, this, &AMMOPlayerController::TryCastSkill<2>);
+
+	InputComponent->BindAction("Group1", IE_Released, this, &AMMOPlayerController::HandleGroup<1>);
+	InputComponent->BindAction("Group2", IE_Released, this, &AMMOPlayerController::HandleGroup<2>);
+	InputComponent->BindAction("Group3", IE_Released, this, &AMMOPlayerController::HandleGroup<3>);
+	InputComponent->BindAction("Group4", IE_Released, this, &AMMOPlayerController::HandleGroup<4>);
+	InputComponent->BindAction("Group5", IE_Released, this, &AMMOPlayerController::HandleGroup<5>);
+	InputComponent->BindAction("Group6", IE_Released, this, &AMMOPlayerController::HandleGroup<6>);
 
 }
 
@@ -270,5 +280,27 @@ void AMMOPlayerController::TryCastSkill(const int32 Index)
 		{
 			AIController->RequestCastSpell(Target, Location, Index);
 		}
+	}
+}
+
+void AMMOPlayerController::CreateGroup(const int32 Number)
+{
+	const TArray<AMMOBaseHero*>& HeroesSelected = GetSelectedHeroes();
+
+	if (HeroesSelected.Num() > 0)
+	{
+		FMMOGroup Group;
+		Group.Heroes = GetSelectedHeroes();
+
+		GroupsManager->AddGroup(NameFromInt(Number), Group);
+	}
+}
+
+void AMMOPlayerController::SelectGroup(const int32 Number)
+{
+	const FMMOGroup& Group = GroupsManager->GetGroup(NameFromInt(Number));
+	if (Group.Heroes.Num() > 0)
+	{
+		SetSelectedHeroes(Group.Heroes);
 	}
 }

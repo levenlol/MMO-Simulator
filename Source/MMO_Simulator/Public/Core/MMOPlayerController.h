@@ -12,6 +12,7 @@ class AMMOBaseHero;
 class UMMOFormationManager;
 class AMMOBaseEnemy;
 class AMMOBaseCharacter;
+class UMMOGroupsManagerComponent;
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOPlayerController : public APlayerController
@@ -24,6 +25,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UMMOFormationManager* FormationManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UMMOGroupsManagerComponent* GroupsManager;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TEnumAsByte<ECollisionChannel> EnemyCollionChannel;
@@ -117,10 +121,31 @@ private:
 	void TryCastSkill();
 
 	void TryCastSkill(const int32 Index);
+
+	/** Groups */
+	template<int32 Number>
+	void HandleGroup();
+
+	void CreateGroup(const int32 Number);
+	void SelectGroup(const int32 Number);
+	static FName NameFromInt(const int32 Number) { return FName(*FString::FromInt(Number)); }
 };
 
 template<int32 Index>
 FORCEINLINE void AMMOPlayerController::TryCastSkill()
 {
 	TryCastSkill(Index);
+}
+
+template<int32 Number>
+inline void AMMOPlayerController::HandleGroup()
+{
+	if (IsInputKeyDown(EKeys::LeftControl) || IsInputKeyDown(EKeys::LeftCommand))
+	{
+		CreateGroup(Number);
+	}
+	else
+	{
+		SelectGroup(Number);
+	}
 }
