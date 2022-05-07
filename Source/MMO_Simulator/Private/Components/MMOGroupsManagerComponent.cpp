@@ -22,7 +22,13 @@ void UMMOGroupsManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UMMOGroupsManagerComponent::AddGroup(FName InName, FMMOGroup Group)
 {
-	Groups.FindOrAdd(InName) = MoveTemp(Group);
+	if (Group.Heroes.Num() > 0)
+	{
+		Groups.FindOrAdd(InName) = MoveTemp(Group);
+
+		// Broadcast event.
+		OnGroupCreatedOrModified.Broadcast(InName);
+	}
 }
 
 const FMMOGroup& UMMOGroupsManagerComponent::GetGroup(FName Name) const
@@ -34,5 +40,13 @@ const FMMOGroup& UMMOGroupsManagerComponent::GetGroup(FName Name) const
 
 	static FMMOGroup EmptyGroup;
 	return EmptyGroup;
+}
+
+TArray<FName> UMMOGroupsManagerComponent::GetGroupNames() const
+{
+	TArray<FName> Names;
+	Groups.GenerateKeyArray(Names);
+
+	return Names;
 }
 

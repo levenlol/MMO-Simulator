@@ -62,8 +62,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Selection)
 	void TogglePause();
 
-	FORCEINLINE const TArray<AMMOBaseHero*>& GetSelectedHeroes() const { return SelectedHeroes; }
+	UFUNCTION(BlueprintCallable, Category = Group)
+	void CreateGroup(FName Name);
 
+	UFUNCTION(BlueprintCallable, Category = Group)
+	void SelectGroup(FName Name);
+
+	FORCEINLINE const TArray<AMMOBaseHero*>& GetSelectedHeroes() const { return SelectedHeroes; }
 
 protected:
 	// Current selected heroes.
@@ -126,8 +131,6 @@ private:
 	template<int32 Number>
 	void HandleGroup();
 
-	void CreateGroup(const int32 Number);
-	void SelectGroup(const int32 Number);
 	static FName NameFromInt(const int32 Number) { return FName(*FString::FromInt(Number)); }
 };
 
@@ -142,10 +145,10 @@ inline void AMMOPlayerController::HandleGroup()
 {
 	if (IsInputKeyDown(EKeys::LeftControl) || IsInputKeyDown(EKeys::LeftCommand))
 	{
-		CreateGroup(Number);
+		CreateGroup(NameFromInt(Number));
 	}
 	else
 	{
-		SelectGroup(Number);
+		SelectGroup(NameFromInt(Number));
 	}
 }

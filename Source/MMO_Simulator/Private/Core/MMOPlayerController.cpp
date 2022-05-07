@@ -283,7 +283,7 @@ void AMMOPlayerController::TryCastSkill(const int32 Index)
 	}
 }
 
-void AMMOPlayerController::CreateGroup(const int32 Number)
+void AMMOPlayerController::CreateGroup(FName Name)
 {
 	const TArray<AMMOBaseHero*>& HeroesSelected = GetSelectedHeroes();
 
@@ -292,13 +292,13 @@ void AMMOPlayerController::CreateGroup(const int32 Number)
 		FMMOGroup Group;
 		Group.Heroes = GetSelectedHeroes();
 
-		GroupsManager->AddGroup(NameFromInt(Number), Group);
+		GroupsManager->AddGroup(Name, Group);
 	}
 }
 
-void AMMOPlayerController::SelectGroup(const int32 Number)
+void AMMOPlayerController::SelectGroup(FName Name)
 {
-	const FMMOGroup& Group = GroupsManager->GetGroup(NameFromInt(Number));
+	const FMMOGroup& Group = GroupsManager->GetGroup(Name);
 	if (Group.Heroes.Num() > 0)
 	{
 		SetSelectedHeroes(Group.Heroes);

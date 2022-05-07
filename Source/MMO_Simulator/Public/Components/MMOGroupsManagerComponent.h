@@ -8,6 +8,8 @@
 
 class AMMOBaseHero;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOGroupCreatedOrModified, FName, Name);
+
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOGroup
 {
@@ -35,6 +37,12 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Group)
 	const FMMOGroup& GetGroup(FName Name) const;
+
+	UFUNCTION(BlueprintPure, Category = Group)
+	TArray<FName> GetGroupNames() const;
+
+	UPROPERTY(BlueprintAssignable, Category = Group)
+	FMMOGroupCreatedOrModified OnGroupCreatedOrModified;
 
 protected:
 	virtual void BeginPlay() override;
