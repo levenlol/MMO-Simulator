@@ -111,8 +111,6 @@ void AMMODummyPawn::HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes)
 
 void AMMODummyPawn::HandleFreeCamera(AMMOPlayerController* PlayerController, float DeltaSeconds)
 {
-	constexpr int32 BorderSize = 50;
-
 	int32 SizeX, SizeY;
 	PlayerController->GetViewportSize(SizeX, SizeY);
 
