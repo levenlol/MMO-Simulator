@@ -13,6 +13,7 @@
 #include "Animation/AnimationAsset.h"
 #include "Components/CapsuleComponent.h"
 #include "Utils/MMOGameplayUtils.h"
+#include "Camera/MMOPlayerCameraManager.h"
 
 
 FMMOStatusTags FMMOStatusTags::StatusTags;
@@ -55,6 +56,8 @@ void AMMOBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CameraManager = AMMOPlayerCameraManager::GetPlayerCameraManager(this, 0);
+
 	GetWorld()->GetTimerManager().SetTimer(RecuperateTimerHandle, this, &AMMOBaseCharacter::OnRecuperate, static_cast<float>(CharacterInfo.Stats.RecuperateEverySeconds), true, -1.f);
 }
 
@@ -263,6 +266,25 @@ bool AMMOBaseCharacter::HasTag(const FGameplayTag& InTag) const
 void AMMOBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (CameraManager)
+	{
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		CameraManager->GetCameraViewPoint(CameraLocation, CameraRotation);
+
+		FHitResult HitResult;
+
+		if (GetWorld()->LineTraceSingleByObjectType(HitResult, GetActorLocation(), CameraLocation, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllStaticObjects)))
+		{
+			GetMesh()->SetRenderCustomDepth(true);
+			GetMesh()->SetCustomDepthStencilValue(2);
+		}
+		else
+		{
+			GetMesh()->SetRenderCustomDepth(false);
+		}
+	}
 
 	if (HasTag(FMMOStatusTags::Get().StunnedTag))
 	{

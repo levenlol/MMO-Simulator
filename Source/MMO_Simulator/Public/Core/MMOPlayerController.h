@@ -29,6 +29,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UMMOGroupsManagerComponent* GroupsManager;
 
+	UPROPERTY(EditAnywhere, Category = Movement)
+	TEnumAsByte<ECollisionChannel> TerrainCollisionChannel = ECollisionChannel::ECC_WorldStatic;
+
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TEnumAsByte<ECollisionChannel> EnemyCollionChannel;
 

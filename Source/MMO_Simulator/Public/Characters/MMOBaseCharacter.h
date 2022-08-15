@@ -16,6 +16,7 @@ class UMMOStatsManager;
 class UMMODebuffManager;
 class UMMOBuffManager;
 class UAnimationAsset;
+class AMMOPlayerCameraManager;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOOnCharacterEvent, AMMOBaseCharacter*, Sender);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMMOOnDamageTaken, AMMOBaseCharacter*, Sender, FMMODamage, Damage);
@@ -167,6 +168,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equip)
 	TMap<EMMOArmorSlotType, FMMOItemStats> EquippedArmor;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+	TEnumAsByte<ECollisionChannel> WallCollisionChannel = ECollisionChannel::ECC_WorldStatic;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -195,4 +199,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	bool bAlive = true;
+
+	UPROPERTY()
+	AMMOPlayerCameraManager* CameraManager = nullptr;
 };
