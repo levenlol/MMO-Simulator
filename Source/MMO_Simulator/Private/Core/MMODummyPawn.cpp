@@ -39,8 +39,8 @@ void AMMODummyPawn::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//MoveCameraMouse(DeltaSeconds);
-	//HandleRotateCamera(DeltaSeconds);
+	MoveCameraMouse(DeltaSeconds);
+	HandleRotateCamera(DeltaSeconds);
 }
 
 void AMMODummyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
