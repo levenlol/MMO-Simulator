@@ -89,7 +89,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime) override;
+	virtual void UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime) override;
 
 	void UpdateCurrentOffset();
 

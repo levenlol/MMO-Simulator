@@ -47,9 +47,9 @@ void AMMOPlayerCameraManager::BeginPlay()
 	ParabolaParameters.UpdateInitialParams(); // probably uncesessary
 }
 
-void AMMOPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime)
+void AMMOPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime)
 {
-	Super::UpdateViewTarget(OutVT, DeltaTime);
+	Super::UpdateViewTargetInternal(OutVT, DeltaTime);
 
 	if (ViewTarget.Target.Get() == nullptr)
 		return;
