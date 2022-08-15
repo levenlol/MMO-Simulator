@@ -7,7 +7,7 @@
 #include "MMODummyPawn.generated.h"
 
 class UCameraComponent;
-class USpringArmComponent;
+class AMMOPlayerCameraManager;
 class UInputComponent;
 class AMMOBaseHero;
 class AMMOPlayerController;
@@ -38,8 +38,6 @@ public:
 
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 private:
 #if WITH_EDITORONLY_DATA
@@ -47,18 +45,15 @@ private:
 	bool bDebug = false;
 #endif
 
+	UPROPERTY()
+	AMMOPlayerCameraManager* CameraManager = nullptr;
+
 	// Camera Movement Speed when isn't locked.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float CameraSpeed = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float CameraRotationSpeed = 100.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	FVector2D CameraZoomRange = FVector2D(1000.f, 3000.f);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float CameraZoomSpeed = 200.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	bool bCameraLocked = false;
@@ -80,10 +75,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* TopDownCameraComponent;
 
-	/** Camera boom positioning the camera above the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraBoom;
-
 	/** Handle camera movements */
 	void MoveCameraMouse(float DeltaSeconds);
 	void MoveCameraUp(float AxisValue);
@@ -95,8 +86,6 @@ private:
 
 	void HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes);
 	void HandleFreeCamera(AMMOPlayerController* PlayerController, float DeltaSeconds);
-
-	void HandleCameraZoom(float DeltaSeconds);
 
 	void CameraRotate_Pressed();
 	void CameraRotate_Released();

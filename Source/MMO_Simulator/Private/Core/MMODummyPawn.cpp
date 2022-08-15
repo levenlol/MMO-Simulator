@@ -6,7 +6,7 @@
 #include "Components/DecalComponent.h"
 #include "Core/MMOPlayerController.h"
 #include "Characters/MMOBaseHero.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Camera/MMOPlayerCameraManager.h"
 #include "Engine/World.h"
 
 AMMODummyPawn::AMMODummyPawn()
@@ -18,19 +18,9 @@ AMMODummyPawn::AMMODummyPawn()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
-	// Create a camera boom...
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->SetUsingAbsoluteRotation(false); 
-	CameraBoom->TargetArmLength = 2300.f;
-	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
-	CameraBoom->bDoCollisionTest = false;
-
-	TargetZoom = CameraBoom->TargetArmLength;
-
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	TopDownCameraComponent->SetupAttachment(RootComponent);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Activate ticking in order to update the cursor every frame.
@@ -42,27 +32,15 @@ void AMMODummyPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TargetZoom = CameraBoom->TargetArmLength;
+	CameraManager = AMMOPlayerCameraManager::GetPlayerCameraManager(this, 0);
 }
 
 void AMMODummyPawn::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	HandleCameraZoom(DeltaSeconds);
-	MoveCameraMouse(DeltaSeconds);
-	HandleRotateCamera(DeltaSeconds);
-
-#if WITH_EDITORONLY_DATA
-	if (bDebug)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, FString("Current: ") + FString::SanitizeFloat(CameraBoom->TargetArmLength) + FString(" - Target: ") + FString::SanitizeFloat(TargetZoom) + FString(" - Delta: ") + FString::SanitizeFloat(TargetZoom - CameraBoom->TargetArmLength));
-		
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 200.f, FColor::Red, false, -1.f, 0, 10.f);
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorRightVector() * 200.f, FColor::Green, false, -1.f, 0, 10.f);
-		DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorUpVector() * 200.f, FColor::Blue, false, -1.f, 0, 10.f);
-	}
-#endif
+	//MoveCameraMouse(DeltaSeconds);
+	//HandleRotateCamera(DeltaSeconds);
 }
 
 void AMMODummyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -92,7 +70,7 @@ void AMMODummyPawn::HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes)
 		float Y = 0.f;
 		float Z = 0.f;
 
-		// fly average
+		// online-average
 		for (int32 i = 0; i < Heroes.Num(); i++)
 		{
 			const FVector Location = Heroes[i]->GetActorLocation();
@@ -127,23 +105,6 @@ void AMMODummyPawn::HandleFreeCamera(AMMOPlayerController* PlayerController, flo
 
 		const FVector Delta = GetActorForwardVector() * SpeedY + GetActorRightVector() * SpeedX;
 		AddActorWorldOffset(Delta * DeltaSeconds);
-	}
-}
-
-void AMMODummyPawn::HandleCameraZoom(float DeltaSeconds)
-{
-	if (CameraBoom->TargetArmLength != TargetZoom)
-	{
-		if (FMath::IsNearlyEqual(CameraBoom->TargetArmLength, TargetZoom, 0.1f))
-		{
-			CameraBoom->TargetArmLength = TargetZoom;
-		}
-		else
-		{
-			// smooth interpolation
-			const float NewArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetZoom, DeltaSeconds, 3.f);
-			CameraBoom->TargetArmLength = NewArmLength;
-		}
 	}
 }
 
@@ -229,11 +190,8 @@ void AMMODummyPawn::HandleRotateCamera(float DeltaSeconds)
 
 void AMMODummyPawn::CameraZoom(float AxisValue)
 {
-	if (AxisValue != 0.f)
+	if (AxisValue != 0.f && CameraManager)
 	{
-		const float CurrentLength = CameraBoom->TargetArmLength;
-
-		const float NewLength = FMath::Clamp(CurrentLength + AxisValue * CameraZoomSpeed, CameraZoomRange.X, CameraZoomRange.Y);
-		TargetZoom = NewLength;
+		CameraManager->CameraZoom(AxisValue);
 	}
 }
