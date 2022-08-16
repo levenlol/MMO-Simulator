@@ -66,7 +66,13 @@ private:
 	bool bRotatingCamera = false;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	float TargetZoom;
+	float CurrentCameraRotationSpeed = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = Camera)
+	float CameraRotationSmoothSpeed = 0.25f;
+
+	UPROPERTY(EditAnywhere, Category = Camera)
+	float MouseCameraRotationMultiplier = 1.f;
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	FVector2D LastMousePosition;
@@ -91,5 +97,5 @@ private:
 	void CameraRotate_Released();
 	void CameraRotate_Axis(float AxisValue);
 
-	void RotateCameraYaw(float Delta);
+	void RotateCameraYaw(float AxisValue);
 };

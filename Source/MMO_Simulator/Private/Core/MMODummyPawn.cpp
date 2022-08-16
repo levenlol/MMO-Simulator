@@ -33,6 +33,7 @@ void AMMODummyPawn::BeginPlay()
 	Super::BeginPlay();
 
 	CameraManager = AMMOPlayerCameraManager::GetPlayerCameraManager(this, 0);
+	CurrentCameraRotationSpeed = 0.f;
 }
 
 void AMMODummyPawn::Tick(float DeltaSeconds)
@@ -124,11 +125,21 @@ void AMMODummyPawn::CameraRotate_Released()
 
 void AMMODummyPawn::CameraRotate_Axis(float AxisValue)
 {
-	RotateCameraYaw(AxisValue * CameraSpeed * GetWorld()->GetDeltaSeconds());
+	RotateCameraYaw(AxisValue);
 }
 
-void AMMODummyPawn::RotateCameraYaw(float Delta)
+void AMMODummyPawn::RotateCameraYaw(float AxisValue)
 {
+	if (AxisValue == 0.f)
+	{
+		CurrentCameraRotationSpeed = 0.f;
+		return;
+	}
+
+	const float DeltaSeconds = GetWorld()->GetDeltaSeconds();
+	FMath::ExponentialSmoothingApprox(CurrentCameraRotationSpeed, CameraRotationSpeed, DeltaSeconds, CameraRotationSmoothSpeed);
+
+	const float Delta = AxisValue * CurrentCameraRotationSpeed;
 	AddActorWorldRotation(FRotator(0.f, Delta, 0.f));
 }
 
@@ -183,8 +194,8 @@ void AMMODummyPawn::HandleRotateCamera(float DeltaSeconds)
 	const float PrevMouseX = LastMousePosition.X;
 	if (PlayerController->GetMousePosition(LastMousePosition.X, LastMousePosition.Y))
 	{
-		const float Delta = (LastMousePosition.X - PrevMouseX) * DeltaSeconds * CameraRotationSpeed;
-		RotateCameraYaw(Delta);
+		const float Delta = (LastMousePosition.X - PrevMouseX);
+		RotateCameraYaw(Delta * MouseCameraRotationMultiplier);
 	}
 }
 

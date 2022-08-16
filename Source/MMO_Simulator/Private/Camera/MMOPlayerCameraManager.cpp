@@ -58,7 +58,7 @@ void AMMOPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, floa
 	ParabolaParameters.UpdateZoomDistance(DeltaTime, AccCameraZoom);
 	AccCameraZoom = 0.f;
 
-	// Internal compute POV. POV is express as offset from ViewTarget.
+	// Internal compute POV. POV is expressed as offset from ViewTarget.
 	UpdateCurrentOffset();
 
 	OutVT.POV.Location = ViewTarget.Target->GetActorLocation() + CurrentOffset;
@@ -72,7 +72,7 @@ void AMMOPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, floa
 		FVector LastPoint = ViewTargetLoc;
 
 		constexpr float XStep = 25.f;
-		// draw parable
+		// draw parabola
 		for (int32 i = 0; i < 100; i++)
 		{
 			FVector Delta;
