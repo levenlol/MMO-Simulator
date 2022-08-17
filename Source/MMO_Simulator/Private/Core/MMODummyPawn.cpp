@@ -8,6 +8,7 @@
 #include "Characters/MMOBaseHero.h"
 #include "Camera/MMOPlayerCameraManager.h"
 #include "Engine/World.h"
+#include "Utils/MMOGameplayUtils.h"
 
 AMMODummyPawn::AMMODummyPawn()
 {
@@ -67,24 +68,8 @@ void AMMODummyPawn::HandleCameraLocked(const TArray<AMMOBaseHero*>& Heroes)
 {
 	if (Heroes.Num() > 0)
 	{
-		float X = 0.f;
-		float Y = 0.f;
-		float Z = 0.f;
-
-		// online-average
-		for (int32 i = 0; i < Heroes.Num(); i++)
-		{
-			const FVector Location = Heroes[i]->GetActorLocation();
-			const float n = (i + 1.f);
-			const float a = 1 / n;
-			const float b = 1 - a;
-
-			X = a * Location.X + b * X;
-			Y = a * Location.Y + b * Y;
-			Z = a * Location.Z + b * Z;
-		}
-
-		SetActorLocation(FVector(X, Y, Z));
+		const FVector MiddlePoint = UMMOGameplayUtils::ComputeHeroesSelectionMiddlePoint(Heroes);
+		SetActorLocation(MiddlePoint);
 	}
 }
 

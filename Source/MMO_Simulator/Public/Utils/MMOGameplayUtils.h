@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Utility)
 	static FString GetClassName(EMMOCharacterClass InClass);
 
+	UFUNCTION(BlueprintPure, Category = Utility)
+	static FVector ComputeHeroesSelectionMiddlePoint(const TArray<AMMOBaseHero*>& Heroes);
+
 	UFUNCTION(BlueprintCallable, Category = Utility, meta = (WorldContext = WorldContextObject))
 	static FVector VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset = 0.f)
 	{

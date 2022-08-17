@@ -105,7 +105,7 @@ void AMMOPlayerController::PlayerTick(float DeltaTime)
 		FVector Location, ImpactNormal;
 		if (DeprojectMouseToTerrain(Location, ImpactNormal))
 		{
-			const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes.Num(), MousePressedTerrainLocation, Location);
+			const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
 			FormationManager->ShowPreview(Points);
 		}
 	}
@@ -145,7 +145,7 @@ void AMMOPlayerController::SetNewMoveDestination()
 	FVector Location, ImpactNormal;
 	if (DeprojectMouseToTerrain(Location, ImpactNormal))
 	{
-		const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes.Num(), MousePressedTerrainLocation, Location);
+		const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
 
 		for (int32 i = 0; i < SelectedHeroes.Num(); i++)
 		{

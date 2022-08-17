@@ -8,6 +8,14 @@
 
 class AMMOBaseHero;
 
+UENUM(BlueprintType)
+enum class EMMOFormationSortType : uint8
+{
+	None,
+	Nearest,
+	Similar
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MMO_SIMULATOR_API UMMOFormationManager : public UActorComponent
 {
@@ -21,13 +29,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// return an array of points, each for every actors passed as input
-	UFUNCTION(BlueprintCallable, Category = Formation)
-	TArray<FVector> ComputeFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+	UFUNCTION(BlueprintPure, Category = Formation)
+	TArray<FVector> ComputeSimpleFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+
+	UFUNCTION(BlueprintPure, Category = Formation)
+	TArray<FVector> ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void ShowPreview(const TArray<FVector>& Points);
 
-	void ShowPreview(const FVector& Point);
+	void ShowPreview(FVector Point);
 
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void HideAllPreviews();
@@ -54,6 +65,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
 	float VerticalMargin = 150.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
+	EMMOFormationSortType FormationSortType = EMMOFormationSortType::Similar;
+
+#if WITH_EDITORONLY_DATA 
+	UPROPERTY(EditAnywhere, Category = Debug)
+	bool bDebug = false;
+#endif
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -62,4 +80,10 @@ private:
 
 	void AddPrecachePreviewActors(const int32 PreviewNumbersToAdd);
 	FVector ProjectPointToNavMesh(const FVector& InLocation) const;
+
+	// greedy find the nearest point to each actor (cannot select the same point)
+	TArray<FVector> SortPoints_Nearest(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points,const FVector& AnchorPoint, const FVector& LastPoint);
+
+	// based on similiarty. 1 - abs(x1 - x2) / (x1 + x2)
+	TArray<FVector> SortPoints_Similiar(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points, const FVector& AnchorPoint, const FVector& LastPoint);
 };

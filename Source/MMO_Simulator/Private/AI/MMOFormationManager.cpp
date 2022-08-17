@@ -4,6 +4,7 @@
 #include "AI/MMOFormationManager.h"
 #include "Characters/MMOBaseHero.h"
 #include "NavigationSystem.h"
+#include "Utils/MMOGameplayUtils.h"
 
 UMMOFormationManager::UMMOFormationManager()
 	: Super()
@@ -63,6 +64,124 @@ FVector UMMOFormationManager::ProjectPointToNavMesh(const FVector& InLocation) c
 	return InLocation;
 }
 
+TArray<FVector> UMMOFormationManager::SortPoints_Nearest(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points, const FVector& AnchorPoint, const FVector& LastPoint)
+{
+	TArray<FVector> SortedPoints;
+	SortedPoints.Init(FVector::ZeroVector, Points.Num());
+
+	int32 HeroIdx = -1;
+	int32 PointIdx = -1;
+
+	float MinDist = BIG_NUMBER;
+	const int32 HeroesNum = Heroes.Num();
+	for (int32 k = 0; k < HeroesNum; k++)
+	{
+		HeroIdx = -1;
+		PointIdx = -1;
+
+		MinDist = BIG_NUMBER;
+
+		for (int32 i = 0; i < Heroes.Num(); i++)
+		{
+			AMMOBaseHero* Hero = Heroes[i];
+			if (!Hero)
+				continue;
+
+			for (int j = 0; j < Points.Num(); j++)
+			{
+				const FVector& Point = Points[j];
+
+				const float CurrDist = (Hero->GetActorLocation() - Point).SizeSquared();
+				if (CurrDist < MinDist)
+				{
+					MinDist = CurrDist;
+					HeroIdx = i;
+					PointIdx = j;
+				}
+			}
+		}
+
+
+		SortedPoints[HeroIdx] = Points[PointIdx];
+		Points[PointIdx] = FVector(1.84e+18f); // this point shouldnt be selected anymore.
+		Heroes[HeroIdx] = nullptr; // this hero has been already addressed.
+	}
+
+	return SortedPoints;
+}
+
+TArray<FVector> UMMOFormationManager::SortPoints_Similiar(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points, const FVector& AnchorPoint, const FVector& LastPoint)
+{
+	struct DummyContainer
+	{
+		int32 Idx;
+		float Value;
+	};
+
+	const FVector MiddlePoint = UMMOGameplayUtils::ComputeHeroesSelectionMiddlePoint(Heroes);
+
+	if (MiddlePoint == AnchorPoint)
+		return Points;
+
+
+	const FVector Direction = (MiddlePoint - AnchorPoint).GetSafeNormal2D();
+	const FVector NormalDirection(-Direction.Y, Direction.X, Direction.Z);
+
+	TArray<FVector> SortedPoints;
+	SortedPoints.Init(FVector::ZeroVector, Points.Num());
+
+	TArray<DummyContainer> PrecomputedPointsDot;
+
+	for (int32 i = 0; i < Points.Num(); i++)
+	{
+		const FVector DirToPoint = (Points[i] - AnchorPoint);
+		const float Value = NormalDirection | DirToPoint;
+
+		DummyContainer D;
+		D.Idx = i;
+		D.Value = Value;
+
+		PrecomputedPointsDot.Add(D);
+	}
+
+	TArray<DummyContainer> PrecomputedHeroesDot;
+	for (int32 i = 0; i < Heroes.Num(); i++)
+	{
+		const FVector DirToHero = (Heroes[i]->GetActorLocation() - AnchorPoint);
+		const float Value = NormalDirection | DirToHero;
+
+		DummyContainer D;
+		D.Idx = i;
+		D.Value = Value;
+
+		PrecomputedHeroesDot.Add(D);
+	}
+
+	PrecomputedPointsDot.Sort([](const DummyContainer& A, const DummyContainer& B) { return A.Value < B.Value; });
+	PrecomputedHeroesDot.Sort([](const DummyContainer& A, const DummyContainer& B) { return A.Value < B.Value; });
+
+	for (int32 i = 0; i < Heroes.Num(); i++)
+	{
+		SortedPoints[i] = Points[PrecomputedPointsDot[PrecomputedHeroesDot[i].Idx].Idx];
+	}
+
+#if WITH_EDITORONLY_DATA
+	if (bDebug)
+	{
+		DrawDebugLine(GetWorld(), AnchorPoint + FVector::UpVector * 100.f, AnchorPoint + FVector::UpVector * 100.f + Direction * 200.f, FColor::Blue, false, -1.f, 1, 5.f);
+		DrawDebugLine(GetWorld(), AnchorPoint + FVector::UpVector * 100.f, AnchorPoint + FVector::UpVector * 100.f + NormalDirection * 200.f, FColor::Green, false, -1.f, 1, 5.f);
+		
+		FlushDebugStrings(GetWorld());
+		for (const auto& P : PrecomputedHeroesDot)
+		{
+			DrawDebugString(GetWorld(), Heroes[P.Idx]->GetActorLocation(), FString::SanitizeFloat(P.Value));
+		}
+	}
+#endif
+
+	return SortedPoints;
+}
+
 void UMMOFormationManager::ShowPreview(const TArray<FVector>& Points)
 {
 	for (const FVector& Point : Points)
@@ -71,7 +190,7 @@ void UMMOFormationManager::ShowPreview(const TArray<FVector>& Points)
 	}
 }
 
-void UMMOFormationManager::ShowPreview(const FVector& Point)
+void UMMOFormationManager::ShowPreview(FVector Point)
 {
 	if (++CurrentPreviewIndex >= UIFormationPreviews.Num())
 	{
@@ -99,7 +218,7 @@ void UMMOFormationManager::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-TArray<FVector> UMMOFormationManager::ComputeFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview /* = true */)
+TArray<FVector> UMMOFormationManager::ComputeSimpleFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview /* = true */)
 {
 	if (CharactersNum <= 0)
 		return {};
@@ -132,7 +251,34 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const int32 CharactersNum
 			ShowPreview(Point);
 		}
 	}
-	
+
+	return Points;
+}
+
+TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview)
+{
+	TArray<FVector> Points = ComputeSimpleFormation(Heroes.Num(), AnchorPoint, LastPoint, bShowPreview);
+
+	if (FormationSortType == EMMOFormationSortType::Nearest)
+	{
+		Points = SortPoints_Nearest(Heroes, Points, AnchorPoint, LastPoint);
+	}
+	else if (FormationSortType == EMMOFormationSortType::Similar)
+	{
+		Points = SortPoints_Similiar(Heroes, Points, AnchorPoint, LastPoint);
+	}
+
+#if WITH_EDITORONLY_DATA
+	if (bDebug)
+	{
+		for (int32 i = 0; i < Points.Num(); i++)
+		{
+			DrawDebugLine(GetWorld(), Heroes[i]->GetActorLocation() + FVector::UpVector * 100.f, Points[i], FColor::Blue, false, -1.f, 1, 3.f);
+			//DrawDebugString(GetWorld(), Points[i], FString::SanitizeFloat((Heroes[i]->GetActorLocation() - Points[i]).Size()), Heroes[i]);
+		}
+	}
+#endif
+
 	return Points;
 }
 
