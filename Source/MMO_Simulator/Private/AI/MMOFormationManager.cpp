@@ -134,8 +134,8 @@ TArray<FVector> UMMOFormationManager::SortPoints_Similiar(TArray<AMMOBaseHero*> 
 
 	for (int32 i = 0; i < Points.Num(); i++)
 	{
-		const FVector DirToPoint = (Points[i] - AnchorPoint);
-		const float Value = NormalDirection | DirToPoint;
+		const FVector DirToPoint = (Points[i] - MiddlePoint);
+		const float Value = DirToPoint | NormalDirection;
 
 		DummyContainer D;
 		D.Idx = i;
@@ -148,7 +148,7 @@ TArray<FVector> UMMOFormationManager::SortPoints_Similiar(TArray<AMMOBaseHero*> 
 	for (int32 i = 0; i < Heroes.Num(); i++)
 	{
 		const FVector DirToHero = (Heroes[i]->GetActorLocation() - AnchorPoint);
-		const float Value = NormalDirection | DirToHero;
+		const float Value = DirToHero | NormalDirection;
 
 		DummyContainer D;
 		D.Idx = i;
@@ -162,19 +162,23 @@ TArray<FVector> UMMOFormationManager::SortPoints_Similiar(TArray<AMMOBaseHero*> 
 
 	for (int32 i = 0; i < Heroes.Num(); i++)
 	{
-		SortedPoints[i] = Points[PrecomputedPointsDot[PrecomputedHeroesDot[i].Idx].Idx];
+		SortedPoints[PrecomputedHeroesDot[i].Idx] = Points[PrecomputedPointsDot[i].Idx];
 	}
 
 #if WITH_EDITORONLY_DATA
 	if (bDebug)
 	{
-		DrawDebugLine(GetWorld(), AnchorPoint + FVector::UpVector * 100.f, AnchorPoint + FVector::UpVector * 100.f + Direction * 200.f, FColor::Blue, false, -1.f, 1, 5.f);
-		DrawDebugLine(GetWorld(), AnchorPoint + FVector::UpVector * 100.f, AnchorPoint + FVector::UpVector * 100.f + NormalDirection * 200.f, FColor::Green, false, -1.f, 1, 5.f);
+		DrawDebugLine(GetWorld(), AnchorPoint + FVector::UpVector * 100.f, MiddlePoint + FVector::UpVector * 100.f, FColor::Magenta, false, -1.f, 1, 5.f);
 		
+		DrawDebugSphere(GetWorld(), MiddlePoint + FVector::UpVector * 100.f, 16.f, 8, FColor::Magenta, false, -1.f, 0, 3.f);
+		DrawDebugSphere(GetWorld(), AnchorPoint + FVector::UpVector * 100.f, 16.f, 8, FColor::Magenta, false, -1.f, 0, 3.f);
+
+
 		FlushDebugStrings(GetWorld());
-		for (const auto& P : PrecomputedHeroesDot)
+		for (int32 i = 0; i < PrecomputedHeroesDot.Num(); i++)
 		{
-			DrawDebugString(GetWorld(), Heroes[P.Idx]->GetActorLocation(), FString::SanitizeFloat(P.Value));
+			DrawDebugString(GetWorld(), Heroes[PrecomputedHeroesDot[i].Idx]->GetActorLocation(), FString::SanitizeFloat(PrecomputedHeroesDot[i].Value));
+			DrawDebugString(GetWorld(), Points[PrecomputedPointsDot[i].Idx], FString::SanitizeFloat(PrecomputedPointsDot[i].Value));
 		}
 	}
 #endif
