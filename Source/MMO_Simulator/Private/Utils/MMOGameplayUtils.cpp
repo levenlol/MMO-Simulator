@@ -210,17 +210,22 @@ FString UMMOGameplayUtils::GetClassName(EMMOCharacterClass InClass)
 
 FVector UMMOGameplayUtils::ComputeHeroesSelectionMiddlePoint(const TArray<AMMOBaseHero*>& Heroes)
 {
+	TArray<FVector> Positions;
+	Algo::Transform(Heroes, Positions, [](const AMMOBaseHero* Hero) { return Hero->GetActorLocation(); });
+	
+	return ComputeMiddlePoint(Positions);
+}
+
+FVector UMMOGameplayUtils::ComputeMiddlePoint(const TArray<FVector>& Points)
+{
 	float X = 0.f;
 	float Y = 0.f;
 	float Z = 0.f;
 
 	// online-average
-	for (int32 i = 0; i < Heroes.Num(); i++)
+	for (int32 i = 0; i < Points.Num(); i++)
 	{
-		if (!Heroes[i])
-			continue;
-
-		const FVector Location = Heroes[i]->GetActorLocation();
+		const FVector& Location = Points[i];
 		const float n = (i + 1.f);
 		const float a = 1 / n;
 		const float b = 1 - a;

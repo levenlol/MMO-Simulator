@@ -259,8 +259,16 @@ TArray<FVector> UMMOFormationManager::ComputeSimpleFormation(const int32 Charact
 	return Points;
 }
 
-TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview)
+TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview)
 {
+	if (FMath::IsNearlyZero((AnchorPoint - LastPoint).SizeSquared(), 0.1f))
+	{
+		// Better approximation than using FVector::UpVector
+		const FVector MiddlePoint = UMMOGameplayUtils::ComputeHeroesSelectionMiddlePoint(Heroes);
+		LastPoint = AnchorPoint + ((AnchorPoint - MiddlePoint).GetSafeNormal() * 100.f);
+	}
+
+
 	TArray<FVector> Points = ComputeSimpleFormation(Heroes.Num(), AnchorPoint, LastPoint, bShowPreview);
 
 	if (FormationSortType == EMMOFormationSortType::Nearest)
@@ -278,7 +286,6 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero
 		for (int32 i = 0; i < Points.Num(); i++)
 		{
 			DrawDebugLine(GetWorld(), Heroes[i]->GetActorLocation() + FVector::UpVector * 100.f, Points[i], FColor::Blue, false, -1.f, 1, 3.f);
-			//DrawDebugString(GetWorld(), Points[i], FString::SanitizeFloat((Heroes[i]->GetActorLocation() - Points[i]).Size()), Heroes[i]);
 		}
 	}
 #endif

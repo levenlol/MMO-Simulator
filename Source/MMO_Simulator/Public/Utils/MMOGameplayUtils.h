@@ -55,6 +55,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Utility)
 	static FVector ComputeHeroesSelectionMiddlePoint(const TArray<AMMOBaseHero*>& Heroes);
 
+	UFUNCTION(BlueprintPure, Category = Utility)
+	static FVector ComputeMiddlePoint(const TArray<FVector>& Points);
+
 	UFUNCTION(BlueprintCallable, Category = Utility, meta = (WorldContext = WorldContextObject))
 	static FVector VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset = 0.f)
 	{

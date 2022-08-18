@@ -33,7 +33,7 @@ public:
 	TArray<FVector> ComputeSimpleFormation(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintPure, Category = Formation)
-	TArray<FVector> ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+	TArray<FVector> ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void ShowPreview(const TArray<FVector>& Points);
