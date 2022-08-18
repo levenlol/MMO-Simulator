@@ -7,7 +7,6 @@
 #include "MMOBTService_PickNearestTarget.generated.h"
 
 class AMMOBaseCharacter;
-enum ECollisionChannel : uint8;
 
 UCLASS()
 class MMO_SIMULATOR_API UMMOBTService_PickNearestTarget : public UBTService_BlackboardBase

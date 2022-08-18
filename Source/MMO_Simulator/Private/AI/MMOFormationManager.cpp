@@ -259,7 +259,7 @@ TArray<FVector> UMMOFormationManager::ComputeSimpleFormation(const int32 Charact
 	return Points;
 }
 
-TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview)
+TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview)
 {
 	if (FMath::IsNearlyZero((AnchorPoint - LastPoint).SizeSquared(), 0.1f))
 	{
@@ -267,7 +267,6 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero
 		const FVector MiddlePoint = UMMOGameplayUtils::ComputeHeroesSelectionMiddlePoint(Heroes);
 		LastPoint = AnchorPoint + ((AnchorPoint - MiddlePoint).GetSafeNormal() * 100.f);
 	}
-
 
 	TArray<FVector> Points = ComputeSimpleFormation(Heroes.Num(), AnchorPoint, LastPoint, bShowPreview);
 
@@ -290,6 +289,10 @@ TArray<FVector> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseHero
 	}
 #endif
 
-	return Points;
+	const FRotator Rotation = (LastPoint - AnchorPoint).GetSafeNormal().ToOrientationRotator();
+	TArray<FTransform> Transforms;
+	Algo::Transform(Points, Transforms, [&Rotation](const FVector& Point) { return FTransform(Rotation, Point, FVector::OneVector); });
+
+	return Transforms;
 }
 

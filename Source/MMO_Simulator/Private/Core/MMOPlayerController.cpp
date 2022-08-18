@@ -105,8 +105,7 @@ void AMMOPlayerController::PlayerTick(float DeltaTime)
 		FVector Location, ImpactNormal;
 		if (DeprojectMouseToTerrain(Location, ImpactNormal))
 		{
-			const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
-			FormationManager->ShowPreview(Points);
+			FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location, true);
 		}
 	}
 }
@@ -128,13 +127,19 @@ void AMMOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill_2", IE_Released, this, &AMMOPlayerController::TryCastSkill<1>);
 	InputComponent->BindAction("Skill_3", IE_Released, this, &AMMOPlayerController::TryCastSkill<2>);
 
-	InputComponent->BindAction("Group1", IE_Released, this, &AMMOPlayerController::HandleGroup<1>);
-	InputComponent->BindAction("Group2", IE_Released, this, &AMMOPlayerController::HandleGroup<2>);
-	InputComponent->BindAction("Group3", IE_Released, this, &AMMOPlayerController::HandleGroup<3>);
-	InputComponent->BindAction("Group4", IE_Released, this, &AMMOPlayerController::HandleGroup<4>);
-	InputComponent->BindAction("Group5", IE_Released, this, &AMMOPlayerController::HandleGroup<5>);
-	InputComponent->BindAction("Group6", IE_Released, this, &AMMOPlayerController::HandleGroup<6>);
+	InputComponent->BindAction("CreateGroup1", IE_Released, this, &AMMOPlayerController::CreateGroup<1>);
+	InputComponent->BindAction("CreateGroup2", IE_Released, this, &AMMOPlayerController::CreateGroup<2>);
+	InputComponent->BindAction("CreateGroup3", IE_Released, this, &AMMOPlayerController::CreateGroup<3>);
+	InputComponent->BindAction("CreateGroup4", IE_Released, this, &AMMOPlayerController::CreateGroup<4>);
+	InputComponent->BindAction("CreateGroup5", IE_Released, this, &AMMOPlayerController::CreateGroup<5>);
+	InputComponent->BindAction("CreateGroup6", IE_Released, this, &AMMOPlayerController::CreateGroup<6>);
 
+	InputComponent->BindAction("SelectGroup1", IE_Released, this, &AMMOPlayerController::SelectGroup<1>);
+	InputComponent->BindAction("SelectGroup2", IE_Released, this, &AMMOPlayerController::SelectGroup<2>);
+	InputComponent->BindAction("SelectGroup3", IE_Released, this, &AMMOPlayerController::SelectGroup<3>);
+	InputComponent->BindAction("SelectGroup4", IE_Released, this, &AMMOPlayerController::SelectGroup<4>);
+	InputComponent->BindAction("SelectGroup5", IE_Released, this, &AMMOPlayerController::SelectGroup<5>);
+	InputComponent->BindAction("SelectGroup6", IE_Released, this, &AMMOPlayerController::SelectGroup<6>);
 }
 
 void AMMOPlayerController::SetNewMoveDestination()
@@ -145,12 +150,12 @@ void AMMOPlayerController::SetNewMoveDestination()
 	FVector Location, ImpactNormal;
 	if (DeprojectMouseToTerrain(Location, ImpactNormal))
 	{
-		const TArray<FVector> Points = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
+		const TArray<FTransform> Transforms = FormationManager->ComputeFormation(SelectedHeroes, MousePressedTerrainLocation, Location);
 
 		for (int32 i = 0; i < SelectedHeroes.Num(); i++)
 		{
 			AMMOBaseHero* CurrentHero = SelectedHeroes[i];
-			const FVector& DestLocation = Points[i];
+			const FVector DestLocation = Transforms[i].GetTranslation();
 
 			MoveHeroTo(CurrentHero->GetController(), DestLocation);
 		}
@@ -285,6 +290,11 @@ void AMMOPlayerController::TryCastSkill(const int32 Index)
 
 void AMMOPlayerController::CreateGroup(FName Name)
 {
+	if (IsInputKeyDown(EKeys::LeftShift) || IsInputKeyDown(EKeys::RightShift))
+	{
+		return;
+	}
+
 	const TArray<AMMOBaseHero*>& HeroesSelected = GetSelectedHeroes();
 
 	if (HeroesSelected.Num() > 0)

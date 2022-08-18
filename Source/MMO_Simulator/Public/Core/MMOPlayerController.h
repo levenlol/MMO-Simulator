@@ -132,7 +132,10 @@ private:
 
 	/** Groups */
 	template<int32 Number>
-	void HandleGroup();
+	void CreateGroup();
+
+	template<int32 Number>
+	void SelectGroup();
 
 	static FName NameFromInt(const int32 Number) { return FName(*FString::FromInt(Number)); }
 };
@@ -144,14 +147,14 @@ FORCEINLINE void AMMOPlayerController::TryCastSkill()
 }
 
 template<int32 Number>
-inline void AMMOPlayerController::HandleGroup()
+inline void AMMOPlayerController::CreateGroup()
 {
-	if (IsInputKeyDown(EKeys::LeftControl) || IsInputKeyDown(EKeys::LeftCommand))
-	{
-		CreateGroup(NameFromInt(Number));
-	}
-	else
-	{
-		SelectGroup(NameFromInt(Number));
-	}
+	CreateGroup(NameFromInt(Number));
 }
+
+template<int32 Number>
+inline void AMMOPlayerController::SelectGroup()
+{
+	SelectGroup(NameFromInt(Number));
+}
+
