@@ -32,7 +32,8 @@ void AMMOGameMode::BeginPlay()
 	if (UMMOGameInstance* MMOGameInstance = UMMOGameInstance::GetMMOGameInstance(this))
 	{
 		AMMOPlayerController* PC = Cast<AMMOPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-		const TArray<FVector> Formation = PC->FormationManager->ComputeSimpleFormation(MMOGameInstance->GetRaidCharacters().Num(), FVector::ZeroVector, FVector(100.f, 0.f, 0.f));
+
+		const TArray<FVector> Formation = PC->FormationManager->ComputeSimpleFormation(MMOGameInstance->GetRaidCharacters().Num(), FVector::ZeroVector, FVector(100.f, 0.f, 0.f), false);
 
 		for (int32 i = 0; i < MMOGameInstance->GetRaidCharacters().Num(); i++)
 		{

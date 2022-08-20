@@ -237,3 +237,8 @@ FVector UMMOGameplayUtils::ComputeMiddlePoint(const TArray<FVector>& Points)
 
 	return FVector(X, Y, Z);
 }
+
+TArray<AMMOBaseHero*> UMMOGameplayUtils::FilterByRole(TArray<AMMOBaseHero*> Heroes, EMMOCharacterRole Role)
+{
+	return Heroes.FilterByPredicate([Role](const AMMOBaseHero* Hero) { return Hero && Hero->CharacterInfo.CharacterRole == Role; });
+}
