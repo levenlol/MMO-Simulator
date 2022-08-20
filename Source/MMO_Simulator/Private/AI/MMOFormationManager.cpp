@@ -284,6 +284,12 @@ TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FM
 	TArray<FVector> RangedPoints = ComputeSimpleFormation(Ranged.Num(), AnchorPoint + RangedOffset, LastPoint + RangedOffset, true);
 	TArray<FVector> HealerPoints = ComputeSimpleFormation(Healers.Num(), AnchorPoint + HealerOffset, LastPoint + HealerOffset, true);
 
+	TankPoints = SortPoints(Tanks, TankPoints, AnchorPoint + TankOffset, LastPoint + TankOffset);
+	MeleePoints = SortPoints(Melee, MeleePoints, AnchorPoint + MeleeOffset, LastPoint + MeleeOffset);
+	RangedPoints = SortPoints(Ranged, RangedPoints, AnchorPoint + RangedOffset, LastPoint + RangedOffset);
+	HealerPoints = SortPoints(Healers, HealerPoints, AnchorPoint + HealerOffset, LastPoint + HealerOffset);
+
+
 	int32 TankIdx = 0;
 	int32 HealerIdx = 0;
 	int32 RangedIdx = 0;
@@ -336,6 +342,7 @@ TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseH
 	{
 		// Standard Quad Formation
 		Points = ComputeSimpleFormation(Heroes.Num(), AnchorPoint, LastPoint, bShowPreview);
+		Points = SortPoints(Heroes, Points, AnchorPoint, LastPoint);
 	}
 	else if (FormationType == EMMOFormationType::Standard)
 	{

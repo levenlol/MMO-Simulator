@@ -63,7 +63,7 @@ public:
 
 	// Max distance from roles
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "100", UIMin = "100"))
-	float AdvancedFormationLength = 2500.f; 
+	float AdvancedFormationLength = 1500.f; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Setup)
 	EMMOFormationSortType FormationSortType = EMMOFormationSortType::Similar;
