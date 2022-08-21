@@ -30,7 +30,7 @@ struct MMO_SIMULATOR_API FMMOFormationSetup
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = Formation)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Formation)
 	TMap<EMMOCharacterRole, FVector2D> GroupsPositionOffset;
 
 	FVector2D GetOffset(EMMOCharacterRole CharacterRole) const;

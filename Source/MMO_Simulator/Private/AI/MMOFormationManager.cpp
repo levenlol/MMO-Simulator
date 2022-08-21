@@ -275,8 +275,8 @@ TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FM
 	TArray<AMMOBaseHero*> Ranged = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Ranged);
 	TArray<AMMOBaseHero*> Healers = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Healer);
 
-	const FVector Direction = (LastPoint - AnchorPoint).GetSafeNormal2D() * AdvancedFormationLength;
-	const FVector NormalDirection = FVector(-Direction.Y, Direction.X, Direction.Z);
+	const FVector Direction = (LastPoint - AnchorPoint).GetSafeNormal2D() * AdvancedFormationLength; // Value range should be between [0, +1]
+	const FVector NormalDirection = FVector(-Direction.Y, Direction.X, Direction.Z) * 0.5f; // Half length because X range is [-1, +1]
 
 	const FVector TankOffset = NormalDirection * Setup.GetOffset(EMMOCharacterRole::Tank).X - Direction * Setup.GetOffset(EMMOCharacterRole::Tank).Y;
 	const FVector MeleeOffset = NormalDirection * Setup.GetOffset(EMMOCharacterRole::Melee).X - Direction * Setup.GetOffset(EMMOCharacterRole::Melee).Y;
@@ -405,8 +405,8 @@ FVector2D FMMOFormationSetup::GetOffset(EMMOCharacterRole CharacterRole) const
 	if (GroupsPositionOffset.Contains(CharacterRole))
 	{
 		const FVector2D Offset = GroupsPositionOffset[CharacterRole];
-		const float X = FMath::Clamp(Offset.X, 0.f, 1.f);
-		const float Y = FMath::Clamp(Offset.Y, 0.f, 1.f);
+		const float X = FMath::Clamp(Offset.X, -1.f, 1.f);
+		const float Y = FMath::Clamp(Offset.Y, -1.f, 1.f);
 
 		return FVector2D(X, Y);
 	}
