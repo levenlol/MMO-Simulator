@@ -81,7 +81,7 @@ bool AMMOPlayerController::DeprojectMouseToTerrain(FVector& OutLocation, FVector
 	if (DeprojectMousePositionToWorld(MouseLocation, Direction))
 	{
 		FHitResult HitResult;
-		if(GetWorld()->LineTraceSingleByChannel(HitResult, MouseLocation, MouseLocation + Direction * 3500.f, TerrainCollisionChannel))
+		if(GetWorld()->LineTraceSingleByChannel(HitResult, MouseLocation, MouseLocation + Direction * LineTraceLength, TerrainCollisionChannel))
 		{
 			OutLocation = HitResult.ImpactPoint;
 			OutTerrainNormal = HitResult.ImpactNormal;

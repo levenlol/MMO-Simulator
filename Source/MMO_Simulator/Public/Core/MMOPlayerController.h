@@ -29,6 +29,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UMMOGroupsManagerComponent* GroupsManager;
 
+	UPROPERTY(EditAnywhere, Category = Movement, meta=(ClampMin="100", UIMin="100"))
+	float LineTraceLength = 5000.f;
+
 	UPROPERTY(EditAnywhere, Category = Movement)
 	TEnumAsByte<ECollisionChannel> TerrainCollisionChannel = ECollisionChannel::ECC_WorldStatic;
 
