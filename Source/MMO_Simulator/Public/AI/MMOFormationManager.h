@@ -81,6 +81,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = Formation)
 	TArray<FVector> SortPoints(const TArray<AMMOBaseHero*>& Heroes, const TArray<FVector>& Points, const FVector& AnchorPoint, const FVector& LastPoint) const;
 
+	UFUNCTION(BlueprintPure, Category = Formation)
+	bool HasValidAdvancedFormation() const;
+
+	UFUNCTION(BlueprintCallable, Category = Formation)
+	void SetAdvancedFormation(const FMMOFormationSetup& InSetup);
+
 	UFUNCTION(BlueprintCallable, Category = UI)
 	void ShowPreview(const TArray<FVector>& Points);
 
@@ -93,6 +99,12 @@ protected:
 	// Formation Preview Actor class.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	TSubclassOf<AActor> UIFormationPreviewClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	FMMOFormationSetup AdvancedSetupFormation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	FMMOFormationSetup StandardSetup;
 
 	// FX preview for current formation
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = UI)

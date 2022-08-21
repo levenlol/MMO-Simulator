@@ -69,6 +69,17 @@ void UMMOGameplayUtils::SetActorActive(AActor* InActor, bool bActive)
 	}
 }
 
+void UMMOGameplayUtils::SetImageToButton(UButton* InButton, UTexture* InTexture)
+{
+	if (InButton && InTexture)
+	{
+		InButton->WidgetStyle.Normal.SetResourceObject(InTexture);
+		InButton->WidgetStyle.Hovered.SetResourceObject(InTexture);
+		InButton->WidgetStyle.Pressed.SetResourceObject(InTexture);
+		InButton->WidgetStyle.Disabled.SetResourceObject(InTexture);
+	}
+}
+
 void UMMOGameplayUtils::AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<UTexture2D> Texture)
 {
 	if (!Button || Texture.IsNull())

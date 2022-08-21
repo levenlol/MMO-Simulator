@@ -30,6 +30,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static void SetActorActive(AActor* InActor, bool bActive);
+
+	UFUNCTION(BlueprintCallable, Category = UI)
+	static void SetImageToButton(UButton* InButton, UTexture* InTexture);
 	
 	UFUNCTION(BlueprintCallable, Category = Widget, meta = (WorldContext = WorldContextObject))
 	static void AsyncChangeImageButton(UButton* Button, TSoftObjectPtr<UTexture2D> Texture);

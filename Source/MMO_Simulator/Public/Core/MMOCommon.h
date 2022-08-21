@@ -48,7 +48,8 @@ enum class EMMOCharacterRole : uint8
 	Tank,
 	Healer,
 	Melee,
-	Ranged
+	Ranged,
+	MAX UMETA(hidden)
 };
 
 UENUM(BlueprintType)

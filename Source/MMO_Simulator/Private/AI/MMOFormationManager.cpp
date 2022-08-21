@@ -10,8 +10,12 @@ UMMOFormationManager::UMMOFormationManager()
 	: Super()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-}
 
+	StandardSetup.GroupsPositionOffset.Add(EMMOCharacterRole::Tank, FVector2D(0.f, 0.f));
+	StandardSetup.GroupsPositionOffset.Add(EMMOCharacterRole::Melee, FVector2D(0.f, 0.33f));
+	StandardSetup.GroupsPositionOffset.Add(EMMOCharacterRole::Healer, FVector2D(0.f, 0.66f));
+	StandardSetup.GroupsPositionOffset.Add(EMMOCharacterRole::Ranged, FVector2D(0.f, 1.f));
+}
 
 // Called when the game starts
 void UMMOFormationManager::BeginPlay()
@@ -346,22 +350,11 @@ TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseH
 	}
 	else if (FormationType == EMMOFormationType::Standard)
 	{
-		static FMMOFormationSetup StandardSetup = []() -> FMMOFormationSetup
-		{
-			FMMOFormationSetup Setup;
-			Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Tank, FVector2D(0.f, 0.f));
-			Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Melee, FVector2D(0.f, 0.33f));
-			Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Healer, FVector2D(0.f, 0.66f));
-			Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Ranged, FVector2D(0.f, 1.f));
-
-			return Setup;
-		}();
-
 		Points = ComputeAdvancedFormation_Internal(StandardSetup, Heroes, AnchorPoint, LastPoint, bShowPreview);
 	}
 	else if (FormationType == EMMOFormationType::Advanced)
 	{
-
+		Points = ComputeAdvancedFormation_Internal(HasValidAdvancedFormation() ? AdvancedSetupFormation : StandardSetup, Heroes, AnchorPoint, LastPoint, bShowPreview);
 	}
 
 #if WITH_EDITORONLY_DATA
@@ -395,6 +388,16 @@ TArray<FVector> UMMOFormationManager::SortPoints(const TArray<AMMOBaseHero*>& He
 	}
 
 	return Points;
+}
+
+bool UMMOFormationManager::HasValidAdvancedFormation() const
+{
+	return AdvancedSetupFormation.GroupsPositionOffset.Num() == static_cast<int32>(EMMOCharacterRole::MAX);
+}
+
+void UMMOFormationManager::SetAdvancedFormation(const FMMOFormationSetup& InSetup)
+{
+	AdvancedSetupFormation = InSetup;
 }
 
 FVector2D FMMOFormationSetup::GetOffset(EMMOCharacterRole CharacterRole) const
