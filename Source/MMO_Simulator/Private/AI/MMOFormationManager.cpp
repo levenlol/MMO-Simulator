@@ -27,7 +27,14 @@ void UMMOFormationManager::BeginPlay()
 
 TArray<FVector> UMMOFormationManager::ComputeSimpleFormation(const int32 HeroesNum, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview)
 {
-	return ComputeSimpleFormation_Internal(HeroesNum, AnchorPoint, LastPoint, bShowPreview);
+	TArray<FVector> Points = ComputeSimpleFormation_Internal(SimpleFormationTuning, HeroesNum, AnchorPoint, LastPoint);
+
+	if (bShowPreview)
+	{
+		ShowPreview(Points);
+	}
+
+	return Points;
 }
 
 void UMMOFormationManager::AddPrecachePreviewActors(const int32 PreviewNumbersToAdd)
@@ -231,7 +238,7 @@ void UMMOFormationManager::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-TArray<FVector> UMMOFormationManager::ComputeSimpleFormation_Internal(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview /* = true */)
+TArray<FVector> UMMOFormationManager::ComputeSimpleFormation_Internal(const FMMOFormationTuning& FormationTuning, const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint) const
 {
 	if (CharactersNum <= 0)
 		return {};
@@ -239,6 +246,12 @@ TArray<FVector> UMMOFormationManager::ComputeSimpleFormation_Internal(const int3
 	TArray<FVector> Points;
 	Points.Reserve(CharactersNum);
 	
+	const float Distance = (LastPoint - AnchorPoint).Size();
+
+	const int32 MaxHeroesPerRow = FormationTuning.GetMaxHeroesPerRow(Distance);
+	const float HorizontalMargin = FormationTuning.GetHorizontalMargin(Distance);
+	const float VerticalMargin = FormationTuning.GetVerticalMargin(Distance);
+
 	const int32 SafeCharacterRowNum = FMath::Min(MaxHeroesPerRow, CharactersNum);
 	const float InitialLateralOffset = SafeCharacterRowNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
 	const int32 InitialLateralNum = (SafeCharacterRowNum - 1)/ 2;
@@ -258,47 +271,54 @@ TArray<FVector> UMMOFormationManager::ComputeSimpleFormation_Internal(const int3
 		FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) - (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
 		Point = ProjectPointToNavMesh(Point);
 		Points.Add(Point);
-
-		if (bShowPreview)
-		{
-			ShowPreview(Point);
-		}
 	}
 
 	return Points;
 }
 
-TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview)
+TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint)
 {
 	TArray<AMMOBaseHero*> Tanks = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Tank);
 	TArray<AMMOBaseHero*> Melee = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Melee);
 	TArray<AMMOBaseHero*> Ranged = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Ranged);
 	TArray<AMMOBaseHero*> Healers = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Healer);
 
-	const FVector Direction = (LastPoint - AnchorPoint).GetSafeNormal2D() * AdvancedFormationLength; // Value range should be between [0, +1]
-	const FVector NormalDirection = FVector(-Direction.Y, Direction.X, Direction.Z) * 0.5f; // Half length because X range is [-1, +1]
+	const FVector Direction = (LastPoint - AnchorPoint).GetSafeNormal2D() * AdvancedFormationLength;
+	const FVector NormalDirection = FVector(-Direction.Y, Direction.X, Direction.Z);
 
-	const FVector TankOffset = NormalDirection * Setup.GetOffset(EMMOCharacterRole::Tank).X - Direction * Setup.GetOffset(EMMOCharacterRole::Tank).Y;
-	const FVector MeleeOffset = NormalDirection * Setup.GetOffset(EMMOCharacterRole::Melee).X - Direction * Setup.GetOffset(EMMOCharacterRole::Melee).Y;
-	const FVector RangedOffset = NormalDirection * Setup.GetOffset(EMMOCharacterRole::Ranged).X - Direction * Setup.GetOffset(EMMOCharacterRole::Ranged).Y;
-	const FVector HealerOffset = NormalDirection * Setup.GetOffset(EMMOCharacterRole::Healer).X - Direction * Setup.GetOffset(EMMOCharacterRole::Healer).Y;
+	const FVector2D Tank2D = Setup.GetOffset(EMMOCharacterRole::Tank);
+	const FVector2D Melee2D = Setup.GetOffset(EMMOCharacterRole::Melee);
+	const FVector2D Ranged2D = Setup.GetOffset(EMMOCharacterRole::Ranged);
+	const FVector2D Healer2D = Setup.GetOffset(EMMOCharacterRole::Healer);
 
-	TArray<FVector> TankPoints = ComputeSimpleFormation(Tanks.Num(), AnchorPoint + TankOffset, LastPoint + TankOffset, true);
-	TArray<FVector> MeleePoints = ComputeSimpleFormation(Melee.Num(), AnchorPoint + MeleeOffset, LastPoint + MeleeOffset, true);
-	TArray<FVector> RangedPoints = ComputeSimpleFormation(Ranged.Num(), AnchorPoint + RangedOffset, LastPoint + RangedOffset, true);
-	TArray<FVector> HealerPoints = ComputeSimpleFormation(Healers.Num(), AnchorPoint + HealerOffset, LastPoint + HealerOffset, true);
+	// Offset Y so we dont click and position heroes far away.
+	float MinY = 10.f;
+	if (Tanks.Num() > 0) MinY = FMath::Min(Tank2D.Y, MinY);
+	if (Melee.Num() > 0) MinY = FMath::Min(Melee2D.Y, MinY);
+	if (Ranged.Num() > 0) MinY = FMath::Min(Ranged2D.Y, MinY);
+	if (Healers.Num() > 0) MinY = FMath::Min(Healer2D.Y, MinY);
 
+	const FVector TankOffset = NormalDirection * Tank2D.X - Direction * (Tank2D.Y - MinY);
+	const FVector MeleeOffset = NormalDirection * Melee2D.X - Direction *  (Melee2D.Y - MinY);
+	const FVector RangedOffset = NormalDirection * Ranged2D.X - Direction * (Ranged2D.Y - MinY);
+	const FVector HealerOffset = NormalDirection * Healer2D.X - Direction * (Healer2D.Y - MinY);
+
+	// Each group is disposed like a simple formation. so we have 4 simple formation.
+	TArray<FVector> TankPoints = ComputeSimpleFormation_Internal(FormationTuning, Tanks.Num(), AnchorPoint + TankOffset, LastPoint + TankOffset);
+	TArray<FVector> MeleePoints = ComputeSimpleFormation_Internal(FormationTuning, Melee.Num(), AnchorPoint + MeleeOffset, LastPoint + MeleeOffset);
+	TArray<FVector> RangedPoints = ComputeSimpleFormation_Internal(FormationTuning, Ranged.Num(), AnchorPoint + RangedOffset, LastPoint + RangedOffset);
+	TArray<FVector> HealerPoints = ComputeSimpleFormation_Internal(FormationTuning, Healers.Num(), AnchorPoint + HealerOffset, LastPoint + HealerOffset);
+
+	// Sort points so we dont have problem with path finding. (or just have less problem)
 	TankPoints = SortPoints(Tanks, TankPoints, AnchorPoint + TankOffset, LastPoint + TankOffset);
 	MeleePoints = SortPoints(Melee, MeleePoints, AnchorPoint + MeleeOffset, LastPoint + MeleeOffset);
 	RangedPoints = SortPoints(Ranged, RangedPoints, AnchorPoint + RangedOffset, LastPoint + RangedOffset);
 	HealerPoints = SortPoints(Healers, HealerPoints, AnchorPoint + HealerOffset, LastPoint + HealerOffset);
 
-
 	int32 TankIdx = 0;
 	int32 HealerIdx = 0;
 	int32 RangedIdx = 0;
 	int32 MeleeIdx = 0;
-
 
 	TArray<FVector> Points;
 	for (AMMOBaseHero* Hero : Heroes)
@@ -345,16 +365,17 @@ TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseH
 	if (FormationType == EMMOFormationType::Simple)
 	{
 		// Standard Quad Formation
-		Points = ComputeSimpleFormation(Heroes.Num(), AnchorPoint, LastPoint, bShowPreview);
+		Points = ComputeSimpleFormation_Internal(SimpleFormationTuning, Heroes.Num(), AnchorPoint, LastPoint);
 		Points = SortPoints(Heroes, Points, AnchorPoint, LastPoint);
 	}
 	else if (FormationType == EMMOFormationType::Standard)
 	{
-		Points = ComputeAdvancedFormation_Internal(StandardSetup, Heroes, AnchorPoint, LastPoint, bShowPreview);
+		Points = ComputeAdvancedFormation_Internal(AdvancedFormationTuning, StandardSetup, Heroes, AnchorPoint, LastPoint);
 	}
 	else if (FormationType == EMMOFormationType::Advanced)
 	{
-		Points = ComputeAdvancedFormation_Internal(HasValidAdvancedFormation() ? AdvancedSetupFormation : StandardSetup, Heroes, AnchorPoint, LastPoint, bShowPreview);
+		const FMMOFormationSetup& FormationSetup = HasValidAdvancedFormation() ? AdvancedSetupFormation : StandardSetup;
+		Points = ComputeAdvancedFormation_Internal(AdvancedFormationTuning, FormationSetup, Heroes, AnchorPoint, LastPoint);
 	}
 
 #if WITH_EDITORONLY_DATA
@@ -366,6 +387,11 @@ TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseH
 		}
 	}
 #endif
+
+	if (bShowPreview)
+	{
+		ShowPreview(Points);
+	}
 
 	check(Points.Num() == Heroes.Num());
 
@@ -413,4 +439,31 @@ FVector2D FMMOFormationSetup::GetOffset(EMMOCharacterRole CharacterRole) const
 
 	check(0);
 	return FVector2D::ZeroVector;
+}
+
+int32 FMMOFormationTuning::GetMaxHeroesPerRow(float Distance) const
+{
+	if (Distance < MapDistance.X)
+	{
+		return MaxHeroesPerRow.X;
+	}
+
+	if (Distance > MapDistance.Y)
+	{
+		return MaxHeroesPerRow.Y;
+	}
+
+	const float Alpha = FMath::GetRangePct(MapDistance, Distance);
+
+	return FMath::Lerp(MaxHeroesPerRow.X, MaxHeroesPerRow.Y, Alpha);
+}
+
+float FMMOFormationTuning::GetHorizontalMargin(float Distance) const
+{
+	return FMath::GetMappedRangeValueClamped(MapDistance, HorizontalMargin, Distance);
+}
+
+float FMMOFormationTuning::GetVerticalMargin(float Distance) const
+{
+	return FMath::GetMappedRangeValueClamped(MapDistance, VerticalMargin, Distance);
 }

@@ -36,6 +36,32 @@ public:
 	FVector2D GetOffset(EMMOCharacterRole CharacterRole) const;
 };
 
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOFormationTuning
+{
+	GENERATED_BODY()
+public:
+	int32 GetMaxHeroesPerRow(float Distance) const;
+	float GetHorizontalMargin(float Distance) const;
+	float GetVerticalMargin(float Distance) const;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "1", UIMin = "1"))
+	FIntPoint MaxHeroesPerRow = FIntPoint(2, 5);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
+	FVector2D HorizontalMargin = FVector2D(200.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
+	FVector2D VerticalMargin = FVector2D(150.f);
+
+	// Distance to lerp between min max. If value < min X is taken, if value > max Y is taken. lerp otherwise
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
+	FVector2D MapDistance = FVector2D(100.f, 500.f);
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MMO_SIMULATOR_API UMMOFormationManager : public UActorComponent
 {
@@ -52,14 +78,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = UI)
 	int32 InitialPreviewsCacheSize = 25;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "1", UIMin = "1"))
-	int32 MaxHeroesPerRow = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
+	FMMOFormationTuning SimpleFormationTuning;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
-	float HorizontalMargin = 150.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup)
-	float VerticalMargin = 150.f;
+	FMMOFormationTuning AdvancedFormationTuning;
 
 	// Max distance from roles
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "100", UIMin = "100"))
@@ -130,8 +153,8 @@ private:
 	TArray<FVector> SortPoints_Similiar(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points, const FVector& AnchorPoint, const FVector& LastPoint) const;
 
 	// Generate a Formation in a rectangular shape
-	TArray<FVector> ComputeSimpleFormation_Internal(const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+	TArray<FVector> ComputeSimpleFormation_Internal(const FMMOFormationTuning& FormationTuning, const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint) const;
 
 	// Generate SimpleFormation at given offset
-	TArray<FVector> ComputeAdvancedFormation_Internal(const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint, bool bShowPreview = true);
+	TArray<FVector> ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint);
 };
