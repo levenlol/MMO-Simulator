@@ -26,14 +26,47 @@ enum class EMMOFormationType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOVector2Container
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FVector2D> Array;
+};
+
+USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOFormationSetup
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Formation)
-	TMap<EMMOCharacterRole, FVector2D> GroupsPositionOffset;
+	FMMOFormationSetup() {}
+	void Add(EMMOCharacterRole Role, const TArray<FVector2D>& InOffsets)
+	{
+		GroupsPositionOffset.FindOrAdd(Role).Array = InOffsets;
+	}
 
-	FVector2D GetOffset(EMMOCharacterRole CharacterRole) const;
+	UPROPERTY(BlueprintReadWrite, Category = Formation)
+	TMap<EMMOCharacterRole, FMMOVector2Container> GroupsPositionOffset;
+
+	TArray<FVector2D> GetOffsets(EMMOCharacterRole CharacterRole) const;
+};
+
+USTRUCT(BlueprintType)
+struct MMO_SIMULATOR_API FMMOFormationPoint
+{
+	GENERATED_BODY()
+public:
+	FMMOFormationPoint() {}
+	FMMOFormationPoint(const FVector& InAnchorPoint, const FVector& InLastPoint)
+		: AnchorPoint(InAnchorPoint)
+		, LastPoint(InLastPoint)
+	{}
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Point)
+	FVector AnchorPoint = FVector::ZeroVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Point)
+	FVector LastPoint = FVector::OneVector;
 };
 
 USTRUCT(BlueprintType)
@@ -102,7 +135,7 @@ public:
 	TArray<FTransform> ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintPure, Category = Formation)
-	TArray<FVector> SortPoints(const TArray<AMMOBaseHero*>& Heroes, const TArray<FVector>& Points, const FVector& AnchorPoint, const FVector& LastPoint) const;
+	TArray<FVector> SortPoints(const TArray<AMMOBaseHero*>& Heroes, const TArray<FVector>& Points, const FVector& AnchorPoint) const;
 
 	UFUNCTION(BlueprintPure, Category = Formation)
 	bool HasValidAdvancedFormation() const;
@@ -147,13 +180,14 @@ private:
 	FVector ProjectPointToNavMesh(const FVector& InLocation) const;
 
 	// greedy find the nearest point to each actor (cannot select the same point)
-	TArray<FVector> SortPoints_Nearest(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points,const FVector& AnchorPoint, const FVector& LastPoint) const;
+	TArray<FVector> SortPoints_Nearest(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points,const FVector& AnchorPoint) const;
 
 	// based on similiarty. 1 - abs(x1 - x2) / (x1 + x2)
-	TArray<FVector> SortPoints_Similiar(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points, const FVector& AnchorPoint, const FVector& LastPoint) const;
+	TArray<FVector> SortPoints_Similiar(TArray<AMMOBaseHero*> Heroes, TArray<FVector> Points, const FVector& AnchorPoint) const;
 
 	// Generate a Formation in a rectangular shape
 	TArray<FVector> ComputeSimpleFormation_Internal(const FMMOFormationTuning& FormationTuning, const int32 CharactersNum, const FVector& AnchorPoint, const FVector& LastPoint) const;
+	TArray<FVector> ComputeSimpleFormation_Internal(const FMMOFormationTuning& FormationTuning, const int32 CharactersNum, const TArray<FMMOFormationPoint>& AnchorPoints) const;
 
 	// Generate SimpleFormation at given offset
 	TArray<FVector> ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint);

@@ -128,7 +128,7 @@ private:
 	void HealerButtonClicked() { CreateOrDestroyButtonWidget(HealerButtons, HealerImage); }
 
 	FMMOFormationSetup ComputeFormation();
-	FVector2D ComputeRescalePointInWindow(const TArray<UMMOAdvancedFormationButtonWidget*>& AdvButtons) const;
+	TArray<FVector2D> ComputeRescalePointInWindow(const TArray<UMMOAdvancedFormationButtonWidget*>& AdvButtons) const;
 
 	FVector2D ClampToWindow(FVector2D Point, FVector2D Size) const;
 

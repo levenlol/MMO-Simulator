@@ -132,22 +132,23 @@ FMMOFormationSetup UMMOAdvancedFormationWidget::ComputeFormation()
 {
 	FMMOFormationSetup Setup;
 	
-	Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Tank, ComputeRescalePointInWindow(TankButtons));
-	Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Melee, ComputeRescalePointInWindow(MeleeButtons));
-	Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Ranged, ComputeRescalePointInWindow(RangedButtons));
-	Setup.GroupsPositionOffset.Add(EMMOCharacterRole::Healer, ComputeRescalePointInWindow(HealerButtons));
+	Setup.Add(EMMOCharacterRole::Tank, ComputeRescalePointInWindow(TankButtons));
+	Setup.Add(EMMOCharacterRole::Melee, ComputeRescalePointInWindow(MeleeButtons));
+	Setup.Add(EMMOCharacterRole::Ranged, ComputeRescalePointInWindow(RangedButtons));
+	Setup.Add(EMMOCharacterRole::Healer, ComputeRescalePointInWindow(HealerButtons));
 
 	return Setup;
 }
 
-FVector2D UMMOAdvancedFormationWidget::ComputeRescalePointInWindow(const TArray<UMMOAdvancedFormationButtonWidget*>& AdvButtons) const
+TArray<FVector2D> UMMOAdvancedFormationWidget::ComputeRescalePointInWindow(const TArray<UMMOAdvancedFormationButtonWidget*>& AdvButtons) const
 {
-	// todo return an array of FVector2D
-	if (AdvButtons.Num() > 0)
+	TArray<FVector2D> Points;
+	const FVector2D MapSize = MapCanvas->GetCachedGeometry().GetLocalSize();
+
+	for (int32 i = 0; i < AdvButtons.Num(); i++)
 	{
-		const FVector2D MapSize = MapCanvas->GetCachedGeometry().GetLocalSize();
-		const FVector2D ButtonSize = AdvButtons[0]->GetCachedGeometry().GetLocalSize();
-		const FVector2D ButtonPosition = AdvButtons[0]->RenderTransform.Translation;
+		const FVector2D ButtonSize = AdvButtons[i]->GetCachedGeometry().GetLocalSize();
+		const FVector2D ButtonPosition = AdvButtons[i]->RenderTransform.Translation;
 
 		// We need to remap the value because the button isnt 0 sized and it is clamped inside the view. If view size is 512 and button size is 64 value range is 0 - 448
 		const float InX = MapSize.X - ButtonSize.X * 0.5f;
@@ -164,10 +165,10 @@ FVector2D UMMOAdvancedFormationWidget::ComputeRescalePointInWindow(const TArray<
 		static const FVector2D YOutRange(0.f, 1.f);
 		Y = FMath::GetMappedRangeValueClamped(FVector2D(0.f, MapSize.Y), YOutRange, Y);
 
-		return FVector2D(X, Y);
+		Points.Add(FVector2D(X, Y));
 	}
 
-	return FVector2D::ZeroVector;
+	return Points;
 }
 
 FVector2D UMMOAdvancedFormationWidget::ClampToWindow(FVector2D Point, FVector2D Size) const
