@@ -252,26 +252,44 @@ TArray<FVector> UMMOFormationManager::ComputeSimpleFormation_Internal(const FMMO
 	const float HorizontalMargin = FormationTuning.GetHorizontalMargin(Distance);
 	const float VerticalMargin = FormationTuning.GetVerticalMargin(Distance);
 
-	const int32 SafeCharacterRowNum = FMath::Min(MaxHeroesPerRow, CharactersNum);
-	const float InitialLateralOffset = SafeCharacterRowNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
-	const int32 InitialLateralNum = (SafeCharacterRowNum - 1)/ 2;
-	const int32 ColumnsNum = (SafeCharacterRowNum / MaxHeroesPerRow) + 1;
-
 	FVector Tangent = FMath::IsNearlyZero((LastPoint - AnchorPoint).SizeSquared()) ? FVector::ForwardVector : (LastPoint - AnchorPoint);
 	Tangent.Z = 0.f;
 	Tangent.Normalize();
 
 	const FVector Side(-Tangent.Y, Tangent.X, 0.f);
 
-	for (int32 j = 0; j < CharactersNum; j++)
-	{
-		const int32 ColumnNum = j % MaxHeroesPerRow;
-		const int32 RowNum = j / MaxHeroesPerRow;
+	const int32 TotalRowsNum = ((CharactersNum - 1) / MaxHeroesPerRow) + 1;
 
-		FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) - (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
-		Point = ProjectPointToNavMesh(Point);
-		Points.Add(Point);
+	int32 HeroesToPlace = CharactersNum;
+	for (int32 i = 0; i < TotalRowsNum; i++)
+	{
+		const int32 SafeCharacterRowNum = FMath::Min(MaxHeroesPerRow, HeroesToPlace);
+		const float InitialLateralOffset = SafeCharacterRowNum & 0x1 ? 0.f : HorizontalMargin / 2.f;
+		const int32 InitialLateralNum = (SafeCharacterRowNum - 1) / 2;
+		const int32 ColumnsNum = (SafeCharacterRowNum / MaxHeroesPerRow) + 1;
+
+		for (int j = 0; j < SafeCharacterRowNum; j++)
+		{
+			const int32 ColumnNum = j % SafeCharacterRowNum;
+			const int32 RowNum = i;
+
+			FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) - (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
+			Point = ProjectPointToNavMesh(Point);
+			Points.Add(Point);
+
+			HeroesToPlace--;
+		}
 	}
+
+	//for (int32 j = 0; j < CharactersNum; j++)
+	//{
+	//	const int32 ColumnNum = j % MaxHeroesPerRow;
+	//	const int32 RowNum = j / MaxHeroesPerRow;
+	//
+	//	FVector Point = AnchorPoint + ((ColumnNum - InitialLateralNum) * Side * HorizontalMargin) - (Tangent * RowNum * VerticalMargin) - Side * InitialLateralOffset; // anchor + lateral + vertical - offset
+	//	Point = ProjectPointToNavMesh(Point);
+	//	Points.Add(Point);
+	//}
 
 	return Points;
 }
