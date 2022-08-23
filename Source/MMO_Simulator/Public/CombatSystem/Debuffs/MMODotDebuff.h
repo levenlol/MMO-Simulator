@@ -6,6 +6,8 @@
 #include "CombatSystem/Debuffs/MMOBaseDebuff.h"
 #include "Tools/MMOMathExpression.h"
 #include "Core/MMOCommon.h"
+#include "Characters/MMOBaseCharacter.h"
+
 #include "MMODotDebuff.generated.h"
 
 class AMMOBaseCharacter;
@@ -23,7 +25,7 @@ public:
 	FMMOMathExpression DamageExpression;
 
 	virtual void Init(AMMOBaseCharacter* InOwner) override;
-	virtual void Activate(AMMOBaseCharacter* InTarget) override;
+	virtual void Activate(AMMOBaseCharacter* InTarget) override; 
 	virtual void ReceiveExecute() override;
 	virtual void Deactivate() override;
 	virtual void Uninit() override;

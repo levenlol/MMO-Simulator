@@ -25,6 +25,13 @@ enum class EMMOFormationType : uint8
 	Advanced
 };
 
+UENUM(BlueprintType)
+enum class EMMOFormationPositioningType : uint8
+{
+	UpDown,
+	LeftRight
+};
+
 USTRUCT(BlueprintType)
 struct MMO_SIMULATOR_API FMMOVector2Container
 {
@@ -127,12 +134,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Setup)
 	EMMOFormationType FormationType = EMMOFormationType::Simple;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Setup)
+	EMMOFormationPositioningType FormationPositioningType = EMMOFormationPositioningType::UpDown;
+
 	// return an array of points, each for every actors passed as input
 	UFUNCTION(BlueprintPure, Category = Formation)
 	TArray<FVector> ComputeSimpleFormation(const int32 HeroesNum, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintPure, Category = Formation)
-	TArray<FTransform> ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, FVector LastPoint, bool bShowPreview = true);
+	TArray<FTransform> ComputeFormation(const TArray<AMMOBaseHero*>& Heroes, FVector AnchorPoint, FVector LastPoint, bool bShowPreview = true);
 
 	UFUNCTION(BlueprintPure, Category = Formation)
 	TArray<FVector> SortPoints(const TArray<AMMOBaseHero*>& Heroes, const TArray<FVector>& Points, const FVector& AnchorPoint) const;
@@ -191,4 +201,6 @@ private:
 
 	// Generate SimpleFormation at given offset
 	TArray<FVector> ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint);
+
+	FMMOFormationSetup HandleFormationBiases(const FMMOFormationSetup& Setup) const;
 };
