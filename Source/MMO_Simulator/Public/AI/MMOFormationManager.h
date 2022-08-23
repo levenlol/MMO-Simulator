@@ -128,6 +128,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "100", UIMin = "100"))
 	float AdvancedFormationLength = 1500.f; 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setup, meta = (ClampMin = "50", UIMin = "50"))
+	float FormationThreshold = 50.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Setup)
 	EMMOFormationSortType FormationSortType = EMMOFormationSortType::Similar;
 
@@ -200,7 +203,7 @@ private:
 	TArray<FVector> ComputeSimpleFormation_Internal(const FMMOFormationTuning& FormationTuning, const int32 CharactersNum, const TArray<FMMOFormationPoint>& AnchorPoints) const;
 
 	// Generate SimpleFormation at given offset
-	TArray<FVector> ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint);
+	TArray<FVector> ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, FMMOFormationSetup Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint);
 
-	FMMOFormationSetup HandleFormationBiases(const FMMOFormationSetup& Setup) const;
+	FMMOFormationSetup HandleFormationBiases(const FMMOFormationSetup& Setup, bool bConsiderTank, bool bConsiderMelee, bool bConsiderRanged, bool bConsiderHealer) const;
 };

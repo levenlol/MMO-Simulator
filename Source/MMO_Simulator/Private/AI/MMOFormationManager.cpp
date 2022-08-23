@@ -373,12 +373,14 @@ TArray<FVector> UMMOFormationManager::ComputeSimpleFormation_Internal(const FMMO
 	return Points;
 }
 
-TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, const FMMOFormationSetup& Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint)
+TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FMMOFormationTuning& FormationTuning, FMMOFormationSetup Setup, const TArray<AMMOBaseHero*>& Heroes, const FVector& AnchorPoint, const FVector& LastPoint)
 {
 	TArray<AMMOBaseHero*> Tanks = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Tank);
 	TArray<AMMOBaseHero*> Melee = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Melee);
 	TArray<AMMOBaseHero*> Ranged = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Ranged);
 	TArray<AMMOBaseHero*> Healers = UMMOGameplayUtils::FilterByRole(Heroes, EMMOCharacterRole::Healer);
+
+	Setup = HandleFormationBiases(Setup, Tanks.Num() > 0, Melee.Num() > 0, Ranged.Num() > 0, Healers.Num() > 0);
 
 	FVector Direction = (LastPoint - AnchorPoint).GetSafeNormal2D() * AdvancedFormationLength;
 	FVector NormalDirection = FVector(-Direction.Y, Direction.X, Direction.Z);
@@ -475,8 +477,11 @@ TArray<FVector> UMMOFormationManager::ComputeAdvancedFormation_Internal(const FM
 	return Points;
 }
 
-FMMOFormationSetup UMMOFormationManager::HandleFormationBiases(const FMMOFormationSetup& Setup) const
+FMMOFormationSetup UMMOFormationManager::HandleFormationBiases(const FMMOFormationSetup& Setup, bool bConsiderTank, bool bConsiderMelee, bool bConsiderRanged, bool bConsiderHealer) const
 {
+	if (!bConsiderTank && !bConsiderMelee && !bConsiderRanged && !bConsiderHealer)
+		return Setup;
+
 	// Offset Y so we dont click and position heroes far away.
 	float MinY = 10.f;
 	float MinX = 10.f;
@@ -486,29 +491,42 @@ FMMOFormationSetup UMMOFormationManager::HandleFormationBiases(const FMMOFormati
 	TArray<FVector2D> Ranged2Ds = Setup.GetOffsets(EMMOCharacterRole::Ranged);
 	TArray<FVector2D> Healer2Ds = Setup.GetOffsets(EMMOCharacterRole::Healer);
 
-	for (FVector2D Tank2D : Tank2Ds) 
-	{ 
-		MinX = FMath::Min(Tank2D.X, MinX); 
-		MinY = FMath::Min(Tank2D.Y, MinY);
+	if (bConsiderTank)
+	{
+		for (FVector2D Tank2D : Tank2Ds)
+		{
+			MinX = FMath::Min(Tank2D.X, MinX);
+			MinY = FMath::Min(Tank2D.Y, MinY);
+		}
 	}
 
-	for (FVector2D Melee2D : Melee2Ds)
+	if (bConsiderMelee)
 	{
-		MinX = FMath::Min(Melee2D.X, MinX);
-		MinY = FMath::Min(Melee2D.Y, MinY);
+		for (FVector2D Melee2D : Melee2Ds)
+		{
+			MinX = FMath::Min(Melee2D.X, MinX);
+			MinY = FMath::Min(Melee2D.Y, MinY);
+		}
 	}
-
-	for (FVector2D Ranged2D : Ranged2Ds)
+	
+	if (bConsiderRanged)
 	{
-		MinX = FMath::Min(Ranged2D.X, MinX);
-		MinY = FMath::Min(Ranged2D.Y, MinY);
+		for (FVector2D Ranged2D : Ranged2Ds)
+		{
+			MinX = FMath::Min(Ranged2D.X, MinX);
+			MinY = FMath::Min(Ranged2D.Y, MinY);
+		}
 	}
-
-	for (FVector2D Healer2D : Healer2Ds)
+	
+	if (bConsiderHealer)
 	{
-		MinX = FMath::Min(Healer2D.X, MinX);
-		MinY = FMath::Min(Healer2D.Y, MinY);
+		for (FVector2D Healer2D : Healer2Ds)
+		{
+			MinX = FMath::Min(Healer2D.X, MinX);
+			MinY = FMath::Min(Healer2D.Y, MinY);
+		}
 	}
+	
 
 	auto ApplyBias = [](TArray<FVector2D>& ArrayRef, float X, float Y)
 	{
@@ -540,7 +558,8 @@ TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseH
 {
 	TArray<FVector> Points;
 
-	if (FMath::IsNearlyZero((AnchorPoint - LastPoint).SizeSquared(), 0.1f))
+	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Blue, FString::SanitizeFloat((AnchorPoint - LastPoint).Size()));
+	if (FMath::IsNearlyZero((AnchorPoint - LastPoint).SizeSquared(), FormationThreshold * FormationThreshold)) // avoid jittering
 	{
 		// Better approximation than using FVector::UpVector
 		const FVector MiddlePoint = UMMOGameplayUtils::ComputeHeroesSelectionMiddlePoint(Heroes);
@@ -556,13 +575,11 @@ TArray<FTransform> UMMOFormationManager::ComputeFormation(const TArray<AMMOBaseH
 	else if (FormationType == EMMOFormationType::Standard)
 	{
 		// Offset X-Y so we dont click and position heroes far away from click position.
-		FMMOFormationSetup StandardBiasSetup = HandleFormationBiases(StandardSetup);
-		Points = ComputeAdvancedFormation_Internal(AdvancedFormationTuning, StandardBiasSetup, Heroes, AnchorPoint, LastPoint);
+		Points = ComputeAdvancedFormation_Internal(AdvancedFormationTuning, StandardSetup, Heroes, AnchorPoint, LastPoint);
 	}
 	else if (FormationType == EMMOFormationType::Advanced)
 	{
-		const FMMOFormationSetup& FormationSetup = HandleFormationBiases(HasValidAdvancedFormation() ? AdvancedSetupFormation : StandardSetup);
-		Points = ComputeAdvancedFormation_Internal(AdvancedFormationTuning, FormationSetup, Heroes, AnchorPoint, LastPoint);
+		Points = ComputeAdvancedFormation_Internal(AdvancedFormationTuning, HasValidAdvancedFormation() ? AdvancedSetupFormation : StandardSetup, Heroes, AnchorPoint, LastPoint);
 	}
 
 #if WITH_EDITORONLY_DATA
