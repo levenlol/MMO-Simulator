@@ -23,11 +23,22 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = Selection)
 	void OnDeselected();
 
-	UFUNCTION(BlueprintPure, Category = Decal)
-	FORCEINLINE UDecalComponent* GetDecalComponent() const { return SelectionDecal; }
+	UFUNCTION(BlueprintCallable, Category = Preview)
+	void ShowSkillRange(const int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = Preview)
+	void HideSkillRange();
 
 private:
-	/** A decal to follow  */
+	/** Selection Decal */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UDecalComponent* SelectionDecal;
+
+	/** Skill Preview Decal */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UDecalComponent* SkillPreviewDecal;
+
+	bool CanShowSkillPreview() const;
+
+	int32 CurrentSkillPreviewIdx = -1;
 };

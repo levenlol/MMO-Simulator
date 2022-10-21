@@ -102,6 +102,12 @@ public:
 	bool CanCharacterAttack() const;
 
 	UFUNCTION(BlueprintPure, Category = Skill)
+	int32 GetSkillsCount() const { return Skills.Num(); }
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	float GetSkillRange(const int32 Index) const;
+
+	UFUNCTION(BlueprintPure, Category = Skill)
 	float GetRemainingGlobalCooldown() const;
 
 	UFUNCTION(BlueprintPure, Category = Skill)

@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "AI/MMOAIController.h"
 #include "Components/MMOGroupsManagerComponent.h"
+#include "CombatSystem/MMOCombatSystem.h"
 
 
 AMMOPlayerController::AMMOPlayerController()
@@ -33,8 +34,13 @@ void AMMOPlayerController::BeginPlay()
 	FInputModeGameAndUI InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
 	InputMode.SetHideCursorDuringCapture(false);
-	
+
 	SetInputMode(InputMode);
+}
+
+void AMMOPlayerController::EndPlay(EEndPlayReason::Type EndPlayType)
+{
+	Super::EndPlay(EndPlayType);
 }
 
 void AMMOPlayerController::SetSelectedHeroes(const TArray<AMMOBaseHero*>& InHeroes)
@@ -123,6 +129,10 @@ void AMMOPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Pause", IE_Released, this, &AMMOPlayerController::TogglePause);
 	
+	InputComponent->BindAction("Skill_1", IE_Pressed, this, &AMMOPlayerController::ShowSkillRange<0>);
+	InputComponent->BindAction("Skill_2", IE_Pressed, this, &AMMOPlayerController::ShowSkillRange<1>);
+	InputComponent->BindAction("Skill_3", IE_Pressed, this, &AMMOPlayerController::ShowSkillRange<2>);
+
 	InputComponent->BindAction("Skill_1", IE_Released, this, &AMMOPlayerController::TryCastSkill<0>);
 	InputComponent->BindAction("Skill_2", IE_Released, this, &AMMOPlayerController::TryCastSkill<1>);
 	InputComponent->BindAction("Skill_3", IE_Released, this, &AMMOPlayerController::TryCastSkill<2>);
@@ -284,7 +294,24 @@ void AMMOPlayerController::TryCastSkill(const int32 Index)
 		if (AMMOAIController* AIController = Cast<AMMOAIController>(Hero->GetController()))
 		{
 			AIController->RequestCastSpell(Target, Location, Index);
+			HideSkillRange(); // dont need to show skill range anymore.
 		}
+	}
+}
+
+void AMMOPlayerController::ShowSkillRange(const int32 Index)
+{
+	for (AMMOBaseHero* Hero : SelectedHeroes)
+	{
+		Hero->ShowSkillRange(Index);
+	}
+}
+
+void AMMOPlayerController::HideSkillRange()
+{
+	for (AMMOBaseHero* Hero : SelectedHeroes)
+	{
+		Hero->HideSkillRange();
 	}
 }
 

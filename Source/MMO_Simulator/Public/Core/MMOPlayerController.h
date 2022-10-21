@@ -22,6 +22,7 @@ public:
 	AMMOPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayType) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	UMMOFormationManager* FormationManager;
@@ -100,6 +101,7 @@ protected:
 	bool DeprojectMouseToTerrain(FVector& OutLocation, FVector& OutTerrainNormal) const;
 
 private:
+	
 	bool bHasValidMousePosition = false;
 
 	// Begin PlayerController interface
@@ -133,6 +135,12 @@ private:
 
 	void TryCastSkill(const int32 Index);
 
+	template<int32 Index>
+	void ShowSkillRange();
+
+	void ShowSkillRange(const int32 Index);
+	void HideSkillRange();
+
 	/** Groups */
 	template<int32 Number>
 	void CreateGroup();
@@ -147,6 +155,12 @@ template<int32 Index>
 FORCEINLINE void AMMOPlayerController::TryCastSkill()
 {
 	TryCastSkill(Index);
+}
+
+template<int32 Index>
+inline void AMMOPlayerController::ShowSkillRange()
+{
+	ShowSkillRange(Index);
 }
 
 template<int32 Number>

@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/DecalComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "CombatSystem/MMOCombatSystem.h"
 
 AMMOBaseHero::AMMOBaseHero()
 	: Super()
@@ -30,8 +31,45 @@ AMMOBaseHero::AMMOBaseHero()
 	{
 		SelectionDecal->SetDecalMaterial(DecalMaterialAsset.Object);
 	}
-	SelectionDecal->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	SelectionDecal->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+	SelectionDecal->DecalSize = FVector(16.0, 32.0, 32.0);
+	SelectionDecal->SetRelativeRotation(FRotator(90.0, 0.0, 0.0).Quaternion());
+
+	SkillPreviewDecal = CreateDefaultSubobject<UDecalComponent>("SkillPreviewDecal");
+	SkillPreviewDecal->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UMaterial> DecalPreviewAsset(TEXT("Material'/Game/Materials/Hud/M_Spell_Circle_Decal.M_Spell_Circle_Decal'"));
+	if (DecalPreviewAsset.Succeeded())
+	{
+		SkillPreviewDecal->SetDecalMaterial(DecalPreviewAsset.Object);
+	}
+	SkillPreviewDecal->DecalSize = FVector(64., 100., 100.);
+	SkillPreviewDecal->SetRelativeRotation(FRotator(90.0, 0.0, 0.0).Quaternion());
+	SkillPreviewDecal->SetRelativeLocation(FVector::UpVector * -50.f);
+	
+	HideSkillRange();
+}
+
+void AMMOBaseHero::ShowSkillRange(const int32 Index)
+{
+	if (CanShowSkillPreview())
+	{
+		SkillPreviewDecal->SetHiddenInGame(false);
+
+		const double Range = (double) CombatSystem->GetSkillRange(Index);
+		if (Range > 0.)
+		{
+			SkillPreviewDecal->DecalSize = FVector(64., Range, Range);
+		}
+	}
+}
+
+void AMMOBaseHero::HideSkillRange()
+{
+	SkillPreviewDecal->SetHiddenInGame(true);
+}
+
+bool AMMOBaseHero::CanShowSkillPreview() const
+{
+	return !HasTag(FMMOStatusTags::Get().StunnedTag);
 }
 
 void AMMOBaseHero::OnSelected_Implementation()
@@ -42,4 +80,5 @@ void AMMOBaseHero::OnSelected_Implementation()
 void AMMOBaseHero::OnDeselected_Implementation()
 {
 	SelectionDecal->SetHiddenInGame(true);
+	HideSkillRange();
 }

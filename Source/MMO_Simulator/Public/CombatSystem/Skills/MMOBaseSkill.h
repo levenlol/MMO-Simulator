@@ -94,10 +94,10 @@ class MMO_SIMULATOR_API UMMOBaseSkill : public UObject
 public:
 	virtual void Setup(AMMOBaseCharacter* InOwner);
 
-	virtual void CastAbility(const FMMOSkillInputData& Data) {};
-	virtual void AbortAbility() {};
-	virtual void Finish() {};
-	virtual void Abort() {};
+	virtual void CastAbility(const FMMOSkillInputData& Data) {}
+	virtual void AbortAbility() {}
+	virtual void Finish() {}
+	virtual void Abort() {}
 
 	// Triggered Skills from this.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Category = Skills)

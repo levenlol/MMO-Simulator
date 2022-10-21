@@ -450,6 +450,15 @@ bool UMMOCombatSystem::CanCharacterAttack() const
 	return MainHandWeapon && !bIsAttacking && !bIsCasting && !bIsStunned;
 }
 
+float UMMOCombatSystem::GetSkillRange(const int32 Index) const
+{
+	if (Skills.IsValidIndex(Index))
+	{
+		return Skills[Index]->Range;
+	}
+	return 0.0f;
+}
+
 float UMMOCombatSystem::GetRemainingGlobalCooldown() const
 {
 	if (GlobalCooldown <= 0.f)
