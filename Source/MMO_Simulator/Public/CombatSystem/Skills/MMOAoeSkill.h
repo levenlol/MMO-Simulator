@@ -61,4 +61,6 @@ private:
 	float MaxRange = 0.f;
 
 	bool bTargetHeroes = true;
+
+	// TODO: Duplicate triggered skills, IE: DamageFx are now played only on last target.
 };

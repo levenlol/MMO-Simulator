@@ -20,15 +20,15 @@ void UMMOBaseSkill::Setup(AMMOBaseCharacter* InOwner)
 
 const UMMOWrapperSkill* UMMOBaseSkill::GetOuterSkill() const
 {
-	return Cast<UMMOWrapperSkill>(GetOuterSkill_Rec(this));
+	return GetOuterSkill_Rec(this);
 }
 
-const UMMOBaseSkill* UMMOBaseSkill::GetOuterSkill_Rec(const UMMOBaseSkill* InSkill) const
+const UMMOWrapperSkill* UMMOBaseSkill::GetOuterSkill_Rec(const UObject* InSkill) const
 {
 	if (InSkill)
 	{
-		const UMMOBaseSkill* OuterSkill = Cast<UMMOBaseSkill>(InSkill->GetOuter());
-		return OuterSkill ? GetOuterSkill_Rec(OuterSkill) : InSkill;
+		const UObject* OuterSkill = InSkill->GetOuter();
+		return OuterSkill->IsA<UMMOWrapperSkill>() ? Cast<UMMOWrapperSkill>(OuterSkill) : GetOuterSkill_Rec(OuterSkill);
 	}
 
 	return nullptr;

@@ -109,6 +109,6 @@ protected:
 
 	const UMMOWrapperSkill* GetOuterSkill() const;
 private:
-	const UMMOBaseSkill* GetOuterSkill_Rec(const UMMOBaseSkill* InSkill) const;
+	const UMMOWrapperSkill* GetOuterSkill_Rec(const UObject* InSkill) const;
 };
 

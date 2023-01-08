@@ -63,7 +63,7 @@ void UMMOAoeSkill::CastAbility(const FMMOSkillInputData& Data)
 	float CurrentDistance = (Characters[0]->GetActorLocation() - PivotLocation).Size();
 
 	// Loop until we have hit the maximum number of units or the current distance exceeds the maximum range
-	while (i < MaxUnitToHit && CurrentDistance < MaxRange)
+	while (i < MaxUnitToHit && CurrentDistance < MaxRange && Characters.Num() > 0)
 	{
 		// For each TriggeredSkill, create an input data object and use it to cast the skill on the current character in the loop
 		for (UMMOBaseSkill* TriggeredSkill : TriggeredSkills)
@@ -74,10 +74,14 @@ void UMMOAoeSkill::CastAbility(const FMMOSkillInputData& Data)
 			InputData.TargetActor = Characters[i];
 			InputData.SourceLocation = Characters[i]->GetActorLocation();
 
+			TriggeredSkill->CastAbility(InputData);
 		}
 
 		// Increment the loop counter and update the current distance
 		i++;
+
+		if (i >= Characters.Num())
+			break;
 		CurrentDistance = (Characters[i]->GetActorLocation() - PivotLocation).Size();
 	}
 }
