@@ -106,7 +106,7 @@ void UMMOAdvancedFormationWidget::CreateDraggableWidget(TArray<UMMOAdvancedForma
 		// Draw it to the center of the canvas
 		const FVector2D Size = MapCanvas->GetCachedGeometry().GetLocalSize();
 
-		const FVector2D Position = MapCanvas->RenderTransform.Translation + Size * 0.5f;
+		const FVector2D Position = MapCanvas->GetRenderTransform().Translation + Size * 0.5f;
 		Button->SetRenderTranslation(Position - FVector2D(32.f));
 	}
 }
@@ -116,7 +116,7 @@ void UMMOAdvancedFormationWidget::OnAdvButtonPressed(UMMOAdvancedFormationButton
 	CurrentPressedButton = Sender;
 
 	const FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
-	ClickOffset = CurrentPressedButton->RenderTransform.Translation - MousePosition;
+	ClickOffset = CurrentPressedButton->GetRenderTransform().Translation - MousePosition;
 }
 
 void UMMOAdvancedFormationWidget::OnAdvButtonReleased(UMMOAdvancedFormationButtonWidget* Sender)
@@ -148,7 +148,7 @@ TArray<FVector2D> UMMOAdvancedFormationWidget::ComputeRescalePointInWindow(const
 	for (int32 i = 0; i < AdvButtons.Num(); i++)
 	{
 		const FVector2D ButtonSize = AdvButtons[i]->GetCachedGeometry().GetLocalSize();
-		const FVector2D ButtonPosition = AdvButtons[i]->RenderTransform.Translation;
+		const FVector2D ButtonPosition = AdvButtons[i]->GetRenderTransform().Translation;
 
 		// We need to remap the value because the button isnt 0 sized and it is clamped inside the view. If view size is 512 and button size is 64 value range is 0 - 448
 		const float InX = MapSize.X - ButtonSize.X * 0.5f;
@@ -174,7 +174,7 @@ TArray<FVector2D> UMMOAdvancedFormationWidget::ComputeRescalePointInWindow(const
 FVector2D UMMOAdvancedFormationWidget::ClampToWindow(FVector2D Point, FVector2D Size) const
 {
 	const FVector2D MapSize = MapCanvas->GetCachedGeometry().GetLocalSize();
-	const FVector2D MapPosition = MapCanvas->RenderTransform.Translation;
+	const FVector2D MapPosition = MapCanvas->GetRenderTransform().Translation;
 
 	float X = FMath::Max(Point.X, MapPosition.X);
 	float Y = FMath::Max(Point.Y, MapPosition.Y);

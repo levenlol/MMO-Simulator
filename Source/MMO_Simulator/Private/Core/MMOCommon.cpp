@@ -22,6 +22,16 @@ void FMMOCharacterStats::Recuperate(int32 ElapsedSeconds)
 	Resources = FMath::Clamp(Resources + ElapsedSeconds * RPS, 0, MaxResources);
 }
 
+bool FMMOCharacterStats::RequestResource(int32 Amount)
+{
+	if (Resources >= Amount)
+	{
+		Resources -= Amount;
+		return true;
+	}
+	return false;
+}
+
 FMMOCharacter::FMMOCharacter(const FName& InName)
 	: Name(InName)
 {}

@@ -26,6 +26,9 @@ public:
 	TSoftObjectPtr<UTexture2D> Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta = (ClampMin = "0"))
+	int32 ResourceCost = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta = (ClampMin = "0"))
 	float Range = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Skill, meta=(ClampMin="0"))

@@ -40,7 +40,7 @@ void UMovableWidget::TopWindowBarPressed()
 	bMoving = true;
 
 	const FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
-	const FVector2D WidgetPos = GetRootWidget()->RenderTransform.Translation;
+	const FVector2D WidgetPos = GetRootWidget()->GetRenderTransform().Translation;
 	ClickOffset = MousePosition - WidgetPos;
 }
 
@@ -51,5 +51,5 @@ void UMovableWidget::TopWindowBarReleased()
 
 void UMovableWidget::CloseClicked()
 {
-	RemoveFromViewport();
+	RemoveFromParent();
 }

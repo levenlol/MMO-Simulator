@@ -148,6 +148,10 @@ void UMMOCombatSystem::TryCastSkill(AMMOBaseCharacter* Target, const FVector& Lo
 		return;
 	}
 
+	// We are sure we have resource to cast that ability.
+	const bool bRequestSuccess = OwnerCharacter->CharacterInfo.Stats.RequestResource(Skills[Index]->ResourceCost);
+	check(bRequestSuccess);
+
 	FMMOSkillInputData InputData;
 	InputData.TargetLocation = Location;
 	InputData.TargetActor = Target;
@@ -208,6 +212,11 @@ EMMOSkillCastFailType UMMOCombatSystem::CanCastSkill(AMMOBaseCharacter* Target, 
 		if (Skills[Index]->IsLocked())
 		{
 			return EMMOSkillCastFailType::Unavailable;
+		}
+
+		if (Skills[Index]->ResourceCost > OwnerCharacter->CharacterInfo.Stats.Resources)
+		{
+			return EMMOSkillCastFailType::MissingResource;
 		}
 
 		const bool bOnSameSide = UMMOGameplayUtils::AreOnTheSameSide(OwnerCharacter, Target);
@@ -457,6 +466,16 @@ float UMMOCombatSystem::GetSkillRange(const int32 Index) const
 		return Skills[Index]->Range;
 	}
 	return 0.0f;
+}
+
+int32 UMMOCombatSystem::GetSkillResourceCost(const int32 Index) const
+{
+	if (Skills.IsValidIndex(Index))
+	{
+		return Skills[Index]->ResourceCost;
+	}
+
+	return 0;
 }
 
 float UMMOCombatSystem::GetRemainingGlobalCooldown() const

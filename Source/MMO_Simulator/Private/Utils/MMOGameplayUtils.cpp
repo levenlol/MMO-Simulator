@@ -10,7 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "CombatSystem/Skills/MMOBaseSkill.h"
 #include "Particles/ParticleSystemComponent.h"
-
+#include "EngineUtils.h"
 
 bool UMMOGameplayUtils::Is2HWeapon(EMMOWeaponType WeaponType)
 {
@@ -209,7 +209,7 @@ void UMMOGameplayUtils::PlayParticlesAt(AMMOFXActor* FxActor, const FVector& Loc
 
 FString UMMOGameplayUtils::GetClassName(EMMOCharacterClass InClass)
 {
-	static UEnum* ClassEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterClass"));
+	static UEnum* ClassEnum = FindObject<UEnum>(nullptr, TEXT("/Script/MMO_Simulator.EMMOCharacterClass"));
 	if (!ClassEnum)
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("Cannot find EMMOCharacterClass"));
@@ -252,4 +252,58 @@ FVector UMMOGameplayUtils::ComputeMiddlePoint(const TArray<FVector>& Points)
 TArray<AMMOBaseHero*> UMMOGameplayUtils::FilterByRole(TArray<AMMOBaseHero*> Heroes, EMMOCharacterRole Role)
 {
 	return Heroes.FilterByPredicate([Role](const AMMOBaseHero* Hero) { return Hero && Hero->CharacterInfo.CharacterRole == Role; });
+}
+
+inline FVector UMMOGameplayUtils::VerticalRaycast(const UObject* WorldContextObject, const FVector& InLocation, float RayLength, ECollisionChannel CollisionChannel, float UpRayOffset)
+{
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		FHitResult HitResult;
+
+		const FVector StartLocation = InLocation + FVector(0.f, 0.f, UpRayOffset);
+		const FVector EndLocation = StartLocation + FVector(0.f, 0.f, -RayLength);
+		if (World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, CollisionChannel))
+		{
+			return HitResult.ImpactPoint;
+		}
+	}
+
+	return InLocation;
+}
+
+inline bool UMMOGameplayUtils::IsInLOS(AMMOBaseCharacter* First, AMMOBaseCharacter* Second, ECollisionChannel CollisionChannel)
+{
+	if (!First || !Second)
+	{
+		return false;
+	}
+
+	FHitResult LosHit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(First);
+
+	return First->GetWorld()->LineTraceSingleByChannel(LosHit, First->GetActorLocation(), Second->GetActorLocation(), CollisionChannel, Params);
+}
+
+TArray<AMMOBaseCharacter*> UMMOGameplayUtils::GetAllCharactersOfType(const UObject* WorldContextObject, TSubclassOf<AMMOBaseCharacter> CharacterClass)
+{
+	if (!CharacterClass)
+	{
+		CharacterClass = AMMOBaseCharacter::StaticClass();
+	}
+
+	TArray<AMMOBaseCharacter*> Characters;
+	// We do nothing if no is class provided, rather than giving ALL actors!
+	if (CharacterClass)
+	{
+		if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+		{
+			for (TActorIterator<AMMOBaseCharacter> It(World, CharacterClass); It; ++It)
+			{
+				AMMOBaseCharacter* Character = *It;
+				Characters.Add(Character);
+			}
+		}
+	}
+	return Characters;
 }

@@ -173,13 +173,13 @@ FString UMMOEquipGenerator::GetEquipSlotName(EMMOArmorSlotType ArmorSlotType) co
 
 void UMMOEquipGenerator::Init()
 {
-	ArmorSlotEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOArmorSlotType"));
+	ArmorSlotEnum = FindObject<UEnum>(nullptr, TEXT("/Script/MMO_Simulator.EMMOArmorSlotType"));
 	if (!ArmorSlotEnum)
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("Cannot find enum EMMOArmorSlotType"));
 	}
 
-	RarityEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMORarityType"));
+	RarityEnum = FindObject<UEnum>(nullptr, TEXT("/Script/MMO_Simulator.EMMORarityType"));
 	if (!RarityEnum)
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("Cannot find enum EMMORarityType"));

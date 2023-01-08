@@ -76,3 +76,5 @@ enc_temp_folder/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+.vsconfig

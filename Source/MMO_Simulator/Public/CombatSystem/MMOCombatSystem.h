@@ -22,6 +22,7 @@ enum class EMMOSkillCastFailType : uint8
 	Cooldown,
 	OutOfRange, 
 	AlreadyCasting,
+	MissingResource,
 	Unspecified // this is still a failure
 };
 
@@ -106,6 +107,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Skill)
 	float GetSkillRange(const int32 Index) const;
+
+	UFUNCTION(BlueprintPure, Category = Skill)
+	int32 GetSkillResourceCost(const int32 Index) const;
 
 	UFUNCTION(BlueprintPure, Category = Skill)
 	float GetRemainingGlobalCooldown() const;

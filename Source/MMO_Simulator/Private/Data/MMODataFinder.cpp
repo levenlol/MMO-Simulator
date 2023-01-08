@@ -209,7 +209,7 @@ void UMMODataFinder::ParseClassColor()
 
 void UMMODataFinder::ParseEquipGenerator()
 {
-	UEnum* RarityEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMORarityType"));
+	UEnum* RarityEnum = FindObject<UEnum>(nullptr, TEXT("/Script/MMO_Simulator.EMMORarityType"));
 	if (!RarityEnum)
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("Cannot find EMMORarityType"));
@@ -382,7 +382,7 @@ void UMMODataFinder::ParseRaceCharacterDataTable()
 	}
 
 #if WITH_EDITOR
-	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterRace"));
+	UEnum* Enum = FindObject<UEnum>(nullptr, TEXT("/Script/MMO_Simulator.EMMOCharacterRace"));
 	if (!Enum)
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("UMMODataFinder Cannot Find EMMOCharacterRace."));
@@ -430,7 +430,7 @@ void UMMODataFinder::ParseCharacterProgressionDataTable()
 {
 	UMMOGameInstance* GameInstance = Cast<UMMOGameInstance>(GetOuter());
 
-	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMOCharacterClass"));
+	UEnum* Enum = FindObject<UEnum>(nullptr, TEXT("/Script/MMO_Simulator.EMMOCharacterClass"));
 	if (!Enum)
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("UMMODataFinder Cannot Find EMMOCharacterClass."));

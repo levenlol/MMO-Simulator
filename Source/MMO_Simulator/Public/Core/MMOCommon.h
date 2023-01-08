@@ -198,6 +198,12 @@ struct MMO_SIMULATOR_API FMMOCharacterStats
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FColor ResourceColor = FColor::Blue;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	FText ResourceName = FText::FromString(TEXT("Mana"));
+
 	// Max Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (ClampMin = "1"))
 	int32 MaxHealth = 100;
@@ -227,6 +233,7 @@ public:
 	int32 RecuperateEverySeconds = 1;
 
 	void Recuperate(int32 ElapsedSeconds);
+	bool RequestResource(int32 Amount);
 };
 
 USTRUCT(BlueprintType)
