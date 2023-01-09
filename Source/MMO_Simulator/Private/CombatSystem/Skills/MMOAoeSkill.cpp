@@ -14,10 +14,23 @@ void UMMOAoeSkill::Setup(AMMOBaseCharacter* InOwner)
 	// Call the base class's Setup function
 	Super::Setup(InOwner);
 
-	// Setup each of the TriggeredSkills
-	for (UMMOBaseSkill* Skill : TriggeredSkills)
+	for (int32 i = 0; i < MaxUnitToHit; i++)
 	{
-		Skill->Setup(InOwner);
+		DuplicatedTriggeredSkills.Emplace();
+		for (UMMOBaseSkill* Skill : TriggeredSkills)
+		{
+			UMMOBaseSkill* DSkill = DuplicateObject(Skill, Skill->GetOuter());
+			DuplicatedTriggeredSkills.Last().TriggeredSkills.Add(DSkill);
+		}
+	}
+
+	// Setup each of the TriggeredSkills (duplicated)
+	for (auto& SkillsContainer : DuplicatedTriggeredSkills)
+	{
+		for (UMMOBaseSkill* Skill : SkillsContainer.TriggeredSkills)
+		{
+			Skill->Setup(InOwner);
+		}
 	}
 
 	// Set the MaxRange to the range of the outer skill
@@ -66,7 +79,9 @@ void UMMOAoeSkill::CastAbility(const FMMOSkillInputData& Data)
 	while (i < MaxUnitToHit && CurrentDistance < MaxRange && Characters.Num() > 0)
 	{
 		// For each TriggeredSkill, create an input data object and use it to cast the skill on the current character in the loop
-		for (UMMOBaseSkill* TriggeredSkill : TriggeredSkills)
+		const TArray<UMMOBaseSkill*> SkillsToUse = DuplicatedTriggeredSkills[i].TriggeredSkills;
+
+		for (UMMOBaseSkill* TriggeredSkill : SkillsToUse)
 		{
 			FMMOSkillInputData InputData;
 			InputData.SourceActor = OwnerCharacter;

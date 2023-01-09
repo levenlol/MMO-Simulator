@@ -21,6 +21,15 @@ bTargetFriendly: Whether the skill will target friendly units or enemy units.
 The UMMOAoeSkill class overrides the Setup() and CastAbility() methods of UMMOBaseSkill to add functionality specific to area of effect skills.
 */
 
+USTRUCT()
+struct MMO_SIMULATOR_API FMMOTriggeredSkills
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	TArray<UMMOBaseSkill*> TriggeredSkills;
+};
+
 UCLASS()
 class MMO_SIMULATOR_API UMMOAoeSkill : public UMMOBaseSkill
 {
@@ -62,5 +71,6 @@ private:
 
 	bool bTargetHeroes = true;
 
-	// TODO: Duplicate triggered skills, IE: DamageFx are now played only on last target.
+	UPROPERTY()
+	TArray<FMMOTriggeredSkills> DuplicatedTriggeredSkills;
 };
