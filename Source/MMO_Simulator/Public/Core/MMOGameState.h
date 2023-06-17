@@ -8,8 +8,10 @@
 
 class AMMOBaseCharacter;
 class AMMOBaseHero;
+struct FMMOChatMessageData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOCharacterEvent, AMMOBaseCharacter*, Sender);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMMOChatEvent, const FMMOChatMessageData&, MessageData);
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOGameState : public AGameStateBase
@@ -28,10 +30,14 @@ public:
 	void NotifyStartAttack(AMMOBaseCharacter* Sender);
 	void NotifyDeath(AMMOBaseCharacter* Sender);
 
+	void NotifyChat(AMMOBaseCharacter* Sender, const FString& Message);
 
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOCharacterEvent OnStartAttack;
 
 	UPROPERTY(BlueprintAssignable, Category = Combat)
 	FMMOCharacterEvent OnDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = Chat)
+	FMMOChatEvent OnTalking;
 };

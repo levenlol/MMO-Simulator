@@ -73,10 +73,14 @@ void UMMOGameplayUtils::SetImageToButton(UButton* InButton, UTexture* InTexture)
 {
 	if (InButton && InTexture)
 	{
-		InButton->WidgetStyle.Normal.SetResourceObject(InTexture);
-		InButton->WidgetStyle.Hovered.SetResourceObject(InTexture);
-		InButton->WidgetStyle.Pressed.SetResourceObject(InTexture);
-		InButton->WidgetStyle.Disabled.SetResourceObject(InTexture);
+		FButtonStyle ButtonStyle = InButton->GetStyle();
+
+		ButtonStyle.Normal.SetResourceObject(InTexture);
+		ButtonStyle.Hovered.SetResourceObject(InTexture);
+		ButtonStyle.Pressed.SetResourceObject(InTexture);
+		ButtonStyle.Disabled.SetResourceObject(InTexture);
+	
+		InButton->SetStyle(ButtonStyle);
 	}
 }
 

@@ -19,4 +19,7 @@ public:
 
 	UFUNCTION(exec)
 	void Cheat_StunHeroes(float Seconds);
+
+	UFUNCTION(exec)
+	void Cheat_PostMessage_Random(FString Message);
 };

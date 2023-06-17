@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Characters/MMOBaseHero.h"
 #include "EngineUtils.h"
+#include "UI/Chat/MMOChatMessage.h"
 
 void AMMOGameState::BeginPlay()
 {
@@ -42,4 +43,13 @@ void AMMOGameState::NotifyDeath(AMMOBaseCharacter* Sender)
 	}
 
 	OnDeath.Broadcast(Sender);
+}
+
+void AMMOGameState::NotifyChat(AMMOBaseCharacter* Sender, const FString& Message)
+{
+	if (Sender && Message.Len() >= 0)
+	{
+		FMMOChatMessageData MessageData(Sender, Message);
+		OnTalking.Broadcast(MessageData);
+	}
 }
