@@ -8,6 +8,14 @@
 
 class UDecalComponent;
 
+UENUM(BlueprintType)
+enum class EMMOGuildRole : uint8
+{
+	GuildMaster,
+	Officier,
+	Raider,
+	New
+};
 
 UCLASS()
 class MMO_SIMULATOR_API AMMOBaseHero : public AMMOBaseCharacter
@@ -29,6 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Preview)
 	void HideSkillRange();
 
+	UPROPERTY(EditAnywhere, Category = Role)
+	EMMOGuildRole GuildRole = EMMOGuildRole::New;
 private:
 	/** Selection Decal */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

@@ -2,23 +2,37 @@
 
 
 #include "UI/Chat/MMOChat.h"
-#include "Core/MMOGameState.h"
+#include "Chat/MMOChatManagerComponent.h"
 #include "UI/Chat/MMOChatMessage.h"
 #include "Components/VerticalBox.h"
-
+#include "Components/EditableTextBox.h"
+#include "Characters/MMOBaseHero.h"
+#include "Utils/MMOGameplayUtils.h"
 
 void UMMOChat::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AMMOGameState* GameState = AMMOGameState::GetMMOGameState(this);
-	if (!GameState)
+	ChatManager = UMMOChatManagerComponent::GetChatManagerComponent(this);
+	if (!ChatManager)
 		return;
 
-	// that's not the best thing, cuz if we send a message and the chat still didnt construct we will miss the message.
-	// but for now is Ok-ish.
+	// Hide chat
+	ChatTextBox->SetVisibility(ESlateVisibility::Collapsed);
+	ChatTextBox->SetIsReadOnly(true);
 
-	GameState->OnTalking.AddDynamic(this, &UMMOChat::OnCharacterTalk);
+	ChatTextBox->OnTextCommitted.AddDynamic(this, &UMMOChat::OnCommitText);
+
+	ChatManager->OnTalking.AddDynamic(this, &UMMOChat::OnCharacterTalk);
+
+	// Init chat history
+	const TArray<FMMOChatMessageData>& History = ChatManager->GetChatHistory();
+
+	const int32 SafeHistorySize = FMath::Min(History.Num(), MessageHistorySize);
+	for (int32 i = 0; i < SafeHistorySize; i++)
+	{
+		Messages.Add(History[History.Num() - i - 1]);
+	}
 
 	// remove all children
 	MessagesRoot->ClearChildren();
@@ -27,12 +41,15 @@ void UMMOChat::NativeConstruct()
 	ChatMessages.SetNum(MessageHistorySize);
 
 	// little trick to display the last message first, and clip the top ones.
-	MessagesRoot->RenderTransform.Angle = 180.f;
+	FWidgetTransform TrickRenderTransform = MessagesRoot->GetRenderTransform();
+	MessagesRoot->SetRenderTransform(TrickRenderTransform);
+
+	TrickRenderTransform.Angle = 180.f;
 
 	for (UMMOChatMessage*& ChatMessage : ChatMessages)
 	{
 		ChatMessage = CreateWidget<UMMOChatMessage>(this, ChatMessageClass);
-		ChatMessage->RenderTransform.Angle = 180.f; // little trick
+		ChatMessage->SetRenderTransform(TrickRenderTransform); // little trick
 		MessagesRoot->AddChildToVerticalBox(ChatMessage);
 	}
 
@@ -43,11 +60,12 @@ void UMMOChat::NativeDestruct()
 {
 	Super::NativeDestruct();
 
-	AMMOGameState* GameState = AMMOGameState::GetMMOGameState(this);
-	if (!GameState)
+	ChatTextBox->OnTextCommitted.RemoveDynamic(this, &UMMOChat::OnCommitText);
+
+	if (!ChatManager)
 		return;
 
-	GameState->OnTalking.RemoveDynamic(this, &UMMOChat::OnCharacterTalk);
+	ChatManager->OnTalking.RemoveDynamic(this, &UMMOChat::OnCharacterTalk);
 }
 
 void UMMOChat::OnCharacterTalk(const FMMOChatMessageData& MessageData)
@@ -65,7 +83,8 @@ void UMMOChat::DisplayChatMessages()
 	int32 i = 0;
 
 	// First write in chat the written message in reverse order
-	for (; i < Messages.Num(); i++)
+	const int32 SafeMessageNum = FMath::Min(MessageHistorySize, Messages.Num());
+	for (; i < SafeMessageNum; i++)
 	{
 		const FMMOChatMessageData& MessageData = Messages[i];
 		ChatMessages[Messages.Num() - i - 1]->SetMessage(MessageData);
@@ -75,4 +94,16 @@ void UMMOChat::DisplayChatMessages()
 	{
 		ChatMessages[i]->SetMessage(FMMOChatMessageData());
 	}
+}
+
+void UMMOChat::OnCommitText(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	ChatTextBox->SetVisibility(ESlateVisibility::Hidden);
+	ChatTextBox->SetIsReadOnly(true);
+	ChatTextBox->SetText(FText::GetEmpty());
+
+	if (!ChatManager)
+		return;
+
+	ChatManager->WriteMessage(UMMOGameplayUtils::GetHeroesOfRole(this, EMMOGuildRole::GuildMaster)[0], Text.ToString());
 }

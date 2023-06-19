@@ -11,16 +11,33 @@ void AMMOGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bool bGM = false;
 	for (TActorIterator<AMMOBaseHero> It(GetWorld(), AMMOBaseHero::StaticClass()); It; ++It)
 	{
 		AMMOBaseHero* Hero = *It;
 		Heroes.Add(Hero);
+
+		bGM = bGM || Hero->GuildRole == EMMOGuildRole::GuildMaster;
 	}
+
+	// Sanity check.
+	if (!bGM && Heroes.Num() > 0)
+		Heroes[0]->GuildRole = EMMOGuildRole::GuildMaster;
 }
 
 AMMOGameState* AMMOGameState::GetMMOGameState(const UObject* WorldContextObject)
 {
 	return Cast<AMMOGameState>(UGameplayStatics::GetGameState(WorldContextObject));
+}
+
+UMMOChatManagerComponent* AMMOGameState::GetChatManager()
+{
+	if (!ChatManager)
+	{
+		ChatManager = FindComponentByClass<UMMOChatManagerComponent>();
+	}
+
+	return ChatManager;
 }
 
 void AMMOGameState::NotifyStartAttack(AMMOBaseCharacter* Sender)
@@ -43,13 +60,4 @@ void AMMOGameState::NotifyDeath(AMMOBaseCharacter* Sender)
 	}
 
 	OnDeath.Broadcast(Sender);
-}
-
-void AMMOGameState::NotifyChat(AMMOBaseCharacter* Sender, const FString& Message)
-{
-	if (Sender && Message.Len() >= 0)
-	{
-		FMMOChatMessageData MessageData(Sender, Message);
-		OnTalking.Broadcast(MessageData);
-	}
 }

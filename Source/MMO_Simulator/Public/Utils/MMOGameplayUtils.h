@@ -28,6 +28,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static const TArray<AMMOBaseHero*>& GetHeroes(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	static TArray<AMMOBaseHero*> GetHeroesOfRole(const UObject* WorldContextObject, EMMOGuildRole Role);
+
+	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	static AMMOBaseHero* GetRandomGuildHero(const UObject* WorldContextObject, const bool bExcludeGM = false);
+
 	UFUNCTION(BlueprintCallable, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static void SetActorActive(AActor* InActor, bool bActive);
 

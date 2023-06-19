@@ -6,7 +6,7 @@
 #include "Characters/MMOBaseHero.h"
 #include "Tools/MMOFunctionLibrary.h"
 #include "Utils/MMOGameplayUtils.h"
-#include "Core/MMOGameState.h"
+#include "Chat/MMOChatManagerComponent.h"
 
 void UMMOCheatManager::Cheat_SetPropertyValue(FString PropertyPath, float Value)
 {
@@ -39,10 +39,10 @@ void UMMOCheatManager::Cheat_PostMessage_Random(FString Message)
         return;
     
     const int32 Index = FMath::RandRange(0, Heroes.Num() - 1);
-    AMMOGameState* GameState = AMMOGameState::GetMMOGameState(this);
+    UMMOChatManagerComponent* ChatManager = UMMOChatManagerComponent::GetChatManagerComponent(this);
 
-    if (GameState)
+    if (ChatManager)
     {
-        GameState->NotifyChat(Heroes[Index], Message);
+        ChatManager->WriteMessage(Heroes[Index], Message);
     }
 }

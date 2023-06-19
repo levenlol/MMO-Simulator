@@ -8,6 +8,8 @@
 
 class UMMOChatMessage;
 class UVerticalBox;
+class UEditableTextBox;
+class UMMOChatManagerComponent;
 
 UCLASS()
 class MMO_SIMULATOR_API UMMOChat : public UUserWidget
@@ -26,10 +28,19 @@ public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UVerticalBox* MessagesRoot;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UEditableTextBox* ChatTextBox;
+
 	UFUNCTION()
 	void OnCharacterTalk(const FMMOChatMessageData& MessageData);
 private:
 	void DisplayChatMessages();
+
+	UFUNCTION()
+	void OnCommitText(const FText& Text, ETextCommit::Type CommitMethod);
+
+	UPROPERTY()
+	UMMOChatManagerComponent* ChatManager = nullptr;
 
 	UPROPERTY(VisibleAnywhere, Category = Chat)
 	TArray<FMMOChatMessageData> Messages;

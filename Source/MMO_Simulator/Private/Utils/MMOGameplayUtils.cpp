@@ -59,6 +59,28 @@ const TArray<AMMOBaseHero*>& UMMOGameplayUtils::GetHeroes(const UObject* WorldCo
 	return NoHeroes;
 }
 
+TArray<AMMOBaseHero*> UMMOGameplayUtils::GetHeroesOfRole(const UObject* WorldContextObject, EMMOGuildRole Role)
+{
+	const TArray<AMMOBaseHero*>& Heroes = GetHeroes(WorldContextObject);
+
+	return Heroes.FilterByPredicate([Role](const AMMOBaseHero* Hero) { return Role == Hero->GuildRole; });
+}
+
+AMMOBaseHero* UMMOGameplayUtils::GetRandomGuildHero(const UObject* WorldContextObject, const bool bExcludeGM)
+{
+	TArray<AMMOBaseHero*> Heroes = GetHeroes(WorldContextObject);
+	if (bExcludeGM)
+	{
+		Heroes.RemoveAll([](const AMMOBaseHero* Hero) { return Hero->GuildRole == EMMOGuildRole::GuildMaster; });
+	}
+	
+	if (Heroes.Num() == 0)
+		return nullptr;
+
+	const int32 Index = FMath::RandRange(0, Heroes.Num() - 1);
+	return Heroes[Index];
+}
+
 void UMMOGameplayUtils::SetActorActive(AActor* InActor, bool bActive)
 {
 	if (InActor)
