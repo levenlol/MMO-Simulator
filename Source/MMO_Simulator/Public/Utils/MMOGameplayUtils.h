@@ -29,6 +29,9 @@ public:
 	static const TArray<AMMOBaseHero*>& GetHeroes(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
+	static AMMOBaseHero* GetHeroByName(const UObject* WorldContextObject, const FName& Name);
+
+	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))
 	static TArray<AMMOBaseHero*> GetHeroesOfRole(const UObject* WorldContextObject, EMMOGuildRole Role);
 
 	UFUNCTION(BlueprintPure, Category = Heroes, meta = (WorldContext = WorldContextObject))

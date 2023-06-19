@@ -7,37 +7,11 @@
 #include "Characters/MMOBaseHero.h"
 #include "Utils/MMOGameplayUtils.h"
 
-#if !UE_BUILD_SHIPPING
-static FAutoConsoleCommandWithWorldAndArgs CVarChatGPT_Enabled(
-	TEXT("gpt.Enabled"),
-	TEXT("Arguments: 0/1\n")
-	TEXT("Controls whether the chat manager use chat gpt for message generation."),
-	FConsoleCommandWithWorldAndArgsDelegate::CreateLambda([](const TArray<FString>& Args, UWorld* World)
-		{
-			if (Args.Num() == 0)
-				return;
-
-			const bool bShouldBeEnabled = Args[0].ToBool();
-			UMMOChatManagerComponent* ChatManagerComponent = UMMOChatManagerComponent::GetChatManagerComponent(World);
-
-			if (ChatManagerComponent)
-			{
-				ChatManagerComponent->bEnabled = bShouldBeEnabled;
-				UE_LOG(LogTemp, Log, TEXT("Chat GPT for Game Chat - %s"), bShouldBeEnabled ? TEXT("Enabled") : TEXT("Disabled"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Cannot find ChatManagerComponent"));
-			}
-		}),
-	ECVF_Cheat);
-#endif
-
 UMMOChatManagerComponent::UMMOChatManagerComponent()
 {
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 	PrimaryComponentTick.bCanEverTick = true;
 }
-
 
 void UMMOChatManagerComponent::WriteMessage(AMMOBaseCharacter* Sender, const FString& Message)
 {
@@ -47,16 +21,24 @@ void UMMOChatManagerComponent::WriteMessage(AMMOBaseCharacter* Sender, const FSt
 	if (AMMOGameState* MMOGameState = AMMOGameState::GetMMOGameState(this))
 	{
 		FMMOChatMessageData MessageData(Sender, Message);
-		ChatHistory.Add(MessageData);
-
-		AMMOBaseHero* Hero = Cast<AMMOBaseHero>(Sender);
-		if (IsTalkingToPlayer() && Hero && Hero->GuildRole == EMMOGuildRole::GuildMaster)
-		{
-			TalkToPlayer();
-		}
-
-		OnTalking.Broadcast(MessageData);
+		WriteMessage(MessageData);
 	}
+}
+
+void UMMOChatManagerComponent::WriteMessage(const FMMOChatMessageData& MessageData)
+{
+	if (MessageData.IsEmpty())
+		return;
+
+	ChatHistory.Add(MessageData);
+
+	AMMOBaseHero* Hero = Cast<AMMOBaseHero>(MessageData.OwnerCharacter.Get());
+	if (IsTalkingToPlayer() && Hero && Hero->GuildRole == EMMOGuildRole::GuildMaster)
+	{
+		TalkToPlayer();
+	}
+
+	OnTalking.Broadcast(MessageData);
 }
 
 UMMOChatManagerComponent* UMMOChatManagerComponent::GetChatManagerComponent(const UObject* WorldContextObject)
@@ -78,10 +60,10 @@ void UMMOChatManagerComponent::TalkToPlayer()
 {
 	TArray<FHttpGPTChatMessage> HttpMessages = CollectChatMessages();
 	UHttpGPTChatRequest* Request = UHttpGPTChatRequest::SendMessages_DefaultOptions(this, HttpMessages);
-	Request->ProcessCompleted.AddDynamic(this, &UMMOChatManagerComponent::OnResponceReceived);
-	Request->Activate();
+	Request->ProcessCompleted.AddDynamic(this, &UMMOChatManagerComponent::OnResponseSuccess);
+	Request->ErrorReceived.AddDynamic(this, &UMMOChatManagerComponent::OnResponseError);
 
-	Requests.Add(Request);
+	Request->Activate();
 }
 
 TArray<FHttpGPTChatMessage> UMMOChatManagerComponent::CollectChatMessages() const
@@ -107,7 +89,57 @@ TArray<FHttpGPTChatMessage> UMMOChatManagerComponent::CollectChatMessages() cons
 	return Messages;
 }
 
-void UMMOChatManagerComponent::OnResponceReceived(const FHttpGPTChatResponse& Response)
+void UMMOChatManagerComponent::OnResponseError(const FHttpGPTChatResponse& Response)
+{
+	if (!Response.bSuccess)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to generate response. Code: %s, Type: %s, Message: %s"),
+			*Response.Error.Code.ToString(),
+			*Response.Error.Type.ToString(),
+			*Response.Error.Message);
+	}
+}
+
+TArray<FMMOChatMessageData> UMMOChatManagerComponent::TryParseCharacterResponses(const FString& RawResponse)
+{
+	TArray<FMMOChatMessageData> CharacterResponses;
+	
+	TArray<FString> Lines;
+	RawResponse.ParseIntoArrayLines(Lines);
+
+	for (const FString& Line : Lines)
+	{
+		const int32 Index = Line.Find(TEXT(":"));
+
+		if (Index >= 0)
+		{
+			const FString HeroName = Line.LeftChop(Line.Len() - Index);
+			const FString Message = Line.RightChop(Index + 1);
+
+			AMMOBaseHero* Hero = UMMOGameplayUtils::GetHeroByName(this, *HeroName);
+
+			if (!Hero || Hero->GuildRole == EMMOGuildRole::GuildMaster)
+				Hero = UMMOGameplayUtils::GetRandomGuildHero(this, true);
+
+			CharacterResponses.Add(FMMOChatMessageData(
+				Hero,
+				Message
+			));
+		}
+		else
+		{
+			AMMOBaseHero* Hero = UMMOGameplayUtils::GetRandomGuildHero(this, true);
+			CharacterResponses.Add(FMMOChatMessageData(
+				Hero,
+				Line
+			));
+		}
+	}
+	
+	return CharacterResponses;
+}
+
+void UMMOChatManagerComponent::OnResponseSuccess(const FHttpGPTChatResponse& Response)
 {
 	if (!Response.bSuccess)
 	{
@@ -125,12 +157,28 @@ void UMMOChatManagerComponent::OnResponceReceived(const FHttpGPTChatResponse& Re
 		Response.Usage.TotalTokens);
 
 	const FString& ReceivedMessage = Response.Choices[0].Message.Content;
-	WriteMessage(UMMOGameplayUtils::GetRandomGuildHero(this, true), ReceivedMessage);
+	PendingMessages = TryParseCharacterResponses(ReceivedMessage);
+
+	UE_LOG(LogTemp, Log, TEXT("Message Received: %s"), *ReceivedMessage);
 }
 
 
 void UMMOChatManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (PostPendingMessageDelay > 0.f)
+	{
+		PostPendingMessageDelay -= DeltaTime;
+		return;
+	}
+
+	if (PendingMessages.Num() == 0)
+		return;
+
+	FMMOChatMessageData PendingMessage = PendingMessages.Pop();
+	WriteMessage(PendingMessage);
+
+	PostPendingMessageDelay = 3.f;
 }
 

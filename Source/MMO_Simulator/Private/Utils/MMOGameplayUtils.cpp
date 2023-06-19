@@ -59,6 +59,18 @@ const TArray<AMMOBaseHero*>& UMMOGameplayUtils::GetHeroes(const UObject* WorldCo
 	return NoHeroes;
 }
 
+AMMOBaseHero* UMMOGameplayUtils::GetHeroByName(const UObject* WorldContextObject, const FName& Name)
+{
+	const TArray<AMMOBaseHero*>& Heroes = GetHeroes(WorldContextObject);
+	for (AMMOBaseHero* Hero : Heroes)
+	{
+		if (Hero->CharacterInfo.Name == Name)
+			return Hero;
+	}
+
+	return nullptr;
+}
+
 TArray<AMMOBaseHero*> UMMOGameplayUtils::GetHeroesOfRole(const UObject* WorldContextObject, EMMOGuildRole Role)
 {
 	const TArray<AMMOBaseHero*>& Heroes = GetHeroes(WorldContextObject);

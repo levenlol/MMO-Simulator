@@ -22,4 +22,7 @@ public:
 
 	UFUNCTION(exec)
 	void Cheat_PostMessage_Random(FString Message);
+
+	UFUNCTION(exec)
+	void Cheat_SetGPTEnable(bool bEnable);
 };

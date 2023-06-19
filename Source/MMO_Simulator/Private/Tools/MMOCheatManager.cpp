@@ -46,3 +46,18 @@ void UMMOCheatManager::Cheat_PostMessage_Random(FString Message)
         ChatManager->WriteMessage(Heroes[Index], Message);
     }
 }
+
+void UMMOCheatManager::Cheat_SetGPTEnable(bool bEnable)
+{
+    UMMOChatManagerComponent* ChatManagerComponent = UMMOChatManagerComponent::GetChatManagerComponent(this);
+
+    if (ChatManagerComponent)
+    {
+        ChatManagerComponent->bEnabled = bEnable;
+        UE_LOG(LogTemp, Log, TEXT("Chat GPT for Game Chat - %s"), bEnable ? TEXT("Enabled") : TEXT("Disabled"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Cannot find ChatManagerComponent"));
+    }
+}

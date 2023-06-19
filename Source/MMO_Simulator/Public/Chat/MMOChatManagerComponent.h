@@ -52,12 +52,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = Chat)
 	FString ChatManagerInstruction = "";
 
-	// [TODO] Send last 'MessageHistorySize' chat message to chat gpt. Used to give context.
+	// Send last 'MessageHistorySize' chat message to chat gpt. Used to give context.
 	UPROPERTY(EditAnywhere, Category = Chat)
 	int32 MessageHistorySize = 5;
 
 	UFUNCTION(BlueprintCallable, Category = Chat)
 	void WriteMessage(AMMOBaseCharacter* Sender, const FString& Message);
+
+	void WriteMessage(const FMMOChatMessageData& MessageData);
 
 	UFUNCTION(BlueprintPure, Category = Chat, meta = (WorldContext = WorldContextObject))
 	static UMMOChatManagerComponent* GetChatManagerComponent(const UObject* WorldContextObject);
@@ -82,11 +84,16 @@ private:
 	TArray<FHttpGPTChatMessage> CollectChatMessages() const;
 
 	UFUNCTION()
-	void OnResponceReceived(const FHttpGPTChatResponse& Response);
+	void OnResponseSuccess(const FHttpGPTChatResponse& Response);
+
+	UFUNCTION()
+	void OnResponseError(const FHttpGPTChatResponse& Response);
+
+	TArray<FMMOChatMessageData> TryParseCharacterResponses(const FString& RawResponse);
+
+	TArray<FMMOChatMessageData> PendingMessages;
+	float PostPendingMessageDelay = 0.f;
 
 	UPROPERTY(VisibleAnywhere, Category = Chat)
 	TArray<FMMOChatMessageData> ChatHistory;
-
-	UPROPERTY()
-	TArray<UHttpGPTChatRequest*> Requests;
 };
